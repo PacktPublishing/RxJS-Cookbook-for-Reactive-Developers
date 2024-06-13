@@ -1,0 +1,24 @@
+nav {
+    width: 200px;
+    text-decoration: none;
+    background-color: #59BE9A;
+    height: 100%;
+
+    ul {
+        margin: 0;
+        list-style-type: none;
+
+        li {
+            padding: 10px;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            border-bottom: 1px solid white;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #4D9D8A;
+            }
+        }
+    }
+}
