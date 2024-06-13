@@ -1,0 +1,13 @@
+<div *ngIf="recipes$ | async as recipes">
+    <ng-container *ngIf="recipes.isLoading">
+        <mat-spinner></mat-spinner>
+    </ng-container>
+    
+    <div class="recipes-list">
+        @for (item of recipes.data; track item.id) {
+            <div class="item">
+                <app-recipe-item [recipe]="item"></app-recipe-item>
+            </div>
+        }
+    </div>
+</div>
