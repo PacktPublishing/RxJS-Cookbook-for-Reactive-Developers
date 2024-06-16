@@ -16,12 +16,18 @@ import { RecipesService } from '../../services/recipes.service';
 export class RecipesListComponent {
   private recipesSubscription: Subscription | undefined;
   recipes: Recipe[] = [];
+  error: Error | undefined;
 
   constructor(private recipesService: RecipesService) { }
 
   ngOnInit() {
-    this.recipesSubscription = this.recipesService.getRecipes$().subscribe(recipes => {
-      this.recipes = recipes;
+    this.recipesSubscription = this.recipesService.getRecipes$().subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+      },
+      error: (error) => {
+        this.error = error;
+      }
     });
   }
 

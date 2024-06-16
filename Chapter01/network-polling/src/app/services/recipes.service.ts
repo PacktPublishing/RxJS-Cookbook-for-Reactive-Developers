@@ -12,6 +12,6 @@ export class RecipesService {
   constructor(private httpPollingService: HttpPollingService) { }
 
   getRecipes$(): Observable<Recipe[]> {
-   return this.httpPollingService.startPolling<Recipe[]>('https://super-recipes.com/api/recipes');
+   return this.httpPollingService.startLongPolling<Recipe[]>('https://super-recipes.com/api/recipes');
   }
 }

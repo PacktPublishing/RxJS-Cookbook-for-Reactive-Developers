@@ -29,3 +29,20 @@
 // .item:nth-child(4n) {
 //     background-color: #BDE6FF;
 // }
+
+.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f1165325;
+    margin-top: 50px;
+    color: #f11653;
+    padding: 20px;
+    border-radius: 0.75rem;
+    border: 0;
+
+    p {
+        margin: 0;
+    }
+}
