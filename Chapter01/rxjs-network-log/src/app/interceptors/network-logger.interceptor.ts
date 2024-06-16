@@ -1,8 +1,28 @@
-import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { catchError, finalize, startWith, tap } from 'rxjs';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpInterceptorFn,
+  HttpResponse,
+} from '@angular/common/http';
+import { inject } from '@angular/core';
+import {
+  Subject,
+  catchError, exhaustMap,
+  finalize, tap
+} from 'rxjs';
 
 export const networkLoggerInterceptor: HttpInterceptorFn = (req, next) => {
   const started = Date.now();
+  const httpClient = inject(HttpClient);
+  const errorSubject = new Subject<HttpErrorResponse>();
+
+  errorSubject
+    .pipe(
+      exhaustMap((error: HttpErrorResponse) =>
+        httpClient.post('https://super-recipes.com/api/analytics', error)
+      )
+    )
+    .subscribe();
 
   return next(req).pipe(
     tap(() =>
@@ -25,6 +45,7 @@ export const networkLoggerInterceptor: HttpInterceptorFn = (req, next) => {
         'color: #ffc26e'
       );
       console.log('%cError:', 'color: #d30b8e', error);
+      errorSubject.next(error);
       throw error;
     }),
     finalize(() => console.log('---------------------------------'))
