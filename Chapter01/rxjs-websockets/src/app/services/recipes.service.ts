@@ -4,20 +4,16 @@ import { environment } from '../../environments/environment';
 import {
   catchError,
   delay,
-  filter,
-  merge,
-  of,
-  retry,
-  retryWhen,
-  switchMap,
+  filter, Observable, of,
+  retry, switchMap,
   takeWhile,
   tap,
   timeout,
-  timer,
+  timer
 } from 'rxjs';
 
 export interface Message {
-  type: string; // example 'chat_message'
+  type: string;
   payload?: any;
 }
 
@@ -26,17 +22,23 @@ export interface Message {
 })
 export class RecipesService {
   private socket$!: WebSocketSubject<Message>;
+  public recipes$!: Observable<Message>;
   // public chatMessages$ = this.socket$.pipe(filter(msg => msg.type === 'chat'));
   // public notificationMessages$ = this.socket$.pipe(filter(msg => msg.type === 'notification'));
 
   constructor() {}
 
-  connect(): void {
+  connect() {
     if (!this.socket$ || this.socket$.closed) {
       this.socket$ = webSocket<Message>({
         url: environment.wsEndpoint,
         deserializer: (e) => JSON.parse(e.data) as Message,
       });
+      this.recipes$ = this.socket$.multiplex(
+        () => ({ subscribe: 'recipes' }), // Subscription message
+        () => ({ unsubscribe: 'recipes' }), // Unsubscription message
+        (message) => message.type === 'recipes' // Filter function
+      );
     }
 
     this.socket$
@@ -49,14 +51,13 @@ export class RecipesService {
             );
             return of(error).pipe(delay(1000));
           },
-        })
-      )
-      .subscribe({
-        error: (err) => {
+        }),
+        catchError((err) => {
           console.error('Error occurred during websocket connection:', err);
           this.sendHeartbeat();
-        },
-      });
+          return of(null);
+        })
+      ).subscribe();
   }
 
   sendHeartbeat() {
