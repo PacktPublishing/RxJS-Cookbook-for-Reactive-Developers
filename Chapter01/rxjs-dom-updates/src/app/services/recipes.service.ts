@@ -14,7 +14,7 @@ export class RecipesService {
    return this.httpClient.get<Recipe[]>('https://super-recipes.com/api/recipes');
   }
 
-  searchRecipes$(searchTerm: string): Observable<Recipe[]> {
-   return this.httpClient.get<Recipe[]>(`https://super-recipes.com/api/recipes?name=${searchTerm}`);
+  searchRecipes$(searchTerm: string, searchIngredient: string): Observable<Recipe[]> {
+   return this.httpClient.get<Recipe[]>(`https://super-recipes.com/api/recipes?name=${searchTerm}&ingredient=${searchIngredient}`);
   }
 }

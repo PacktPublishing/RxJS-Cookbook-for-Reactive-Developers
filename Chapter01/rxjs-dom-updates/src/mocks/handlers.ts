@@ -5,15 +5,21 @@ export const handlers = [
   http.get('https://super-recipes.com/api/recipes', async ({ request }) => {
     const url = new URL(request.url);
     const recipeName = url.searchParams.get('name');
+    const recipeIngredient = url.searchParams.get('ingredient');
+    let filteredRecipes = recipes;
 
     if (recipeName) {
-      const filteredRecipes = recipes.filter((recipe) =>
+      filteredRecipes = filteredRecipes.filter((recipe) =>
         recipe.name.toLowerCase().includes(recipeName.toLowerCase())
       );
-
-      return HttpResponse.json(filteredRecipes);
     }
 
-    return HttpResponse.json(recipes);
+    if (recipeIngredient) {
+      filteredRecipes = filteredRecipes.filter((recipe) =>
+        recipe.ingredients.includes(recipeIngredient)
+      );
+    }
+
+    return HttpResponse.json(filteredRecipes);
   }),
 ]

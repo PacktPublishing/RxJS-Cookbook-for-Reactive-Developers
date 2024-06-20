@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { debounceTime, distinctUntilChanged, merge, mergeMap, startWith, switchMap, take } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, distinctUntilKeyChanged, merge, mergeMap, startWith, switchMap, take, tap } from 'rxjs';
 import { RecipesService } from './services/recipes.service';
 import { Recipe } from './types/recipes.type';
 
@@ -27,26 +27,39 @@ import { Recipe } from './types/recipes.type';
 export class AppComponent implements OnInit {
   title = 'rxjs-dom-updates';
 
-  searchFormControl = new FormControl();
+  searchNameFormControl = new FormControl();
+  searchIngredientFormControl = new FormControl();
   recipes: Recipe[] = []
-
-  get searchFormControlValue() {
-    return this.searchFormControl.getRawValue();
-  }
 
   constructor(private recipesService: RecipesService) {}
 
   ngOnInit(): void {
-    this.searchFormControl.valueChanges.pipe(
-      startWith(''),
+    combineLatest({
+      searchName: this.searchNameFormControl.valueChanges.pipe(startWith('')),
+      searchIngredient: this.searchIngredientFormControl.valueChanges.pipe(startWith(''))
+    }).pipe(
       debounceTime(500),
-      distinctUntilChanged(),
-      mergeMap(searchTerm => 
-        searchTerm ? this.recipesService.searchRecipes$(searchTerm) : this.recipesService.getRecipes$()
+      distinctUntilChanged((prev, curr) => {
+        return prev.searchName === curr.searchName && prev.searchIngredient === curr.searchIngredient
+      }),
+      switchMap(({ searchName, searchIngredient }) => 
+        this.recipesService.searchRecipes$(searchName, searchIngredient)
       )
     ).subscribe((recipes) => {
       console.log('recipes', recipes);
       this.recipes = recipes;
     });
+    // ])
+    // this.searchNameFormControl.valueChanges.pipe(
+    //   startWith(''),
+    //   debounceTime(500),
+    //   distinctUntilChanged(),
+    //   mergeMap(searchTerm => 
+    //     searchTerm ? this.recipesService.searchRecipes$(searchTerm) : this.recipesService.getRecipes$()
+    //   )
+    // ).subscribe((recipes) => {
+    //   console.log('recipes', recipes);
+    //   this.recipes = recipes;
+    // });
   }
 }

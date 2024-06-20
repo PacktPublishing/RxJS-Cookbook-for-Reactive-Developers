@@ -1,11 +1,10 @@
 <mat-form-field class="example-form-field">
-  <mat-label>Search recipes</mat-label>
-  <input matInput type="text" [formControl]="searchFormControl">
-  @if (searchFormControlValue) {
-  <!-- <button matSuffix mat-icon-button aria-label="Clear" (click)="searchFormControlValue=''">
-    <mat-icon>close</mat-icon>
-  </button> -->
-  }
+  <mat-label>Search recipes by name</mat-label>
+  <input matInput type="text" [formControl]="searchNameFormControl">
+</mat-form-field>
+<mat-form-field class="example-form-field">
+  <mat-label>Search recipes by ingredient</mat-label>
+  <input matInput type="text" [formControl]="searchIngredientFormControl">
 </mat-form-field>
 
 <app-recipes-list [recipes]="recipes"></app-recipes-list>
