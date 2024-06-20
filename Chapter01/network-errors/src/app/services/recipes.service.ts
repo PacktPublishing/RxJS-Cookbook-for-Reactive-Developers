@@ -67,7 +67,7 @@ export class RecipesService {
 
           if (this.state === 'HALF_OPEN') {
             this.openCircuit(); 
-            return throwError(() => new Error(error));
+            return throwError(() => new Error('Circuit is open'));
           }
 
           if (retryCount === 3) {
