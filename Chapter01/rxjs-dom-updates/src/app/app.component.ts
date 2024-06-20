@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { debounceTime, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, merge, mergeMap, startWith, switchMap, take } from 'rxjs';
 import { RecipesService } from './services/recipes.service';
 import { Recipe } from './types/recipes.type';
 
@@ -38,10 +38,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchFormControl.valueChanges.pipe(
+      startWith(''),
       debounceTime(500),
-      switchMap(searchTerm => this.recipesService.searchRecipes$(searchTerm))
+      distinctUntilChanged(),
+      mergeMap(searchTerm => 
+        searchTerm ? this.recipesService.searchRecipes$(searchTerm) : this.recipesService.getRecipes$()
+      )
     ).subscribe((recipes) => {
-      console.log('Search value changed:', recipes);
+      console.log('recipes', recipes);
       this.recipes = recipes;
     });
   }
