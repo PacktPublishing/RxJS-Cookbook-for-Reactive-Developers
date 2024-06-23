@@ -1,0 +1,38 @@
+@if (recipe) {
+    <mat-card class="card">
+        <mat-card-content>
+            <div class="card-content">
+                <div class="card-info">
+                    <div>
+                        <h5>
+                            {{ recipe.name }}
+                        </h5>
+                        <p>{{ recipe.description }}</p>
+                    </div>
+                    <mat-chip-set class="ingredients">
+                        @for (ingredient of recipe.ingredients; track ingredient) {
+                            <mat-chip color="accent" class="ingredient">{{ ingredient }}</mat-chip>
+                        }
+                    </mat-chip-set>
+
+                    @if (details) {
+                        <div class="instructions">
+                            <h5>Details</h5>
+                            <p>Prep time: {{ details.prepTime }}</p>
+                            <p>Cuisine: {{ details.cuisine }}</p>
+                            <p>Diet: {{ details.diet }}</p>
+                            <div>
+                                <p>Calories: {{ details.nutrition.calories }}</p>
+                                <p>Carbs: {{ details.nutrition.carbs }}</p>
+                                <p>Fat: {{ details.nutrition.fat }}</p>
+                                <p>Protein: {{ details.nutrition.protein }}</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <img mat-card-image class="card-image" [src]="details?.url" [alt]="recipe.name">
+            </div>
+        </mat-card-content>
+    </mat-card>
+}
+  
