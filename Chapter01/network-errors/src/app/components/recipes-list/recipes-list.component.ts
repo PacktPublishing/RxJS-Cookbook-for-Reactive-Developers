@@ -16,7 +16,6 @@ import { RecipesService } from '../../services/recipes.service';
 export class RecipesListComponent {
   private recipesSubscription: Subscription | undefined;
   recipes: Recipe[] = [];
-  error: Error | null = null;
 
   constructor(private recipesService: RecipesService) { }
 
@@ -24,12 +23,16 @@ export class RecipesListComponent {
     this.recipesSubscription = this.recipesService.getRecipesWithCircuitBreakerStrategy$().subscribe({
       next: (recipes) => {
         this.recipes = recipes;
-        this.error = null;
-      },
-      error: (error) => {
-        this.error = error;
       }
     });
+
+    setTimeout(() => {
+      this.recipesSubscription = this.recipesService.getRecipesWithCircuitBreakerStrategy$().subscribe({
+        next: (recipes) => {
+          this.recipes = recipes;
+        }
+      });
+    }, 30000);
   }
 
   ngOnDestroy() {
