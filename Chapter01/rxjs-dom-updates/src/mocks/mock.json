@@ -11,7 +11,7 @@
             "id": 2,
             "name": "Chicken Tikka Masala",
             "description": "Creamy, spiced Indian curry with tender chicken pieces.",
-            "ingredients": ["chicken breasts", "yogurt", "garam masala", "turmeric", "cumin", "tomatoes", "onion", "ginger", "garlic", "heavy cream"],
+            "ingredients": ["chicken breasts", "yogurt", "garam masala", "tomatoes", "onion", "ginger", "garlic"],
             "image": "/assets/images/chicken_tikka_masala.jpg"
         },
         {
@@ -32,7 +32,7 @@
             "id": 5,
             "name": "Beef Stir-Fry",
             "description": "Quick and easy stir-fry with beef, vegetables, and a savory sauce.",
-            "ingredients": ["beef strips", "broccoli", "carrots", "bell peppers", "soy sauce", "hoisin sauce", "ginger", "garlic", "vegetable oil"],
+            "ingredients": ["beef strips", "garlic", "broccoli", "carrots", "bell peppers", "soy sauce", "hoisin sauce", "ginger", "vegetable oil"],
             "image": "/assets/images/beef_stir_fry.jpg"
         }
     ]

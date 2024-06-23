@@ -1,10 +1,10 @@
 <mat-form-field class="example-form-field">
   <mat-label>Search recipes by name</mat-label>
-  <input matInput type="text" [formControl]="searchNameFormControl">
+  <input matInput #searchNameInput type="text">
 </mat-form-field>
 <mat-form-field class="example-form-field">
   <mat-label>Search recipes by ingredient</mat-label>
-  <input matInput type="text" [formControl]="searchIngredientFormControl">
+  <input matInput #searchIngredientInput type="text">
 </mat-form-field>
 
 <app-recipes-list [recipes]="recipes"></app-recipes-list>
