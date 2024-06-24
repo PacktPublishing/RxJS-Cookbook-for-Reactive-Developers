@@ -23,10 +23,9 @@ export class RecipesListComponent {
   ngOnInit() {
     this.recipesSubscription = this.recipesService.getRecipes$().subscribe({
       next: (recipes) => {
-        this.recipes = recipes;
-      },
-      error: (error) => {
-        this.error = error;
+        if (recipes) {
+          this.recipes = recipes;
+        }
       }
     });
   }

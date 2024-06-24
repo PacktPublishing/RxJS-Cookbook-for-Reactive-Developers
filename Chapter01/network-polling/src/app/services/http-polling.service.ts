@@ -1,19 +1,15 @@
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   Subject,
   timer,
-  switchMap,
-  delay,
-  takeUntil,
+  switchMap, takeUntil,
   retry,
   of,
   Observable,
-  shareReplay,
-  share,
-  throwError,
-  merge,
-  map,
+  shareReplay, throwError, map, catchError,
+  timeout
 } from 'rxjs';
 
 @Injectable({
@@ -22,7 +18,7 @@ import {
 export class HttpPollingService {
   private stopPolling$ = new Subject<void>();
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private _snackBar: MatSnackBar) {}
 
   startPolling<T>(url: string, interval: number = 5000): Observable<T> {
     return timer(0, interval).pipe(
@@ -33,7 +29,8 @@ export class HttpPollingService {
           console.log(
             `Attempt ${retryCount}: Error occurred during polling, retrying...`
           );
-          return of(error).pipe(delay(interval));
+          throwError(() => new Error('Request Timeout'))
+          return timer(interval);
         },
       }),
       takeUntil(this.stopPolling$),
@@ -43,30 +40,47 @@ export class HttpPollingService {
 
   startLongPolling<T>(
     url: string,
-    timeoutTime: number = 5000
+    interval: number = 5000
   ): Observable<any> {
-    const request$ = this.httpClient.get<T>(url, { observe: 'events' });
-    const timeout$ = timer(timeoutTime);
-
-    return merge(request$, timeout$).pipe(
+    return timer(0, interval).pipe(
+      switchMap(() => this.httpClient.get<T>(url, { observe: 'events', reportProgress: true }).pipe(
+        timeout(interval),
+      )),
       map((event: any) => {
         if (event.type === HttpEventType.Response) {
           return event.body; // New data received
         }
 
-        if (event === 0) {
+        if (event.type === 0) {
           return null; // Timeout occurred
         }
       }),
-      switchMap((response) => {
-        // Check if the response is null (indicating timeout)
-        if (response === null) {
-          return throwError(() => new Error('Request Timeout'));
-        }
-
-        return of(response); // Continue with the response if it's valid
+      retry({
+        count: 3,
+        delay: (error, retryCount) => {
+          console.log(
+            `Attempt ${retryCount}: Error occurred during polling, retrying...`
+          );
+          this._snackBar.open('Retrying to establish connection...', 'Close', {
+            verticalPosition: 'top',
+            horizontalPosition: 'right',
+            panelClass: ['mat-error'],
+          });
+          return timer(interval);
+        },
       }),
-      share()
+      catchError(error => {
+        console.error('Long polling error:', error);
+        this._snackBar.open(error.message, 'Close', {
+          verticalPosition: 'top',
+          horizontalPosition: 'right',
+          panelClass: ['mat-error'],
+        });
+
+        return throwError(() => new Error(error));
+      }),
+      takeUntil(this.stopPolling$),
+      shareReplay(1)
     );
   }
 
