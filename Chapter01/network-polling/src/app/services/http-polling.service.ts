@@ -43,18 +43,18 @@ export class HttpPollingService {
     interval: number = 5000
   ): Observable<any> {
     return timer(0, interval).pipe(
-      switchMap(() => this.httpClient.get<T>(url, { observe: 'events', reportProgress: true }).pipe(
+      switchMap(() => this.httpClient.get<T>(url).pipe(
         timeout(interval),
       )),
-      map((event: any) => {
-        if (event.type === HttpEventType.Response) {
-          return event.body; // New data received
-        }
+      // map((event: any) => {
+      //   if (event.type === HttpEventType.Response) {
+      //     return event.body; // New data received
+      //   }
 
-        if (event.type === 0) {
-          return null; // Timeout occurred
-        }
-      }),
+      //   if (event.type === 0) {
+      //     return null; // Timeout occurred
+      //   }
+      // }),
       retry({
         count: 3,
         delay: (error, retryCount) => {

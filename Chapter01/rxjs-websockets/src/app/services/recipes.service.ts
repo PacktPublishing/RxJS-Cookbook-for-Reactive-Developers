@@ -4,12 +4,15 @@ import { environment } from '../../environments/environment';
 import {
   catchError,
   delay,
-  filter, Observable, of,
-  retry, switchMap,
+  filter,
+  Observable,
+  of,
+  retry,
+  switchMap,
   takeWhile,
   tap,
   timeout,
-  timer
+  timer,
 } from 'rxjs';
 
 export interface Message {
@@ -57,7 +60,8 @@ export class RecipesService {
           this.sendHeartbeat();
           return of(null);
         })
-      ).subscribe();
+      )
+      .subscribe();
   }
 
   sendHeartbeat() {
@@ -76,7 +80,8 @@ export class RecipesService {
           )
         ),
         takeWhile(() => this.socket$.observed)
-      ).subscribe();
+      )
+      .subscribe();
   }
 
   sendMessage(message: Message) {
