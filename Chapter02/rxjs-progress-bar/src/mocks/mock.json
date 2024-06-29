@@ -1,0 +1,119 @@
+{
+    "recipes": [
+        {
+            "id": 1,
+            "name": "Spaghetti Aglio e Olio",
+            "description": "Simple yet flavorful pasta with garlic, olive oil, and chili flakes",
+            "ingredients": ["spaghetti", "garlic", "olive oil", "chili flakes", "parmesan cheese", "parsley"]
+        },
+        {
+            "id": 2,
+            "name": "Chicken Tikka Masala",
+            "description": "Creamy, spiced Indian curry with tender chicken pieces.",
+            "ingredients": ["chicken breasts", "yogurt", "garam masala", "turmeric", "cumin", "tomatoes", "onion", "ginger", "garlic", "heavy cream"]
+        },
+        {
+            "id": 3,
+            "name": "Chocolate Chip Cookies",
+            "description": "Classic chewy cookies with melty chocolate chips.",
+            "ingredients": ["butter", "sugar", "brown sugar", "eggs", "vanilla extract", "flour", "baking soda", "salt", "chocolate chips"]
+        },
+        {
+            "id": 4,
+            "name": "Caprese Salad",
+            "description": "Refreshing Italian salad with tomatoes, mozzarella, and basil.",
+            "ingredients": ["tomatoes", "mozzarella cheese", "basil", "balsamic vinegar", "olive oil", "salt", "pepper"]
+        },
+        {
+            "id": 5,
+            "name": "Beef Stir-Fry",
+            "description": "Quick and easy stir-fry with beef, vegetables, and a savory sauce.",
+            "ingredients": ["beef strips", "broccoli", "carrots", "bell peppers", "soy sauce", "hoisin sauce", "ginger", "garlic", "vegetable oil"]
+        }
+    ],
+    "images": [
+        {
+            "id": 1,
+            "url": "/assets/images/spaghetti.jpg"
+        },
+        {
+            "id": 2,
+            "url": "/assets/images/chicken_tikka_masala.jpg"
+        },
+        {
+            "id": 3,
+            "url": "/assets/images/chocolate_chip_cookies.jpg"
+        },
+        {
+            "id": 4,
+            "url": "/assets/images/caprese_salad.jpg"
+        },
+        {
+            "id": 5,
+            "url": "/assets/images/beef_stir_fry.jpg"
+        }
+    ],
+    "details": [
+        {
+            "id": 1,
+            "prepTime": 7200000,
+            "cuisine:": "Italian",
+            "diet": "Vegetarian",
+            "url": "/assets/images/spaghetti.jpg",
+            "nutrition": {
+                "calories": 450,
+                "fat": 15,
+                "carbs": 70,
+                "protein": 10
+            }
+        },
+        {
+            "id": 2,
+            "prepTime": 5200000,
+            "cuisine:": "Mexican",
+            "diet": "Paleo",
+            "nutrition": {
+                "calories": 950,
+                "fat": 35,
+                "carbs": 70,
+                "protein": 10
+            }
+        },
+        {
+            "id": 3,
+            "prepTime": 2200000,
+            "cuisine:": "American",
+            "diet": "Paleo",
+            "nutrition": {
+                "calories": 550,
+                "fat": 45,
+                "carbs": 90,
+                "protein": 10
+            }
+        },
+        {
+            "id": 4,
+            "prepTime": 2200000,
+            "cuisine:": "American",
+            "diet": "Paleo",
+            "nutrition": {
+                "calories": 950,
+                "fat": 35,
+                "carbs": 70,
+                "protein": 10
+            }
+        },
+        {
+            "id": 5,
+            "prepTime": 2200000,
+            "cuisine:": "American",
+            "diet": "Paleo",
+            "nutrition": {
+                "calories": 950,
+                "fat": 35,
+                "carbs": 70,
+                "protein": 10
+            }
+        }
+    ]
+}
