@@ -1,0 +1,11 @@
+<ng-container *ngFor="let tab of tabs">
+  <button (click)="selectTab(tab)">{{ tab.label }}</button>
+</ng-container>
+
+<ng-container *ngIf="loadingTab$ | async">
+  <p>Loading...</p>
+</ng-container>
+
+<ng-container *ngIf="activeTabContent$ | async as tabContent">
+  <ng-container *ngComponentOutlet="tabContent"></ng-container>
+</ng-container>
