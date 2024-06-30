@@ -1,0 +1,9 @@
+@if(recipes()) {
+    <div class="recipes-list">
+        @for (item of recipes(); track item.id) {
+            <div class="item">
+                <app-recipe-item [recipe]="item"></app-recipe-item>
+            </div>
+        }
+    </div>
+}

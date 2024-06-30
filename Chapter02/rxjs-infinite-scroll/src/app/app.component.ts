@@ -1,13 +1,79 @@
 import { Component } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {
+  fromEvent,
+  map,
+  filter,
+  distinctUntilChanged,
+  merge,
+  switchMap,
+  debounceTime,
+  Subject,
+  takeUntil,
+  finalize,
+  BehaviorSubject,
+  tap,
+  startWith,
+} from 'rxjs';
+import { RecipesService } from './services/recipes.service';
+import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
+import { Recipe } from './types/recipes.type';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RecipesListComponent, MatProgressSpinnerModule, AsyncPipe],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'rxjs-infinite-scroll';
+  private page = 0;
+  public loading$ = new BehaviorSubject<boolean>(false);
+  public noMoreData$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
+  recipes: Recipe[] = [];
+  
+  constructor(private recipesService: RecipesService) {}
+
+  private isNearBottom(): boolean {
+    const threshold = 100; // Pixels from bottom
+    const position = window.innerHeight + window.scrollY;
+    const height = document.documentElement.scrollHeight;
+
+    return position > height - threshold;
+  }
+
+  ngOnInit() {
+    const scrollEvent$ = fromEvent(window, 'scroll');
+    const resizeEvent$ = fromEvent(window, 'resize');
+
+    merge(scrollEvent$, resizeEvent$)
+      .pipe(
+        startWith(null),
+        debounceTime(10), // Prevent excessive event triggering
+        map(() => this.isNearBottom()),
+        distinctUntilChanged(), // Emit only when near-bottom state changes
+        filter((isNearBottom) => isNearBottom && !this.loading$.value),
+        tap(() => this.loading$.next(true)),
+        switchMap(() =>
+          this.recipesService
+            .getRecipes(++this.page)
+            .pipe(
+              tap((recipes) => {
+                if (recipes.length === 0) this.noMoreData$.next();
+              }),
+              finalize(() => this.loading$.next(false))
+            )
+        ),
+        takeUntil(merge(this.destroy$, this.noMoreData$))
+      )
+      .subscribe((recipes) => (this.recipes = [...this.recipes, ...recipes]));
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
