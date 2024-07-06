@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { fromEvent, map, startWith, catchError, of, finalize, shareReplay, Observable, tap } from 'rxjs';
+import { fromEvent, map, startWith, catchError, of, finalize, shareReplay, Observable, tap, BehaviorSubject, merge, scan, timer, takeWhile, takeUntil, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,22 +12,29 @@ import { fromEvent, map, startWith, catchError, of, finalize, shareReplay, Obser
 })
 export class AppComponent implements OnInit {
   title = 'rxjs-pro-img';
-  src = 'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chorizo-mozarella-gnocchi-bake-cropped-9ab73a3.jpg?quality=90&resize=556,505';
-  placeholderSrc = 'https://atasteofalaska.com/wp-content/uploads/2017/05/Small-Image-Landscape-Placeholder-500x350.jpg';
+  src = '';
+  placeholderSrc = '';
   imageSrc$!: Observable<string>;
+  loadingProgress$ = new BehaviorSubject<number>(0); 
+  loaded$ = new Subject<boolean>(); 
 
   ngOnInit(): void {
     const img = new Image();
     img.src = this.src;
 
-    this.imageSrc$ = fromEvent(img, 'load').pipe(
-      tap((x) => console.log('x', x)),
-      map(() => this.src),
+    this.loadingProgress$.subscribe(progress => console.log(progress));
+
+    const loadProgress$ = timer(0, 100); // Emit 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...
+    const loadComplete$ = fromEvent(img, 'load').pipe(map(() => 100)); // Emit 100 on load
+    const loadError$ = fromEvent(img, 'error').pipe(map(() => -1)); // Emit -1 on error
+
+    this.imageSrc$ = merge(loadProgress$, loadComplete$, loadError$).pipe(
+      map(progress => progress === 100 ? this.src : this.placeholderSrc),
+      tap(progress => console.log(progress)),
       startWith(this.placeholderSrc),
-      catchError(() => of(this.placeholderSrc)), // Fallback to placeholder on error
-      finalize(() => { /* Any cleanup logic */ })
+      takeWhile(src => src === this.placeholderSrc, true),
+      catchError(() => of(this.placeholderSrc)),
+      shareReplay(1),
     );
-    
-    // this.currentImage$ = img$.pipe(shareReplay(1)); 
   }
 }
