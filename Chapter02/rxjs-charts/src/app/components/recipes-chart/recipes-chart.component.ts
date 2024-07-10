@@ -76,11 +76,6 @@ export class RecipesChartComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.recipesSubscription = this.recipesService.orders$.subscribe((message: Message) => {
       this.orders = [...this.orders, ...message.payload];
-      // if (this.orders.length < 12) {
-      //   this.orders.length = 12;
-      //   this.orders.fill(0, this.orders.length);
-      // }
-      console.log(this.orders);
       this.chart.updateSeries([{
         name: 'Sales',
         data: this.orders,
