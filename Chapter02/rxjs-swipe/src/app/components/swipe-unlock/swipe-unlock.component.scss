@@ -1,0 +1,51 @@
+.swipe-area {
+    height: 390px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100vw;
+    gap: 40px;
+
+    .number {
+        background-color: transparent;
+        border-radius: 50%;
+        border: 2px solid white;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: calc(33% - 40px);
+        height: 100px;
+        outline: none;
+        font-size: 30px;
+        font-weight: bold;
+
+        &.selected {
+            background-color: #f6797d;
+            border-color: #f6797d;
+        }
+    }
+}
+
+.pattern-dot {
+    width: 20px; 
+    height: 20px;
+    border-radius: 50%;
+    background-color: lightgray; /* Inactive color */
+    margin: 10px; /* Adjust spacing as needed */
+}
+
+.pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3x3 grid */
+}
+
+.message {
+    position: absolute;
+    top: 150px;
+    left: 0;
+    right: 0;
+    font-size: 30px;
+    color: white;
+    text-align: center;
+}
