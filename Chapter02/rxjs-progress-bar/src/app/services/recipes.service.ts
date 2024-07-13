@@ -32,7 +32,7 @@ export class RecipesService {
       this.randomProgress$,
       this.httpClient.post<Recipe>('https://super-recipes.com/api/recipes', recipe).pipe(
         map(() => 100),
-        finalize(() => this.unsubscribe$.next())
+        finalize(() => this.unsubscribe$.next()),
       )
     )
   }
