@@ -1,11 +1,11 @@
-<ng-container *ngFor="let tab of tabs">
-  <button (click)="selectTab(tab)">{{ tab.label }}</button>
-</ng-container>
-
-<ng-container *ngIf="loadingTab$ | async">
-  <p>Loading...</p>
-</ng-container>
-
-<ng-container *ngIf="activeTabContent$ | async as tabContent">
-  <ng-container *ngComponentOutlet="tabContent"></ng-container>
-</ng-container>
+<mat-tab-group [selectedIndex]="(activeTab$ | async)?.index" (selectedTabChange)="selectTab($event)">
+  <ng-container *ngFor="let tab of tabs">
+    <mat-tab [label]="tab.label"></mat-tab>
+  </ng-container>
+</mat-tab-group>
+<div class="tab-content">
+  @if (loadingTab$ | async) {
+    <mat-spinner></mat-spinner>
+  }
+  <ng-container *ngComponentOutlet="activeTabContent$ | async"></ng-container>
+</div>

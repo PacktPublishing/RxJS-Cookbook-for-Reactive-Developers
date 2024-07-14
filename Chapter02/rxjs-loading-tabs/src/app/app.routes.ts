@@ -9,4 +9,9 @@ export const routes: Routes = [
         path: 'tab2',
         loadComponent: () => import('./components/tab-content2/tab-content2.component').then(mod => mod.TabContent2Component)
     },
+    {
+        path: '',
+        redirectTo: '/tab1',
+        pathMatch: 'full'
+    },
 ];

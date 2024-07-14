@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import {
   BehaviorSubject,
@@ -12,18 +14,14 @@ import {
   of,
   finalize,
   shareReplay,
-  takeUntil,
-  timer,
-  map,
-  from,
-  delay,
-  startWith,
-  repeat,
+  takeUntil, delay,
+  startWith
 } from 'rxjs';
 import { TabContentComponent } from '../tab-content/tab-content.component';
 import { TabContent2Component } from '../tab-content2/tab-content2.component';
 
 interface TabConfig {
+  index: number;
   label: string;
   route: string;
 }
@@ -31,16 +29,16 @@ interface TabConfig {
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [CommonModule, TabContentComponent, RouterModule],
+  imports: [CommonModule, TabContentComponent, RouterModule, MatTabsModule, MatProgressSpinnerModule],
   templateUrl: './tabs.component.html',
   styleUrl: './tabs.component.scss',
 })
 export class TabsComponent {
-  tabs: TabConfig[] = [
-    { label: 'Tab 1', route: 'tab1' },
-    { label: 'Tab 2', route: 'tab2' },
-  ];
   private destroy$ = new Subject<void>();
+  tabs: TabConfig[] = [
+    { index: 0, label: 'Recipe 1', route: 'tab1' },
+    { index: 1, label: 'Recipe 2', route: 'tab2' },
+  ];
 
   activeTab$ = new BehaviorSubject<TabConfig | null>(null);
   activeTabContent$!: Observable<any>;
@@ -51,19 +49,6 @@ export class TabsComponent {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.activeTabContent$ = this.activeTab$.pipe(
-      filter((tab) => !!tab),
-      tap(() => this.loadingTab$.next(true)),
-      switchMap((tab) => this.loadTabContent(tab!).pipe(
-        catchError((error) => {
-          this.errors$.next(error);
-          return of(null);
-        }),
-        finalize(() => this.loadingTab$.next(false)),
-      )),
-      // shareReplay(1)
-    );
-
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -78,17 +63,26 @@ export class TabsComponent {
         },
       });
 
-    // Auto-activate first tab after a short delay to ensure navigation is ready
-    timer(100).subscribe(() => this.selectTab(this.tabs[0]));
+    this.activeTabContent$ = this.activeTab$.pipe(
+      filter((tab) => !!tab),
+      tap(() => this.loadingTab$.next(true)),
+      switchMap((tab) =>
+        this.loadTabContent(tab!).pipe(
+          startWith(null),
+          catchError((error) => {
+            this.errors$.next(error);
+            return of(null);
+          }),
+          finalize(() => this.loadingTab$.next(false))
+        )
+      ),
+      shareReplay(1)
+    );
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  selectTab(tab: TabConfig) {
-    this.router.navigate([tab.route]);
   }
 
   private loadTabContent(tab: TabConfig): Observable<any> {
@@ -100,8 +94,11 @@ export class TabsComponent {
       tab.route === 'tab1' ? of(TabContentComponent) : of(TabContent2Component);
     this.cache.set(tab.route, content$);
 
-    return content$.pipe(
-      delay(1000)
-    );
+    return content$.pipe(delay(1000));
+  }
+
+  public selectTab(tab: MatTabChangeEvent): void {
+    const navigateTab = this.tabs.find((t) => t.index === tab.index);
+    this.router.navigate([navigateTab!.route]);
   }
 }
