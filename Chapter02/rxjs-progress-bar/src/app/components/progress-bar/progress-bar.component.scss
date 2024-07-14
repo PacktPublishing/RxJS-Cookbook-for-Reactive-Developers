@@ -1,9 +1,8 @@
 .progress-bar-container {
-  width: 100%;
   height: 20px;
   background-color: #f1f1f1;
   border-radius: 15px;
-  margin: 40px 0;
+  margin: 40px;
   position: relative;
 
   p {
@@ -18,8 +17,8 @@
 }
 
 .mat-mdc-progress-bar {
-  --mdc-linear-progress-active-indicator-color: #7322ff;
-  --mdc-linear-progress-track-color: rgba(103, 58, 183, 0.25);
+  --mdc-linear-progress-active-indicator-color: transparent;
+  --mdc-linear-progress-track-color: transparent;
   height: 40px;
 }
 
@@ -30,6 +29,7 @@
 
 ::ng-deep .mdc-linear-progress__bar {
   background: #7322ff;
+  border-radius: 25px;
   margin: 0 !important;
   height: 20px !important;
 }
