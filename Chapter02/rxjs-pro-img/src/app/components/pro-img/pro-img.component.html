@@ -1,0 +1,8 @@
+<div class="pro-img-container">
+    @if ((loadingProgress$ | async) !== 100) {
+        <div class="progress">
+            {{ loadingProgress$ | async }}%
+        </div>
+    }
+    <img [src]="imageSrc$ | async" alt="Progressive image" class="pro-img">
+</div>
