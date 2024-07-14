@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { RecipesChartComponent } from './components/recipes-chart/recipes-chart.component';
-import { Subscription } from 'rxjs';
-import { Message, RecipesService } from './services/recipes.service';
-import { Recipe } from './types/recipes.type';
 
 @Component({
   selector: 'app-root',

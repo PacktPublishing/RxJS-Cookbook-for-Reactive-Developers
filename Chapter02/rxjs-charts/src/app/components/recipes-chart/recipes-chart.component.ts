@@ -77,7 +77,7 @@ export class RecipesChartComponent implements AfterViewInit {
     this.recipesSubscription = this.recipesService.orders$.subscribe((message: Message) => {
       this.orders = [...this.orders, ...message.payload];
       this.chart.updateSeries([{
-        name: 'Sales',
+        name: 'Orders',
         data: this.orders,
       }]);
     });
