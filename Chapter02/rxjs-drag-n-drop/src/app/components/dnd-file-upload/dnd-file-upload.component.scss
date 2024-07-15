@@ -1,0 +1,69 @@
+.drop-zone-element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    padding: 50px 20px;
+    text-align: center;
+    margin: 20px;
+    cursor: pointer;
+
+    .add {
+        margin-bottom: 10px;
+        color: #667de7;
+    }
+}
+
+.dragover {
+    border-color: #667de7;
+    background-color: #667de720;
+}
+
+.file-list {
+    display: flex;
+    align-items: center;
+    margin: 20px;
+
+    .folder {
+        margin-right: 20px;
+        color: #667de7;
+    }
+
+    .file-element-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+
+        p {
+            margin: 5px 0;
+        }
+
+        .file-name {
+            margin-right: 10px;
+        }
+
+        .file-size {
+            color: #667de7;
+        }
+
+        .progress-bar {
+            margin-right: 10px;
+            width: 100%;
+        }
+
+        .file-element {
+            width: 100%;
+        }
+    }
+
+    .progress-container {
+        display: flex;
+        align-items: center;
+    }
+}

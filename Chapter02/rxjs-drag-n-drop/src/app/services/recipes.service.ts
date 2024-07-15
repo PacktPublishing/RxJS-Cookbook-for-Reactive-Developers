@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, mergeAll, of } from 'rxjs';
+import { Observable, finalize, interval, map, merge, mergeAll, of, scan, takeUntil } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FileWithProgress } from '../types/recipes.type';
 
@@ -10,7 +10,7 @@ export class RecipesService {
 
   constructor(private httpClient: HttpClient) { }
 
-  validateFiles(files: Observable<File>): Observable<{ valid: boolean, file: FileWithProgress }> {
+  validateFiles$(files: Observable<File>): Observable<{ valid: boolean, file: FileWithProgress }> {
     return files.pipe(
       map((file) => {
         const newFile: FileWithProgress = new File([file], file.name, { type: file.type });
@@ -33,8 +33,40 @@ export class RecipesService {
     );
   }
 
-  uploadFile(file: File): Observable<any> {
-    return this.httpClient.post('https://super-recipes.com/api/recipes/upload', file);
+  uploadFile$(file: File): Observable<any> {
+    return this.httpClient.post('https://super-recipes.com/api/recipes/upload', file).pipe(
+      map(() => {
+        const newFile: FileWithProgress = new File([file], file.name, { type: file.type });
+        newFile.progress = 100;
+        newFile.valid = true;
+
+        return newFile;
+      })
+    );
+  }
+
+  fileUploadProgress$(file: File): Observable<FileWithProgress> {
+    const progress$ = interval(2000).pipe(
+      map(() => Number((Math.random() * 25 + 5).toFixed(2))),
+      scan((acc, curr) => Math.min(acc + curr, 95), 0),
+      map((progress: number) => {
+        const newFile: FileWithProgress = new File([file], file.name, { type: file.type });
+        newFile.progress = progress;
+        newFile.valid = true;
+
+        return newFile;
+      }),
+      takeUntil(this.uploadFile$(file)),
+    );
+  
+    return progress$; 
+  }
+
+  uploadFileWithProgress$(file: FileWithProgress): Observable<any> {
+    return merge(
+      this.fileUploadProgress$(file),
+      this.uploadFile$(file)
+    );
   }
 
 }
