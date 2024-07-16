@@ -1,0 +1,80 @@
+.play-pause-btn {
+    border-radius: 50% !important;
+    background-color: #667de7;
+    color: white;
+}
+
+.skip-btn {
+    border-radius: 50% !important;
+    background-color: transparent;
+    color: white;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+.audio-player-container {
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    padding-top: 100px;
+    align-items: center;
+    flex-direction: column;
+    background-color: #242334;
+    height: 100vh;
+
+    img {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin-bottom: 20px;
+    }
+}
+
+.audio-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.audio-player-time {
+    display: flex;
+    align-items: center;
+    width: 400px;
+
+    .song {
+        width: 100%;
+    }
+
+    p {
+        color: white;
+        margin: 0 10px;
+    }
+}
+
+.volume {
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+    color: #667de7;
+}
+
+.song-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    // background-color: #c961f9;
+    background-color: #3b4163;
+    color: white;
+    border-color: #feb990;
+    border-radius: 40px;
+    width: 300px;
+}
+
+.artist {
+    color: white;
+    font-size: 1rem;
+}

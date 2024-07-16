@@ -1,3 +1,47 @@
-<button (click)="onPlayPause()">{{ isPlaying ? 'Pause' : 'Play' }}</button>
-<input type="range" [value]="currentTime" [max]="duration$ | async" />
-<input type="range" [value]="'0'" min="0" max="1" (input)="skip($event)" />
+
+<div class="audio-player-container">
+    <mat-card appearance="outlined" class="song-card">
+        <mat-card-content>
+            @if (currentTrack) {
+                <img [src]="currentTrack.cover" />
+                <h3>{{ currentTrack.title }}</h3>
+                <p class="artist">{{ currentTrack.artist }}</p>
+                <p>{{ currentTrack.album }}</p>
+                <p>{{ currentTrack.year }}</p>
+            }
+        </mat-card-content>
+    </mat-card>
+    <div class="audio-player-time">
+        <p>{{ currentTime | time }}</p>
+        <audio #audio muted>
+            Your browser does not support the audio element.
+        </audio>
+        <mat-slider [max]="duration" class="song">
+            <input matSliderThumb [value]="currentTime" (dragEnd)="skip($event)">
+        </mat-slider>
+        <p>{{ duration | time }}</p>    
+    </div>
+    <div class="audio-controls">
+        <button class="skip-btn" (click)="skipPrevious()">
+            <mat-icon>skip_previous</mat-icon>
+        </button>
+        <button mat-fab class="play-pause-btn" (click)="playPause()">
+            @if (isPlaying) {
+                <mat-icon>pause</mat-icon>
+            } @else {
+                <mat-icon>play_arrow</mat-icon>
+            }
+        </button>
+        <button class="skip-btn" (click)="skipNext()">
+            <mat-icon>skip_next</mat-icon>
+        </button>
+    </div>
+    <div class="volume">
+        @if (volume === 0) {
+            <mat-icon>volume_off</mat-icon>
+        } @else {
+            <mat-icon>volume_up</mat-icon>
+        }
+        <input type="range" [value]="volume" min="0" max="1" step="0.01" (input)="changeVolume($event)"  />
+    </div>
+</div>

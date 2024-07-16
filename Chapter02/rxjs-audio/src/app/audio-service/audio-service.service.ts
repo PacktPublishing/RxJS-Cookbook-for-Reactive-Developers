@@ -1,40 +1,77 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, fromEvent, map } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+
+export interface Track {
+  title: string;
+  artist: string;
+  album: string;
+  year: number;
+  song: string;
+  cover: string;
+}
+
+interface AudioState {
+  isPlaying: boolean;
+  volume: number;
+  currentTrackIndex: number;
+  duration: number;
+  tracks: Track[];
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class AudioServiceService {
-  private audio = new Audio();
-  public currentTime$ = new BehaviorSubject<number>(0);
-  public duration$ = new BehaviorSubject<number>(0);
-  public isPlaying$ = new BehaviorSubject<boolean>(false);
-  // ... other subjects for volume, playlist, etc.
+export class AudioService {
+  public audioState$ = new BehaviorSubject<AudioState>({
+    isPlaying: false,
+    volume: 0.5,
+    currentTrackIndex: 0,
+    duration: 0,
+    tracks: [
+      {
+        title: 'Cro Magnon',
+        artist: 'Magnon',
+        album: 'Magnon',
+        year: 2025,
+        song: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        cover: '/assets/track-cover.jpg'
+      },
+      {
+        title: 'The Stark Palace',
+        artist: 'The Stark Palace',
+        album: 'The Stark Palace',
+        year: 2021,
+        song: 'http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3',
+        cover: '/assets/jazz-cover.jpg'
+      }
+    ]
+  });
 
-  constructor() {
-    this.audio.src = 'http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3'
-    // Set up event listeners for time updates, etc.
-    combineLatest([
-      fromEvent(this.audio, 'timeupdate').pipe(map(() => this.audio.currentTime)),
-      fromEvent(this.audio, 'loadedmetadata').pipe(map(() => this.audio.duration))
-    ]).subscribe(([currentTime, duration]) => {
-      this.currentTime$.next(currentTime);
-      this.duration$.next(duration);
-    });
+  constructor() {}
+
+  updateState(state: Partial<AudioState>): void {
+    this.audioState$.next({ ...this.audioState$.value, ...state });
   }
 
-  play(): void {
-    this.audio.play();
-    this.isPlaying$.next(true);
+  previousSong(): void {
+    let prevIndex = this.audioState$.value.currentTrackIndex - 1;
+    const tracks = this.audioState$.value.tracks;
+
+    if (prevIndex < 0) {
+      prevIndex = tracks.length - 1; // Loop back to the end
+    }
+
+    this.updateState({ isPlaying: false, currentTrackIndex: prevIndex });
   }
 
-  pause(): void {
-    this.audio.pause();
-    this.isPlaying$.next(false);
-  }
+  nextSong(): void {
+    let nextIndex = this.audioState$.value.currentTrackIndex + 1;
+    const tracks = this.audioState$.value.tracks;
 
-  setTime(time: number): void {
-    this.audio.currentTime = time;
+    if (nextIndex >= tracks.length) {
+      nextIndex = 0; // Loop back to the beginning
+    }
+
+    this.updateState({ isPlaying: false, currentTrackIndex: nextIndex });
   }
-  // ... pause, next, previous, setVolume
 }
