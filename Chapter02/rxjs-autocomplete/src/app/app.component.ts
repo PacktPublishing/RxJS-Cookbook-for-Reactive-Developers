@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
-import { fromEvent, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { fromEvent, debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs';
 import { LocationService } from './services/location.service';
 import { LocationResponse } from './types/LocationResponse.type';
 
@@ -35,10 +35,11 @@ export class AppComponent {
   constructor(private locationService: LocationService) {}
 
   ngOnInit() {
-    fromEvent(this.input.nativeElement, 'input').pipe(
+    fromEvent<InputEvent>(this.input.nativeElement, 'input').pipe(
       debounceTime(200),
+      map((event: any) => event.target.value),
       distinctUntilChanged(),
-      switchMap((event: any) => this.locationService.searchLocation(event.target.value))
-    ).subscribe(results => this.results = results);
+      switchMap((query: string) => this.locationService.searchLocation(query))
+    ).subscribe((results: any) => this.results = results);
   }
 }
