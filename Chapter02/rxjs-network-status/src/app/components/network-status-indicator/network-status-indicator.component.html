@@ -1,0 +1,4 @@
+<div class="container" [ngClass]="{'offline': !isOnline, 'slow': isSlowNetwork}">
+    <mat-icon>{{ isOnline ? 'wifi' : 'wifi_off' }}</mat-icon>
+    <p>Network Status: {{ isOnline ? 'online' : 'offline' }}</p>
+</div>

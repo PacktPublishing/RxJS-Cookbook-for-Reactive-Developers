@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px;
+    background-color: #6A75CA;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 20px;
+    width: 300px;
+
+    &.offline {
+        background-color: #E15B89;
+    }
+
+    &.slow {
+        background-color: #E4C15E;
+    }
+}
