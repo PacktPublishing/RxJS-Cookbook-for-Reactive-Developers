@@ -16,17 +16,17 @@ export class RecipeService {
       tap(() => {
         this.notificationService.addNotification({
           id: crypto.randomUUID(),
-          message: 'Recipes fetched successfully.',
+          message: 'Recipe added successfully.',
           type: 'success'
         });
       }),
       catchError((error) => {
         this.notificationService.addNotification({
           id: crypto.randomUUID(),
-          message: 'Recipes could not be fetched.',
+          message: 'Recipe could not be added.',
           type: 'error'
         });
-        return throwError(() => new Error('Recipes could not be fetched.'));
+        return throwError(() => new Error('Recipe could not be added.'));
       }),
     ).subscribe();
   }
