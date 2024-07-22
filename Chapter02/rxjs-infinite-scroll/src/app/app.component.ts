@@ -20,11 +20,12 @@ import {
 import { RecipesService } from './services/recipes.service';
 import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 import { Recipe } from './types/recipes.type';
+import { NewRecipesComponent } from './components/new-recipes/new-recipes.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RecipesListComponent, MatProgressSpinnerModule, AsyncPipe],
+  imports: [RouterOutlet, RecipesListComponent, MatProgressSpinnerModule, AsyncPipe, NewRecipesComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
@@ -49,7 +50,7 @@ export class AppComponent {
     const scrollEvent$ = fromEvent(window, 'scroll');
     const resizeEvent$ = fromEvent(window, 'resize');
 
-    merge(scrollEvent$, resizeEvent$)
+    fromEvent(window, 'scroll')
       .pipe(
         startWith(null),
         debounceTime(10), // Prevent excessive event triggering

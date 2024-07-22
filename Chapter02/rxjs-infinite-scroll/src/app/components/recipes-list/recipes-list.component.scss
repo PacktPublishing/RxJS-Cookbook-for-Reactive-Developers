@@ -1,12 +1,24 @@
 .recipes-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 30px;
     align-items: stretch;
+    margin: 150px;
 }
 
 .item {
-    width: calc(50% - 15px);
+    width: 100%;
+}
+
+.latest {
+    position: fixed;
+    padding: 20px;
+    top: 0;
+    left: 100px;
+    width: 100%;
+    border-bottom: 2px solid #667de7;
+    background-color: white;
+    z-index: 1;
 }
 
 // .item:nth-child(4n + 1) {

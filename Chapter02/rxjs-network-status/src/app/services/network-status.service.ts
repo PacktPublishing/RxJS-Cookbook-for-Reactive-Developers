@@ -10,16 +10,17 @@ export enum ENetworkSpeed {
   providedIn: 'root'
 })
 export class NetworkStatusService {
-  onlineChanges$: Observable<boolean>;
   slowNetworkChanges$: Observable<'slow' | 'fast'>;
+  onlineChanges$: Observable<boolean>;
   isOnline: boolean = navigator.onLine;
 
   constructor() {
     this.onlineChanges$ = merge(
-      of(this.isOnline), 
       fromEvent(window, 'online').pipe(map(() => true)), 
       fromEvent(window, 'offline').pipe(map(() => false)) 
-    ).pipe(startWith(navigator.onLine)); 
+    ).pipe(
+      startWith(this.isOnline)
+    ); 
 
     const connection = (navigator as any).connection;
 

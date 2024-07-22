@@ -40,6 +40,6 @@ export class AppComponent {
       map((event: any) => event.target.value),
       distinctUntilChanged(),
       switchMap((query: string) => this.locationService.searchLocation(query))
-    ).subscribe((results: any) => this.results = results);
+    ).subscribe((results: LocationResponse) => this.results = results);
   }
 }
