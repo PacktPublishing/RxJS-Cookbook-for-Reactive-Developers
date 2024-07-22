@@ -4,6 +4,7 @@ import { AppState } from "./recipes.types";
 export interface Action {
     type: string;
     payload?: any;
+    error?: Error | string;
 }
 
 export const LOAD_RECIPES = 'LOAD_RECIPES';
@@ -13,8 +14,8 @@ export const SELECT_RECIPE = 'SELECT_RECIPE';
 export const ORDER_RECIPE = 'ORDER_RECIPE';
 
 export const loadRecipesAction = (): Action => ({ type: LOAD_RECIPES });
-export const completeRecipesAction = (): Action => ({ type: LOAD_RECIPES_SUCCESS });
-export const completeErrorRecipesAction = (): Action => ({ type: LOAD_RECIPES_ERROR });
+export const loadRecipesActionSuccess = (payload: any): Action => ({ type: LOAD_RECIPES_SUCCESS, payload });
+export const loadRecipesActionError = (error: Error | string): Action => ({ type: LOAD_RECIPES_ERROR, error });
 export const selectRecipeAction = () => ({ type: SELECT_RECIPE });
 export const orderRecipeAction = () => ({ type: ORDER_RECIPE });
 
