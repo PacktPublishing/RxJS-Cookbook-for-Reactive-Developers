@@ -22,7 +22,7 @@ export const recipeReducer = createReducer(
         ...state,
         loading: true,
     })),
-    on(RecipesActions.completeRecipesAction, (state, { recipes }) => ({
+    on(RecipesActions.loadRecipesActionSuccess, (state, { recipes }) => ({
         ...state,
         recipes,
         loading: false,

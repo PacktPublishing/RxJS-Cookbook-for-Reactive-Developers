@@ -23,7 +23,7 @@ export const selectRecipesWithCurrentRoute = createSelector(
     (recipesState, routerState) => ({ recipesState, routerState })
 );
 
-export const selectSelectedRecipes = createSelector(
+export const selectRecipesWithSelectedRecipes = createSelector(
     selectRecipesState,
     (state) => state.selectedRecipe
 );
