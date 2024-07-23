@@ -6,7 +6,7 @@ import { useRecipes } from "../../state/recipes.state";
 const RecipesList = () => {
   const { data, status } = useRecipes();
 
-  if (status === ResponseStatus.Loading) {
+  if (status === ResponseStatus.LOADING) {
     return <CircularProgress />;
   }
 

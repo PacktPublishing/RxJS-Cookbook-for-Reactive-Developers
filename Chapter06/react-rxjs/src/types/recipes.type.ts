@@ -1,7 +1,7 @@
 export enum ResponseStatus {
-    Loading = 'loading',
-    Success = 'success',
-    Error = 'error'
+    LOADING = 'loading',
+    SUCCESS = 'success',
+    ERROR = 'error'
 }
 
 export interface ResponseData<T> {
