@@ -3,7 +3,7 @@ import { recipes } from './mock.json'
 
 export const handlers = [
   http.get('https://super-recipes.com/api/recipes', async () => {
-    await delay(2000);
+    await delay(7000);
 
     return HttpResponse.json(recipes);
   }),

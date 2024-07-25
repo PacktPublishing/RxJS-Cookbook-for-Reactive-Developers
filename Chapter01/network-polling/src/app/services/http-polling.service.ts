@@ -46,15 +46,6 @@ export class HttpPollingService {
       switchMap(() => this.httpClient.get<T>(url).pipe(
         timeout(interval),
       )),
-      // map((event: any) => {
-      //   if (event.type === HttpEventType.Response) {
-      //     return event.body; // New data received
-      //   }
-
-      //   if (event.type === 0) {
-      //     return null; // Timeout occurred
-      //   }
-      // }),
       retry({
         count: 3,
         delay: (error, retryCount) => {
@@ -77,7 +68,7 @@ export class HttpPollingService {
           panelClass: ['mat-error'],
         });
 
-        return throwError(() => new Error(error));
+        return throwError(() => new Error('Request Timeout'));
       }),
       takeUntil(this.stopPolling$),
       shareReplay(1)
