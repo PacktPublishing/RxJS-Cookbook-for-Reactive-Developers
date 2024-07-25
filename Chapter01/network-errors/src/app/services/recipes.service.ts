@@ -68,17 +68,17 @@ export class RecipesService {
     this.failureCount = 0;
   }
 
-  getRecipesWithCircuitBreakerStrategy$(): Observable<Recipe[]> {
-    return defer(() => {
+  sendRequestIfCircuitNotOpen() {
+    if (this.state === 'OPEN') {
+      console.error('Circuit is open, aborting request');
+      return throwError(() => new Error('Circuit is open'));
+    }
 
-      console.log(this.state)
-      if (this.state === 'OPEN') {
-        console.error('Circuit is open, aborting request');
-        return throwError(() => new Error('Circuit is open'));
-      }
-  
-      return this.httpClient.get<Recipe[]>('https://super-recipes.com/api/recipes');
-    }).pipe(
+    return this.httpClient.get<Recipe[]>('https://super-recipes.com/api/recipes');
+  }
+
+  getRecipesWithCircuitBreakerStrategy$(): Observable<Recipe[]> {
+    return defer(() => this.sendRequestIfCircuitNotOpen()).pipe(
       catchError((error) => {
         this._snackBar.open('Recipes could not be fetched.', 'Close', {
           verticalPosition: 'top',

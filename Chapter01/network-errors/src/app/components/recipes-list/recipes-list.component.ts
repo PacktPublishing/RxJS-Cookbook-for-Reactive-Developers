@@ -20,19 +20,16 @@ export class RecipesListComponent {
   constructor(private recipesService: RecipesService) { }
 
   ngOnInit() {
+    // this.recipesSubscription = this.recipesService.getRecipesWithBackoffStrategy$().subscribe({
+    //   next: (recipes) => {
+    //     this.recipes = recipes;
+    //   }
+    // });
     this.recipesSubscription = this.recipesService.getRecipesWithCircuitBreakerStrategy$().subscribe({
       next: (recipes) => {
         this.recipes = recipes;
       }
     });
-
-    setTimeout(() => {
-      this.recipesSubscription = this.recipesService.getRecipesWithCircuitBreakerStrategy$().subscribe({
-        next: (recipes) => {
-          this.recipes = recipes;
-        }
-      });
-    }, 30000);
   }
 
   ngOnDestroy() {
