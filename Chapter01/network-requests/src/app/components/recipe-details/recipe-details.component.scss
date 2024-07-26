@@ -1,5 +1,10 @@
 .card {
     cursor: pointer;
+    border: 1px solid #ffdcd5;
+    border-radius: 20px;
+    margin: 20px auto;
+    width: 450px;
+    background-image: linear-gradient(to right, #ff7e5f, #feb47b);
 }
 
 .card-image {
@@ -18,10 +23,11 @@
 
 .card-content {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
 
     img {
-        width: 50%;
+        border-radius: 20px;
     }
 }
 
@@ -30,6 +36,15 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 20px;
+
+    .card-title {
+        display: flex;
+        justify-content: space-between;
+
+        .mat-mdc-chip {
+            background-color: #ffcf31;
+        }
+    }
 }
 
 .ingredient:nth-child(2n + 1) {
@@ -37,7 +52,21 @@
 }
 
 .ingredient:nth-child(2n + 2) {
-    background-color: #F0A594;
+    background-color: #b2a5f3;
+}
+
+.recipe-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+
+    .mat-mdc-chip {
+        background-color: #ffd64e;
+    }
+}
+
+.prep {
+    // color: white;
 }
 
 // .ingredient:nth-child(4n + 3) {

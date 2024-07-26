@@ -57,7 +57,7 @@
         {
             "id": 1,
             "prepTime": 7200000,
-            "cuisine:": "Italian",
+            "cuisine": "Italian",
             "diet": "Vegetarian",
             "url": "/assets/images/spaghetti.jpg",
             "nutrition": {
@@ -70,7 +70,7 @@
         {
             "id": 2,
             "prepTime": 5200000,
-            "cuisine:": "Mexican",
+            "cuisine": "Mexican",
             "diet": "Paleo",
             "nutrition": {
                 "calories": 950,
@@ -82,7 +82,7 @@
         {
             "id": 3,
             "prepTime": 2200000,
-            "cuisine:": "American",
+            "cuisine": "American",
             "diet": "Paleo",
             "nutrition": {
                 "calories": 550,
@@ -94,7 +94,7 @@
         {
             "id": 4,
             "prepTime": 2200000,
-            "cuisine:": "American",
+            "cuisine": "American",
             "diet": "Paleo",
             "nutrition": {
                 "calories": 950,
@@ -106,7 +106,7 @@
         {
             "id": 5,
             "prepTime": 2200000,
-            "cuisine:": "American",
+            "cuisine": "American",
             "diet": "Paleo",
             "nutrition": {
                 "calories": 950,
