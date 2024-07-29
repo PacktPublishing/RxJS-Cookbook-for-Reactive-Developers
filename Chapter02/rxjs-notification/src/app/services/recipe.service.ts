@@ -11,7 +11,7 @@ export class RecipeService {
 
   constructor(private httpClient: HttpClient, private notificationService: NotificationService) { }
 
-  getRecipes(): void {
+  postRecipes(): void {
     this.httpClient.get<Recipe[]>('https://super-recipes.com/api/recipes').pipe(
       tap(() => {
         this.notificationService.addNotification({

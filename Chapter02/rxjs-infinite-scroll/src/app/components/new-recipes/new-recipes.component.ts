@@ -10,13 +10,11 @@ import { RecipesService } from '../../services/recipes.service';
   styleUrl: './new-recipes.component.scss'
 })
 export class NewRecipesComponent {
-  number = 10;
+  number = 0;
 
   constructor(private recipesService: RecipesService) {}
 
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
     this.recipesService.checkNumberOfNewRecipes().subscribe((number) => {
       this.number = number;
     });

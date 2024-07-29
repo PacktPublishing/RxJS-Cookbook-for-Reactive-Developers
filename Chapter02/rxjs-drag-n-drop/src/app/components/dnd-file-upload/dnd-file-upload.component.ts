@@ -16,7 +16,8 @@ import {
   takeUntil,
   of,
   repeat, from, concatMap,
-  mergeMap
+  mergeMap,
+  mergeAll
 } from 'rxjs';
 import { RecipesService } from '../../services/recipes.service';
 import { FileWithProgress } from '../../types/recipes.type';
@@ -70,7 +71,7 @@ export class DndFileUploadComponent {
 
           return this.recipeService.validateFiles$(files$);
         }),
-        mergeMap(file => {
+        map(file => {
           if (!file.valid) {
             return of(file);
           }
@@ -80,6 +81,7 @@ export class DndFileUploadComponent {
             this.recipeService.uploadFileWithProgress$(file.file)
           );
         }),
+        mergeAll(),
         takeUntil(droppable$.pipe(filter((isDroppable) => !isDroppable))),
         repeat()
       )

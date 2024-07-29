@@ -16,11 +16,7 @@ import {
   finalize,
   delay,
   mergeMap,
-  bufferCount,
-  takeWhile,
-  Observable,
-  repeat,
-  take,
+  bufferCount, Observable
 } from 'rxjs';
 import { PixelCoordinates } from '../../types/pixel-coordinates.type';
 import { arraysHaveSameElements } from '../../utils/array.util';

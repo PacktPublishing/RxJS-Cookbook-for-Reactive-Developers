@@ -17,6 +17,6 @@ export class AppComponent {
   constructor(private recipeService: RecipeService) { }
 
   sendRequest() {
-    this.recipeService.getRecipes();
+    this.recipeService.postRecipes();
   }
 }
