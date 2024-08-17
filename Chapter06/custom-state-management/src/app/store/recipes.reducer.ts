@@ -38,28 +38,28 @@ function createReducer(...ons: Record<string, any>[]): Reducer<AppState, Action>
 
 export const recipesReducer = createReducer(
   on(LOAD_RECIPES, (state: AppState) => ({
-    ...state,
+    ...structuredClone(state),
     loading: true,
   })),
   on(LOAD_RECIPES_SUCCESS, (state: AppState, { payload }: Action) => ({
-      ...state,
+    ...structuredClone(state),
       recipes: payload ?? [],
       loading: false,
   })),
   on(LOAD_RECIPES_ERROR, (state: AppState, { payload }: Action) => ({
-      ...state,
+    ...structuredClone(state),
       error: payload,
       loading: false,
   })),
   on(SELECT_RECIPE, (state: AppState, { payload }: Action) => ({
-    ...state,
+    ...structuredClone(state),
     selectedRecipe: payload,
   })),
 )
 
 export const recipeOrderReducer = createReducer(
   on(ORDER_RECIPE, (state: AppState, { payload }: Action) => ({
-    ...state,
+    ...structuredClone(state),
     order: payload,
   })),
 )

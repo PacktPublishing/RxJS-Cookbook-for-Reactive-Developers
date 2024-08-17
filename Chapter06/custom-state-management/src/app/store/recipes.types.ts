@@ -1,3 +1,10 @@
+export interface Order {
+    id: number;
+    recipe: Recipe;
+    quantity: number;
+    totalCost: number;
+}
+
 export interface Recipe {
     id: number;
     name: string;
@@ -10,10 +17,10 @@ export interface AppState {
     recipesState: {
         recipes: Recipe[];
         selectedRecipe: Recipe | null;
-        error: null
+        error: Error | null
         loading: boolean;
     }
     ordersState: {
-        orders: Recipe[];
+        orders: Order[];
     }
 }
