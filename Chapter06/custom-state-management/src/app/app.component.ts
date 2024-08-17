@@ -22,7 +22,7 @@ export class AppComponent {
 
   handleLoadRecipes(): void {
     this.recipesStoreService
-      .selectState$((state: AppState) => state.recipesState?.recipes)
+      .selectState$((state: AppState) => state.recipesState?.recipes as Partial<AppState>)
       .subscribe((recipes: Partial<AppState>) => (this.recipes = recipes as Recipe[]));
   }
 }

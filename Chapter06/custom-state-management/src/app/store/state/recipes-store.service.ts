@@ -2,7 +2,7 @@ import { rootReducer } from './../recipes.reducer';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject, Observable, map, shareReplay, withLatestFrom } from 'rxjs';
 import { Action } from '../recipes.actions';
-import { AppState } from '../recipes.types';
+import { AppState, Recipe } from '../recipes.types';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class RecipesStoreService {
   }
 
   selectState$(
-    selector?: (state: AppState) => any,
+    selector?: (state: AppState) => Partial<AppState>,
     cachedValues = 1
   ): Observable<Partial<AppState>> {
     return this.state$

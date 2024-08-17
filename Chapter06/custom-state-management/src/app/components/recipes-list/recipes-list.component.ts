@@ -22,11 +22,13 @@ export class RecipesListComponent {
   ngOnInit() {
     this.recipesService.loadRecipes();
 
-    this.recipesSubscription = this.recipeStore.selectState$((state: Partial<AppState>) => state.recipesState?.recipes).subscribe(
-      (recipes: Partial<AppState>) => { 
-        this.recipes = recipes as Recipe[]; 
-      }
-    );
+    this.recipesSubscription = this.recipeStore
+      .selectState$(
+        (state: Partial<AppState>) => state.recipesState?.recipes as Partial<AppState>
+      )
+      .subscribe((recipes: Partial<AppState>) => {
+        this.recipes = recipes as Recipe[];
+      });
   }
 
   ngOnDestroy() {
