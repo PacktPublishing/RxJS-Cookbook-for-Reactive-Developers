@@ -3,9 +3,9 @@ import { getRecipe$, getRecipes$ } from "../services/recipes.service";
 import { catchError, map, of, startWith, switchMap } from "rxjs";
 import { createSignal } from "@react-rxjs/utils";
 import { AjaxResponse } from "rxjs/ajax";
-import { ResponseStatus, Recipe } from "../types/recipes.type";
+import { ResponseStatus, Recipe, ResponseData } from "../types/recipes.type";
 
-export const [useRecipes, recipes$] = bind(getRecipes$().pipe( 
+export const [useRecipes, recipes$] = bind<ResponseData<Recipe[]>>(getRecipes$().pipe( 
   map((response: AjaxResponse<Recipe[]>) => ({ 
     status: ResponseStatus.SUCCESS, 
     data: (response as AjaxResponse<Recipe[]>).response, 
