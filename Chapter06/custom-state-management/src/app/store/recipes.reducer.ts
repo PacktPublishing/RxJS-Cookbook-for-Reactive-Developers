@@ -44,27 +44,31 @@ export const recipesReducer = createReducer(
       loading: true,
     })
   ),
-  on(LOAD_RECIPES_SUCCESS, (state: AppState, { payload }: Action) => ({
-    ...structuredClone(state),
-    recipes: payload ?? [],
-    loading: false,
-  })),
-  on(LOAD_RECIPES_ERROR, (state: AppState, { payload }: Action) => ({
-    ...structuredClone(state),
-    error: payload,
-    loading: false,
-  })),
-  on(SELECT_RECIPE, (state: AppState, { payload }: Action) => ({
-    ...structuredClone(state),
-    selectedRecipe: payload,
-  }))
+  on(LOAD_RECIPES_SUCCESS, (state: AppState, { payload }: Action) => 
+    Object.assign({}, structuredClone(state), {
+      recipes: payload ?? [],
+      loading: false,
+    })
+  ),
+  on(LOAD_RECIPES_ERROR, (state: AppState, { payload }: Action) => 
+    Object.assign({}, structuredClone(state), {
+      error: payload,
+      loading: false,
+    })
+  ),
+  on(SELECT_RECIPE, (state: AppState, { payload }: Action) => 
+    Object.assign({}, structuredClone(state), {
+      selectedRecipe: payload,
+    })
+  ),
 );
 
 export const recipeOrderReducer = createReducer(
-  on(ORDER_RECIPE, (state: AppState, { payload }: Action) => ({
-    ...structuredClone(state),
-    order: payload,
-  })),
+  on(ORDER_RECIPE, (state: AppState, { payload }: Action) => 
+    Object.assign({}, structuredClone(state), {
+      order: payload,
+    })
+  ),
 )
 
 export const rootReducer = logMetaReducer(combineReducers({
