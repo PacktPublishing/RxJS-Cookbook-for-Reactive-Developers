@@ -13,8 +13,10 @@ import { logMetaReducer } from './recipes.utils';
 export type Reducer<S, A extends Action> = (state: S, action: A) => S;
 
 function combineReducers<S, A extends Action>(reducers: { [K in keyof S]: Reducer<S[K], A> }): Reducer<S, A> {
-  return (state: S, action: A): S => {
-    const newState = { ...state };
+  return (state: S | undefined, action: A): S => {
+    if (!state) return {} as S;
+
+    const newState = { ...state } as S;
 
     for (let key in reducers) {
       newState[key] = reducers[key](state[key], action);
@@ -37,25 +39,26 @@ function createReducer(...ons: Record<string, any>[]): Reducer<AppState, Action>
 }
 
 export const recipesReducer = createReducer(
-  on(LOAD_RECIPES, (state: AppState) => ({
-    ...structuredClone(state),
-    loading: true,
-  })),
+  on(LOAD_RECIPES, (state: AppState) =>
+    Object.assign({}, structuredClone(state), {
+      loading: true,
+    })
+  ),
   on(LOAD_RECIPES_SUCCESS, (state: AppState, { payload }: Action) => ({
     ...structuredClone(state),
-      recipes: payload ?? [],
-      loading: false,
+    recipes: payload ?? [],
+    loading: false,
   })),
   on(LOAD_RECIPES_ERROR, (state: AppState, { payload }: Action) => ({
     ...structuredClone(state),
-      error: payload,
-      loading: false,
+    error: payload,
+    loading: false,
   })),
   on(SELECT_RECIPE, (state: AppState, { payload }: Action) => ({
     ...structuredClone(state),
     selectedRecipe: payload,
-  })),
-)
+  }))
+);
 
 export const recipeOrderReducer = createReducer(
   on(ORDER_RECIPE, (state: AppState, { payload }: Action) => ({
