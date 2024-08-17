@@ -12,7 +12,7 @@ export class RecipesEffects {
       exhaustMap(() => this.recipesService.getRecipes$()
         .pipe(
           map(recipes => loadRecipesActionSuccess({ recipes })),
-          catchError(() => of(loadRecipesActionError()))
+          catchError((error: Error) => of(loadRecipesActionError({ error: error.message })))
         )
       )
     )

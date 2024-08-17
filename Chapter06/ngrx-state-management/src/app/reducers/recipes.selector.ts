@@ -1,6 +1,7 @@
 import { getRouterSelectors } from '@ngrx/router-store';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import * as fromRecipes from './recipes.reducer';
+import * as fromRouter from '@ngrx/router-store';
 
 export const {
     selectCurrentRoute, // select the current route
@@ -20,10 +21,10 @@ export const selectRecipesState = createFeatureSelector<fromRecipes.State>('reci
 export const selectRecipesWithCurrentRoute = createSelector(
     selectRecipesState,  
     selectCurrentRoute, 
-    (recipesState, routerState) => ({ recipesState, routerState })
+    (recipesState: fromRecipes.State, routerState: fromRouter.RouterReducerState) => ({ recipesState, routerState })
 );
 
 export const selectRecipesWithSelectedRecipes = createSelector(
     selectRecipesState,
-    (state) => state.selectedRecipe
+    (state: fromRecipes.State) => state.selectedRecipe
 );
