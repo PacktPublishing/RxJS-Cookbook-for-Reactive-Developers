@@ -25,11 +25,33 @@ export class RecipesListComponent {
     this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message) => {
       this.recipes = message.payload;
     });
+
+    // Test WS heartbeat behavior
+
+    // setTimeout(() => {
+    //   this.recipesService.close();
+    //   console.log('Heartbeat will throw error, since we closed WS connection')
+    //   this.recipesService.sendHeartbeat();
+    // }, 2000);
+    
+    // setTimeout(() => {
+    //   this.recipesService.connect();
+    //   console.log('Heartbeat says I\'m alive!')
+    //   this.recipesService.sendHeartbeat();
+    //   this.connectToRecipesTopic();
+    // }, 15000);
   }
 
   ngOnDestroy() {
     this.recipesSubscription?.unsubscribe();
     this.recipesService.close();
+  }
+
+  private connectToRecipesTopic(): void {
+    this.recipesService.sendMessage({ type: 'recipes' });
+      this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message) => {
+        this.recipes = message.payload;
+    });
   }
 
 }

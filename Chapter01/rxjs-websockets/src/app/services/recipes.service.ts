@@ -65,13 +65,14 @@ export class RecipesService {
   }
 
   sendHeartbeat() {
-    timer(5000)
+    timer(2000)
       .pipe(
         tap(() => this.sendMessage({ type: 'heartbeat' })),
         switchMap(() =>
           this.socket$.pipe(
             filter((msg) => msg.type === 'heartbeat'),
             timeout(5000 * 2), // Allow double the heartbeat interval for response
+
             catchError(() => {
               console.error('Heartbeat timeout, closing connection');
               this.close();
@@ -89,6 +90,6 @@ export class RecipesService {
   }
 
   close() {
-    this.socket$.complete();
+    this.socket$.unsubscribe();
   }
 }
