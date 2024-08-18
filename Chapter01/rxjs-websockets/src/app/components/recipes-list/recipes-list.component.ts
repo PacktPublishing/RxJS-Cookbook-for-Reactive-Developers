@@ -28,16 +28,19 @@ export class RecipesListComponent {
 
     // Test WS heartbeat behavior
 
+    // this.recipesService.sendHeartbeat();
+    // console.log('Heartbeat says I\'m alive!')
+
     // setTimeout(() => {
     //   this.recipesService.close();
-    //   console.log('Heartbeat will throw error, since we closed WS connection')
     //   this.recipesService.sendHeartbeat();
+    //   console.log('Heartbeat will throw error, since we closed WS connection')
     // }, 2000);
     
     // setTimeout(() => {
     //   this.recipesService.connect();
-    //   console.log('Heartbeat says I\'m alive!')
     //   this.recipesService.sendHeartbeat();
+    //   console.log('Heartbeat says I\'m alive!')
     //   this.connectToRecipesTopic();
     // }, 15000);
   }
