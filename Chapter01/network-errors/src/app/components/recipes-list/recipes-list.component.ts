@@ -20,11 +20,14 @@ export class RecipesListComponent {
   constructor(private recipesService: RecipesService) { }
 
   ngOnInit() {
+    // Exponential back off strategy
     // this.recipesSubscription = this.recipesService.getRecipesWithBackoffStrategy$().subscribe({
     //   next: (recipes) => {
     //     this.recipes = recipes;
     //   }
     // });
+
+    // Circuit breaker strategy
     this.recipesSubscription = this.recipesService.getRecipesWithCircuitBreakerStrategy$().subscribe({
       next: (recipes) => {
         this.recipes = recipes;
