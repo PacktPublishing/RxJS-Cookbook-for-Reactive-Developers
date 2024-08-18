@@ -31,7 +31,10 @@ export class RecipesListComponent {
         this.error = error;
       }
     });
-    this.recipesSubscription = this.recipesService.getRecipesWithConcurrentImage$().subscribe({
+
+    // Parallel requests recipe
+
+    this.recipesSubscription = this.recipesService.getRecipesWithImageInParallel$().subscribe({
       next: (images) => {
         if (Array.isArray(images)) {
           this.images = images
@@ -43,6 +46,21 @@ export class RecipesListComponent {
         this.error = error;
       }
     });
+    
+    // Concurrent requests recipe
+
+    // this.recipesSubscription = this.recipesService.getRecipesWithConcurrentImage$().subscribe({
+    //   next: (images) => {
+    //     if (Array.isArray(images)) {
+    //       this.images = images
+    //     } else {
+    //       this.images.push(images)
+    //     }
+    //   },
+    //   error: (error) => {
+    //     this.error = error;
+    //   }
+    // });
   }
 
   ngOnDestroy() {

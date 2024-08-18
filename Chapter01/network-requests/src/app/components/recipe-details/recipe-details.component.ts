@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule, JsonPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { RecipesService } from '../../services/recipes.service';
 import { Recipe, RecipeDetails } from '../../types/recipes.type';
-import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-recipe-details',
   standalone: true,
-  imports: [MatCardModule, MatChipsModule, JsonPipe],
+  imports: [MatCardModule, MatChipsModule, JsonPipe, CommonModule],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss'
 })

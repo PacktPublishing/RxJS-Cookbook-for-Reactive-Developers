@@ -72,6 +72,7 @@
             "prepTime": 5200000,
             "cuisine": "Mexican",
             "diet": "Paleo",
+            "url": "/assets/images/chicken_tikka_masala.jpg",
             "nutrition": {
                 "calories": 950,
                 "fat": 35,
@@ -84,6 +85,7 @@
             "prepTime": 2200000,
             "cuisine": "American",
             "diet": "Paleo",
+            "url": "/assets/images/chocolate_chip_cookies.jpg",
             "nutrition": {
                 "calories": 550,
                 "fat": 45,
@@ -96,6 +98,7 @@
             "prepTime": 2200000,
             "cuisine": "American",
             "diet": "Paleo",
+            "url": "/assets/images/caprese_salad.jpg",
             "nutrition": {
                 "calories": 950,
                 "fat": 35,
@@ -108,6 +111,7 @@
             "prepTime": 2200000,
             "cuisine": "American",
             "diet": "Paleo",
+            "url": "/assets/images/beef_stir_fry.jpg",
             "nutrition": {
                 "calories": 950,
                 "fat": 35,

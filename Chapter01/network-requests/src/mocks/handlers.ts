@@ -42,7 +42,7 @@ export const handlers = [
     return HttpResponse.json(recipe)
   }),
   http.get('https://super-recipes.com/api/recipes/images', async ({ request }) => {
-    await delay(10000)
+    await delay(3000)
     // Construct a URL instance out of the intercepted request.
     const url = new URL(request.url)
  
