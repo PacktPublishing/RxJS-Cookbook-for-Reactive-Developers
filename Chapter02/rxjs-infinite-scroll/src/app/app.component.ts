@@ -48,9 +48,8 @@ export class AppComponent {
 
   ngOnInit() {
     const scrollEvent$ = fromEvent(window, 'scroll');
-    const resizeEvent$ = fromEvent(window, 'resize');
 
-    fromEvent(window, 'scroll')
+    scrollEvent$
       .pipe(
         startWith(null),
         debounceTime(10), // Prevent excessive event triggering
@@ -76,5 +75,16 @@ export class AppComponent {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  refreshAndScrollToTop() {
+    this.page = 1;
+    this.recipes = [];
+    this.loading$.next(true);
+    window.scrollTo(0, 0);
+    this.recipesService.getRecipes(this.page).subscribe((recipes) => {
+      this.loading$.next(false);
+      this.recipes = recipes;
+    });
   }
 }

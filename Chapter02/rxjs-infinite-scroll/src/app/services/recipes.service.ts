@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {
   Observable, delay,
-  interval,
-  switchMap
+  switchMap,
+  timer
 } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Recipe } from '../types/recipes.type';
@@ -21,7 +21,7 @@ export class RecipesService {
   }
 
   checkNumberOfNewRecipes(): Observable<number> {
-    return interval(10000).pipe(
+    return timer(10000, 100000).pipe(
       switchMap(() => this.httpClient.get<number>('https://super-recipes.com/api/new-recipes'))
     );  
   }

@@ -1,5 +1,5 @@
 <div class="app-container">
-    <app-new-recipes></app-new-recipes>
+    <app-new-recipes (refresh)="refreshAndScrollToTop()"></app-new-recipes>
     <app-recipes-list [recipes]="recipes"></app-recipes-list>
     @if (loading$ | async) {
         <mat-spinner></mat-spinner>
