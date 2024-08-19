@@ -2,9 +2,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSliderDragEvent, MatSliderModule } from '@angular/material/slider';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { fromEvent, map, merge, pluck } from 'rxjs';
+import { fromEvent, map, merge } from 'rxjs';
 import { AudioService, Track } from '../audio-service/audio-service.service';
 import { TimePipe } from '../pipes/time.pipe';
 
@@ -28,9 +28,9 @@ export class AudioPlayerComponent {
   duration: number = 0;
   isPlaying: boolean = false;
   volume: number = 0.5;
-  currentTrack: Track = {} as Track;
+  currentTrack: Track | null = null;
 
-  constructor(private audioService: AudioService) {}
+  constructor(private audioService: AudioService, private cdRef: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
     const audio = this.audioElement.nativeElement;
@@ -64,9 +64,10 @@ export class AudioPlayerComponent {
       this.duration = duration;
       this.volume = volume;
 
-      if (tracks[currentTrackIndex].title !== this.currentTrack.title) {
+      if (tracks[currentTrackIndex].title !== this.currentTrack?.title) {
         this.audioElement.nativeElement.src = tracks[currentTrackIndex].song;
         this.currentTrack = tracks[currentTrackIndex];
+        this.cdRef.detectChanges();
       }
     });
   }
@@ -79,7 +80,7 @@ export class AudioPlayerComponent {
     }
   }
 
-  skip({ value }: MatSliderDragEvent): void {
+  skip({ target: { value } }: any): void {
     this.audioElement.nativeElement.currentTime = value;
   }
 

@@ -20,7 +20,7 @@
     padding-top: 100px;
     align-items: center;
     flex-direction: column;
-    background-color: #242334;
+    background-color: #29292b;
     height: 100vh;
 
     img {
@@ -28,6 +28,7 @@
         height: 200px;
         border-radius: 50%;
         margin-bottom: 20px;
+        border: 2px solid #ffd18a;
     }
 }
 
@@ -42,6 +43,7 @@
     display: flex;
     align-items: center;
     width: 400px;
+    margin-bottom: 20px;
 
     .song {
         width: 100%;
@@ -61,20 +63,12 @@
     color: #667de7;
 }
 
-.song-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    // background-color: #c961f9;
-    background-color: #3b4163;
+.title {
     color: white;
-    border-color: #feb990;
-    border-radius: 40px;
-    width: 300px;
+    font-size: 1.2rem;
 }
 
 .artist {
-    color: white;
+    color: #ffd18a;
     font-size: 1rem;
 }

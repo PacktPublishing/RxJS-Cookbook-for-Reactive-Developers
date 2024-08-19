@@ -29,20 +29,20 @@ export class AudioService {
     duration: 0,
     tracks: [
       {
-        title: 'Cro Magnon',
-        artist: 'Magnon',
+        title: 'If You Really Love Me',
+        artist: 'Stevie Wonder',
         album: 'Magnon',
-        year: 2025,
-        song: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        cover: '/assets/track-cover.jpg'
+        year: 1973,
+        song: 'http://www.jplayer.org/audio/mp3/Miaow-10-Thin-ice.mp3',
+        cover: '/assets/track.jpg'
       },
       {
-        title: 'The Stark Palace',
-        artist: 'The Stark Palace',
+        title: 'Tammy Terrell',
+        artist: 'Aint No Mountain High Enough',
         album: 'The Stark Palace',
-        year: 2021,
+        year: 1977,
         song: 'http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3',
-        cover: '/assets/jazz-cover.jpg'
+        cover: '/assets/track-cover.jpg'
       }
     ]
   });

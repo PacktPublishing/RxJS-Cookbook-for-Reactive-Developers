@@ -1,24 +1,16 @@
 
 <div class="audio-player-container">
-    <mat-card appearance="outlined" class="song-card">
-        <mat-card-content>
-            @if (currentTrack) {
-                <img [src]="currentTrack.cover" />
-                <h3>{{ currentTrack.title }}</h3>
-                <p class="artist">{{ currentTrack.artist }}</p>
-                <p>{{ currentTrack.album }}</p>
-                <p>{{ currentTrack.year }}</p>
-            }
-        </mat-card-content>
-    </mat-card>
+    @if (currentTrack) {
+        <img [src]="currentTrack.cover" />
+        <h3 class="title">{{ currentTrack.title }}</h3>
+        <p class="artist">{{ currentTrack.artist }}</p>
+    }
     <div class="audio-player-time">
         <p>{{ currentTime | time }}</p>
         <audio #audio muted>
             Your browser does not support the audio element.
         </audio>
-        <mat-slider [max]="duration" class="song">
-            <input matSliderThumb [value]="currentTime" (dragEnd)="skip($event)">
-        </mat-slider>
+        <input type="range" class="song" [value]="currentTime" min="0" [max]="duration" (input)="skip($event)"  />
         <p>{{ duration | time }}</p>    
     </div>
     <div class="audio-controls">
