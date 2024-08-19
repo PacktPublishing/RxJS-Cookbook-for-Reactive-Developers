@@ -1,24 +1,8 @@
-import { MatSnackBar } from '@angular/material/snack-bar';
 import {
-  AfterViewInit,
-  Component,
-  ElementRef, ViewChild
+  Component
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import {
-  fromEvent,
-  tap,
-  merge,
-  map,
-  filter,
-  switchMap,
-  takeUntil,
-  of,
-  repeat, from, concatMap
-} from 'rxjs';
-import { RecipesService } from './services/recipes.service';
-import { FileWithProgress } from './types/recipes.type';
 import { DndFileUploadComponent } from './components/dnd-file-upload/dnd-file-upload.component';
 
 

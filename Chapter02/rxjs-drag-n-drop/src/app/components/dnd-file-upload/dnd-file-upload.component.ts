@@ -76,7 +76,7 @@ export class DndFileUploadComponent {
 
           return merge(
             of(file), 
-            this.recipeService.uploadFileWithProgress$(file.file)
+            this.recipeService.uploadFileWithProgress$(file)
           );
         }),
         mergeAll(),
@@ -84,10 +84,10 @@ export class DndFileUploadComponent {
         repeat()
       )
       .subscribe({
-        next: (file) => {
+        next: (file: FileWithProgress) => {
           if (Object.keys(file).length === 0) return;
 
-          if (file.valid && file.name) {
+          if (file.valid && file) {
             this.validFiles.set(file.name, file);
 
             return;
