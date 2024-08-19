@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, finalize, interval, map, merge, mergeAll, of, scan, takeUntil } from 'rxjs';
+import { Observable, concat, endWith, finalize, interval, map, merge, mergeAll, of, scan, takeUntil, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { FileWithProgress } from '../types/recipes.type';
 
@@ -46,7 +46,11 @@ export class RecipesService {
   }
 
   fileUploadProgress$(file: File): Observable<FileWithProgress> {
-    const progress$ = interval(2000).pipe(
+    const uploadedFile: FileWithProgress = new File([file], file.name, { type: file.type });
+    uploadedFile.progress = 100;
+    uploadedFile.valid = true;
+
+    const progress$ = timer(300, 2000).pipe(
       map(() => Number((Math.random() * 25 + 5).toFixed(2))),
       scan((acc, curr) => Math.min(acc + curr, 95), 0),
       map((progress: number) => {
@@ -57,16 +61,14 @@ export class RecipesService {
         return newFile;
       }),
       takeUntil(this.uploadFile$(file)),
+      endWith(uploadedFile)
     );
-  
-    return progress$; 
+
+    return progress$;
   }
 
   uploadFileWithProgress$(file: FileWithProgress): Observable<any> {
-    return merge(
-      this.fileUploadProgress$(file),
-      this.uploadFile$(file)
-    );
+    return this.fileUploadProgress$(file);
   }
 
 }

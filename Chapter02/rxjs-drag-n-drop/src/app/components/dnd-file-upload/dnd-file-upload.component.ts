@@ -15,9 +15,7 @@ import {
   switchMap,
   takeUntil,
   of,
-  repeat, from, concatMap,
-  mergeMap,
-  mergeAll
+  repeat, from, mergeAll
 } from 'rxjs';
 import { RecipesService } from '../../services/recipes.service';
 import { FileWithProgress } from '../../types/recipes.type';
@@ -93,10 +91,12 @@ export class DndFileUploadComponent {
             this.validFiles.set(file.name, file);
 
             return;
-          }  
+          }
           
           if (!file.valid) {
-            this._snackBar.open('Invalid file upload.', 'Close', {});
+            this._snackBar.open('Invalid file upload.', 'Close', {
+              duration: 4000
+            });
           }
         }
       });
