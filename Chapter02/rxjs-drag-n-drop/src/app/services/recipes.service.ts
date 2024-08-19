@@ -39,7 +39,7 @@ export class RecipesService {
     uploadedFile.progress = 100;
     uploadedFile.valid = true;
 
-    const progress$ = timer(300, 2000).pipe(
+    const progress$ = timer(300, 1500).pipe(
       map(() => Number((Math.random() * 25 + 5).toFixed(2))),
       scan((acc, curr) => Math.min(acc + curr, 95), 0),
       map((progress: number) => {

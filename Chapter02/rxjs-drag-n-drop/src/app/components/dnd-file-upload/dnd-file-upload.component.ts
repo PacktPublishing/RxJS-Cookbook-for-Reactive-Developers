@@ -14,8 +14,9 @@ import {
   filter,
   switchMap,
   takeUntil,
-  of,
-  repeat, from, mergeAll
+  repeat, from, mergeAll,
+  Observable,
+  EMPTY
 } from 'rxjs';
 import { RecipesService } from '../../services/recipes.service';
 import { FileWithProgress } from '../../types/recipes.type';
@@ -63,42 +64,36 @@ export class DndFileUploadComponent {
 
     drop$
       .pipe(
-        tap((event) => event.preventDefault()),
-        switchMap((event) => {
-          const files$ = from(Array.from(event.dataTransfer!.files));
-
-          return this.recipeService.validateFiles$(files$);
-        }),
-        map(file => {
-          if (!file.valid) {
-            return of(file);
-          }
-
-          return merge(
-            of(file), 
-            this.recipeService.uploadFileWithProgress$(file)
-          );
-        }),
+        tap((event: DragEvent) => event.preventDefault()),
+        switchMap((event: DragEvent) => this.validateFiles$(event)),
+        map((file: FileWithProgress) => this.handleFileValidation$(file)),
         mergeAll(),
         takeUntil(droppable$.pipe(filter((isDroppable) => !isDroppable))),
         repeat()
       )
       .subscribe({
-        next: (file: FileWithProgress) => {
-          if (Object.keys(file).length === 0) return;
-
-          if (file.valid && file) {
-            this.validFiles.set(file.name, file);
-
-            return;
-          }
-          
-          if (!file.valid) {
-            this._snackBar.open('Invalid file upload.', 'Close', {
-              duration: 4000
-            });
-          }
-        }
+        next: (file: FileWithProgress) => this.validFiles.set(file.name, file)
       });
+  }
+
+  validateFiles$(event: DragEvent): Observable<FileWithProgress> {
+    const files$ = from(Array.from(event.dataTransfer!.files));
+
+    return this.recipeService.validateFiles$(files$);
+  }
+  
+
+  handleFileValidation$(file: FileWithProgress): Observable<FileWithProgress | never> {
+    if (!file.valid) {
+      this._snackBar.open(`Invalid file ${file.name} upload.`, 'Close', {
+        duration: 4000
+      });
+
+      return EMPTY;
+    }
+
+    this.validFiles.set(file.name, file);
+
+    return this.recipeService.uploadFileWithProgress$(file);
   }
 }
