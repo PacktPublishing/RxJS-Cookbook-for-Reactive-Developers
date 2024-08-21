@@ -1,0 +1,29 @@
+.container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.success {
+    background-color: #667de7;
+    color: white;
+}
+
+.error {
+    background-color: #E15B89;
+    color: white;
+}
+
+.close {
+    cursor: pointer;
+    margin-left: 10px;
+}
