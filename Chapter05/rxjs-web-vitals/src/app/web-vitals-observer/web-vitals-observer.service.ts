@@ -16,7 +16,6 @@ export class WebVitalsObserverService {
         const observer = new PerformanceObserver((list) =>
           handler(list.getEntries())
         );
-        console.log(entryType)
         observer.observe({ entryTypes: [entryType], buffered: true });
         return observer;
       },
