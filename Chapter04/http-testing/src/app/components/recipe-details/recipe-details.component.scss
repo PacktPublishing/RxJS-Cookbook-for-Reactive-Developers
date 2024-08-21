@@ -1,0 +1,82 @@
+.card {
+    cursor: pointer;
+    border: 1px solid #ffdcd5;
+    border-radius: 20px;
+    margin: 20px auto;
+    width: 450px;
+    background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.mat-mdc-card-content {
+    padding: 0;
+
+    &:first-child, &:last-child {
+        padding: 0;
+    }
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    img {
+        border-radius: 20px;
+    }
+}
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+
+    .card-title {
+        display: flex;
+        justify-content: space-between;
+
+        .mat-mdc-chip {
+            background-color: #ffcf31;
+        }
+    }
+}
+
+.ingredient:nth-child(2n + 1) {
+    background-color: #F9E49B;
+}
+
+.ingredient:nth-child(2n + 2) {
+    background-color: #b2a5f3;
+}
+
+.recipe-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+
+    .mat-mdc-chip {
+        background-color: #ffd64e;
+    }
+}
+
+.prep {
+    // color: white;
+}
+
+// .ingredient:nth-child(4n + 3) {
+//     background-color: #7FD8C0;
+// }
+
+// .ingredient:nth-child(4n + 4) {
+//     background-color: #F6D294;
+// }
+
+// .ingredient:nth-child(4n) {
+//     background-color: #BDE6FF;
+// }

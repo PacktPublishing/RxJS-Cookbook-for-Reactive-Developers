@@ -1,0 +1,25 @@
+<mat-card class="card">
+    <mat-card-content>
+        <div class="card-content">
+            <div class="card-info">
+                <div>
+                    <h5>
+                        {{ recipe()?.name }}
+                    </h5>
+                    <p>{{ recipe()?.description }}</p>
+                </div>
+                <mat-chip-set class="ingredients">
+                    @for (ingredient of recipe()?.ingredients; track ingredient) {
+                        <mat-chip color="accent" class="ingredient">{{ ingredient }}</mat-chip>
+                    }
+                </mat-chip-set>
+            </div>
+            @if (image()) {
+                <img mat-card-image class="card-image" [src]="image()" [alt]="recipe()?.name">
+            } @else {
+                <img mat-card-image class="card-image" src="/assets/images/image-placeholder.png">
+            }
+        </div>
+    </mat-card-content>
+</mat-card>
+  
