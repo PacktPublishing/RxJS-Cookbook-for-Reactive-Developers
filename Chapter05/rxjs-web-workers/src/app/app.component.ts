@@ -15,15 +15,15 @@ export class AppComponent {
   ngOnInit(): void {
     if (typeof Worker !== 'undefined') {
       const worker = new Worker(new URL('./app.worker', import.meta.url));
-      worker.postMessage({ iterations: 1_000_000 });
-
+      worker.postMessage({ iterations: 1_000 });
       const message$ = fromEvent<MessageEvent>(worker, 'message').pipe(
         filter(( { data } ) => data !== null), 
-        distinctUntilKeyChanged('data'),
         map(({ data }) => data),
+        distinctUntilChanged(),
         bufferCount(1000),
         share() 
       );
+
 
       message$.subscribe((data) => {
         console.log('Received message from worker:', data);
