@@ -21,6 +21,7 @@ export class AppComponent {
         map(({ data }) => data),
         distinctUntilChanged(),
         bufferCount(1000),
+        throttleTime(10),
         share() 
       );
 
