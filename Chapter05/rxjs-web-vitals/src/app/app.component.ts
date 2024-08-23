@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { merge } from 'rxjs';
-import { WebVitalsObserverService } from './web-vitals-observer/web-vitals-observer.service';
+import { WebVitalsObserverService } from './services/web-vitals-observer/web-vitals-observer.service';
 
 @Component({
   selector: 'app-root',
