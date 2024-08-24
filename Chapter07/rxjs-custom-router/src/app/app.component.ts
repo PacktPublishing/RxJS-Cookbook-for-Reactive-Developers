@@ -14,35 +14,32 @@ import { CommonModule } from '@angular/common';
 export class AppComponent {
   title = 'rxjs-custom-router';
   component: any;
+  routeParams: { [key: string]: string } = {};
 
   constructor(private routerService: RouterService) { }
 
   ngOnInit(): void {
     this.routerService.paramMap.subscribe(params => {
-      console.log('Route params:', params);
+      this.routeParams = params;
     });
     setTimeout(() => {
       this.routerService.navigate('/home', { id: '123' });
     }, 5000);
-    // setTimeout(() => {
-    //   this.routerService.navigate('/about');
-    // }, 15000);
+    setTimeout(() => {
+      this.routerService.navigate('/about');
+    }, 15000);
     this.routerService.getCurrentRoute().subscribe(route => {
       console.log('Current route:', route);
       switch (route?.path) {
         case '/home':
           this.component = HomeComponent;
           break;
-        // case '/home?id=123':
-        //   this.component = HomeComponent;
-        //   break;
         case '/about':
           this.component = AboutComponent;
           break;
         case '/':
           this.component = HomeComponent;
           break;
-        // ... more routes here ...
       }
     });
   }
