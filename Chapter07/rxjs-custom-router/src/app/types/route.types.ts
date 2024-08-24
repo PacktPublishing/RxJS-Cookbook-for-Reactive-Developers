@@ -4,5 +4,5 @@ export interface CustomRoute {
     path: string;
     queryParams?: Map<string, string>;
     component: any;
-    canActivate?: any;
+    canActivate?: (path: string) => Observable<boolean | URL>;
   }
