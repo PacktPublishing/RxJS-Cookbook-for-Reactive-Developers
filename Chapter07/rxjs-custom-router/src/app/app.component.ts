@@ -4,6 +4,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AboutComponent } from './components/about/about.component';
 import { CommonModule } from '@angular/common';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { LoginComponent } from './components/login/login.component';
 
 @Component({
   selector: 'app-root',
@@ -25,9 +26,9 @@ export class AppComponent {
     setTimeout(() => {
       this.routerService.navigate('/home', { id: '123' });
     }, 5000);
-    setTimeout(() => {
-      this.routerService.navigate('/about');
-    }, 15000);
+    // setTimeout(() => {
+    //   this.routerService.navigate('/about');
+    // }, 15000);
     this.routerService.getCurrentRoute().subscribe(route => {
       console.log('Current route:', route);
       switch (route?.path) {
@@ -39,6 +40,9 @@ export class AppComponent {
           break;
         case '/':
           this.component = HomeComponent;
+          break;
+        case '/login':
+          this.component = LoginComponent;
           break;
         default:
           this.component = NotFoundComponent;

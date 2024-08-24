@@ -1,6 +1,8 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 export const appConfig: ApplicationConfig = {
-  providers: []
+  providers: [
+    AuthService
+  ]
 };
