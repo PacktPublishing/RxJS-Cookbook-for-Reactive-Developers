@@ -3,6 +3,7 @@ import { RouterService } from './services/router.service';
 import { HomeComponent } from './components/home/home.component';
 import { AboutComponent } from './components/about/about.component';
 import { CommonModule } from '@angular/common';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 @Component({
   selector: 'app-root',
@@ -39,6 +40,9 @@ export class AppComponent {
           break;
         case '/':
           this.component = HomeComponent;
+          break;
+        default:
+          this.component = NotFoundComponent;
           break;
       }
     });
