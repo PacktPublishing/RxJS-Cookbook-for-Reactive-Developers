@@ -4,7 +4,7 @@ import { customRoutes } from '../app.routes';
 
 export interface CustomRoute {
   path: string;
-  queryParams?: { [key: string]: string };
+  queryParams?: Map<string, string>;
   component: any;
 }
 
@@ -67,17 +67,17 @@ export class RouterService {
     this.navigationSubject.next(url.pathname + url.search);
   }
 
-  get paramMap(): Observable<{ [key: string]: string }> {
+  get paramMap(): Observable<Map<string, string>> {
     return this.currentRoute$.pipe(
       filter(route => route !== null),
-      map(route => route?.queryParams || {}),
+      map(route => route?.queryParams || new Map()),
     );
   }
 
-  private extractParams(path: string): { [key: string]: string } {
+  private extractParams(path: string): Map<string, string> {
     const url = new URL(window.location.origin + path);
-    const queryParams: { [key: string]: string } = {};
-    url.searchParams.forEach((value, key) => queryParams[key] = value);
+    const queryParams: Map<string, string> = new Map();
+    url.searchParams.forEach((value, key) => queryParams.set(key, value));
 
     return queryParams;
   }

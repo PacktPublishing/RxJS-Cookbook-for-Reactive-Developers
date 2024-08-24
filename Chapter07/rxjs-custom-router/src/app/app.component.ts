@@ -15,13 +15,12 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 export class AppComponent {
   title = 'rxjs-custom-router';
   component: any;
-  routeParams: { [key: string]: string } = {};
 
   constructor(private routerService: RouterService) { }
 
   ngOnInit(): void {
     this.routerService.paramMap.subscribe(params => {
-      this.routeParams = params;
+      console.log('Route params:', params.get('id'));
     });
     setTimeout(() => {
       this.routerService.navigate('/home', { id: '123' });
