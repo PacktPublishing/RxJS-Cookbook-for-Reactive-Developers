@@ -22,7 +22,7 @@ export class RouterService {
   private currentRoute$ = new BehaviorSubject<CustomRoute | null>(null);
   private navigationSubject = new ReplaySubject<string>(10);
 
-  constructor(private authService: AuthService) {
+  constructor() {
     fromEvent(window, 'popstate')
       .pipe(
         map(() => location.pathname + location.search),
