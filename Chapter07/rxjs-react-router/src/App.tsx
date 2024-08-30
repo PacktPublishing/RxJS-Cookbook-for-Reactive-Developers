@@ -6,9 +6,9 @@ import { ajax } from 'rxjs/ajax';
 
 const routes = [
   {
-    path: "/home/:userId",
+    path: "/home/:recipeId",
     loader: ({ params }: any) =>
-      ajax<any>(`https://super-recipes.com/api/recipes/${params.userId}`).subscribe(),
+      ajax<any>(`https://super-recipes.com/api/recipes/${params.recipeId}`).subscribe(),
     element: <ProtectedRoute>
       <Home />
     </ProtectedRoute>

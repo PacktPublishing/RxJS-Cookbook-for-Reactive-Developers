@@ -12,7 +12,7 @@ import {
   startWith,
   switchMap,
 } from 'rxjs';
-import { customRoutes } from '../app.routes';
+import { routes } from '../app.routes';
 import { CustomRoute } from '../types/route.types';
 
 @Injectable({
@@ -78,7 +78,7 @@ export class RouterService {
 
   private matchRoute(path: string): CustomRoute | null {
     const currentRoute =
-      customRoutes.find((route) => path.includes(route.path)) || null;
+      routes.find((route) => path.includes(route.path)) || null;
 
     if (!currentRoute) {
       return null;
@@ -107,7 +107,7 @@ export class RouterService {
     this.navigationSubject.next(url.pathname + url.search);
   }
 
-  get paramMap(): Observable<Map<string, string>> {
+  get queryParamMap(): Observable<Map<string, string>> {
     return this.currentRoute$.pipe(
       filter((route) => route !== null),
       map((route) => route?.queryParams || new Map())

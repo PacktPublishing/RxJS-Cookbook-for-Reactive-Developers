@@ -5,7 +5,7 @@ import { Routes } from './components/Routes'
 function App() {
   return (
     <>
-      <RouterProvider>
+    <RouterProvider>
       {/* <Navigation />
       <Routes /> */}
       <Routes />

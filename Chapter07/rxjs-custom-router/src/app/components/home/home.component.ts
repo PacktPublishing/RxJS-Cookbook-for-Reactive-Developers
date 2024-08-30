@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterService } from '../../services/router.service';
 
 @Component({
   selector: 'app-home',
@@ -9,4 +10,9 @@ import { Component } from '@angular/core';
 })
 export class HomeComponent {
 
+  constructor(private routerService: RouterService) { }
+
+  goToAbout(): void {
+    this.routerService.navigate('/about');
+  }
 }
