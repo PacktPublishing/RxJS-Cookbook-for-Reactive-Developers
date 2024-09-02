@@ -2,12 +2,12 @@ import { useObservableState } from "observable-hooks";
 import { useParams } from "../hooks/useParams";
 
 const AboutPage = () => {
-  const params$: any = useParams();
-  const params = useObservableState(params$);
+  const params$ = useParams();
+  const { id } = useObservableState(params$, {});
 
   return (
-    <div>AboutPage
-      {JSON.stringify(params)}
+    <div>
+      AboutPage id param: {id}
     </div>
   )
 }

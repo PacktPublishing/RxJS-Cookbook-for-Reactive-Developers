@@ -1,23 +1,26 @@
 import { useObservableState } from 'observable-hooks';
 import { Location, Navigate } from 'react-router-dom';
-import { map } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { useObservableLocation$ } from '../hooks/useLocation';
+import { ajax } from 'rxjs/ajax';
 
-const ProtectedRoute = ({ children }: any) => {
-  const location$ = useObservableLocation$().pipe(
-      map(({ pathname }: Location) => {
-          const parts = pathname.split('/');
-          const userIdIndex = parts.findIndex(part => part === 'home') + 1;
-          return parts[userIdIndex];
-        })
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const hasAccess$ = useObservableLocation$().pipe(
+      switchMap((location: Location) => {
+        return ajax<boolean>(`https://super-recipes.com/api/check-access`)
+      })
   );
-  const location = useObservableState(location$)
+  const hasAccess = useObservableState(hasAccess$)
 
-  if (!location) return;
+  if (!hasAccess) return;
   
   return (
     <> 
-      {location === '123' ? <div>{children}</div> : <Navigate to="/login" replace state={{ from: location }} />}
+      {hasAccess ? <>{children}</> : <Navigate to="/login" replace state={{ from: location }} />}
     </>
   )
 }

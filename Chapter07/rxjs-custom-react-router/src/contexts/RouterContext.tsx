@@ -1,43 +1,29 @@
 import React from 'react';
-import { BehaviorSubject, fromEvent } from 'rxjs';
+import { Observable, fromEvent } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { useObservable, useSubscription } from 'observable-hooks';
-import HomePage from '../components/HomePage';
-import AboutPage from '../components/AboutPage';
+import { useObservable } from 'observable-hooks';
+import { RouteConfig } from '../types/RouteConfig.type';
 
-export const routeConfig = [
-  {
-    path: '/home',
-    element: <HomePage />,
-  },
-  {
-    path: '/about',
-    element: <AboutPage />,
-  },
-  {
-    path: '/about/:id',
-    element: <AboutPage />,
-  },
-];
+interface RouterProviderProps {
+  router: RouteConfig[];
+  children: React.ReactNode;
+}
 
-export const RouterContext = React.createContext<any>(null);
-export const navigationSubject = new BehaviorSubject(window.location.pathname);
+export interface RouterContextProps {
+  path$: Observable<string>;
+  router: RouteConfig[];
+  navigate: (path: string) => void;
+}
 
-export function RouterProvider({ children }: React.PropsWithChildren<{}>) {
+export const RouterContext = React.createContext<RouterContextProps>({} as RouterContextProps);
 
+export function RouterProvider({ router, children }: RouterProviderProps) {
   const path$ = useObservable(() =>
     fromEvent(window, 'popstate').pipe(
-      map(() => window.location.pathname + location.search),
-      startWith(window.location.pathname + location.search)
-    )
+      map(() => window.location.pathname),
+      startWith(window.location.pathname)
+    ), ['']
   );
-
-  useSubscription(path$, (path) => {
-    const matchedRoute = matchRoute(path);
-    if (matchedRoute) {
-      navigationSubject.next(matchedRoute.path);
-    }
-  });
 
   function navigate(path: string, queryParams?: { [key: string]: string }) {
     const url = new URL(path, window.location.origin);
@@ -50,15 +36,10 @@ export function RouterProvider({ children }: React.PropsWithChildren<{}>) {
 
     history.pushState(null, '', url.toString());
     window.dispatchEvent(new Event('popstate'));
-    navigationSubject.next(url.pathname + url.search);
-  }
-
-  function matchRoute(path: string) {
-    return routeConfig.find((route) => path.split('/')[1].includes(route.path)) || null;
   }
 
   return (
-    <RouterContext.Provider value={{ path$, navigate }}>
+    <RouterContext.Provider value={{ path$, router, navigate }}>
       {children}
     </RouterContext.Provider>
   );

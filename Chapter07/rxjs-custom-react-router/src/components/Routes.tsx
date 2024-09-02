@@ -1,29 +1,38 @@
-import { useObservableState } from "observable-hooks";
+import { useObservableGetState } from "observable-hooks";
 import { useRouter } from "../hooks/useRouter";
-import { routeConfig } from "../contexts/RouterContext";
+import { map } from "rxjs";
+import { RouteConfig } from "../types/RouteConfig.type";
 
-export const findMathingRoutePattern = (pathname: string, pattern: string) => {
-    const pathPattern = pattern.split('/');
-    const pathArray = pathname.split('/');
+export const findMathingRoutePattern = (
+  pathname: string,
+  router: RouteConfig[]
+): RouteConfig | null => {
+  const pathArray = pathname.split("/");
 
-    if (pathPattern.length === pathArray.length && pathPattern[1] === pathArray[1]) {
-      return pathname;
-    }
-}
+  return (
+    router.find(
+      (route: RouteConfig) =>
+        route.path.split("/").length === pathArray.length &&
+        route.path
+          .split("/")
+          .every(
+            (path: string, index: number) =>
+              path === "" || path.startsWith(":") || path === pathArray[index]
+          )
+    ) || null
+  );
+};
 
 export function Routes() {
-    const { path$ } = useRouter();
-    const pathname = useObservableState<any>(path$)
-    
-    if (!pathname) return;
+  const { path$, router } = useRouter();
+  const component = useObservableGetState(
+    path$.pipe(
+      map((pathname: string) => findMathingRoutePattern(pathname, router))
+    ),
+    null
+  );
 
-    return routeConfig.map((route) => {
-      const routePattern = findMathingRoutePattern(pathname, route.path);
+  if (!component) return;
 
-      if (routePattern) {
-        return route.element;
-      }
-
-      return null;
-    });
-  }
+  return (component as RouteConfig).element;
+}
