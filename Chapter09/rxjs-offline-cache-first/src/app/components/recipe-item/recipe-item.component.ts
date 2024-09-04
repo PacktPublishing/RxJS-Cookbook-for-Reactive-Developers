@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { Recipe } from '../../store/recipes.types';
+import { Recipe } from '../../types/recipes.type';
 
 @Component({
   selector: 'app-recipe-item',

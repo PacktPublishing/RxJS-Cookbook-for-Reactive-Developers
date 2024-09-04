@@ -3,24 +3,20 @@ import {
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
-  HttpResponse
+  HttpResponse,
 } from '@angular/common/http';
 import { EMPTY, catchError, filter, from, map, switchMap, tap } from 'rxjs';
 
-export const offlineInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn
-) => {
+export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
   const openCache$ = from(caches.open('my-app-cache'));
   const continueRequest$ = next(req).pipe(
-    filter(
-      (response: HttpEvent<unknown>): response is HttpResponse<unknown> =>
-        response instanceof HttpResponse
-    ),
-    map(
-      (response: HttpResponse<unknown>) =>
-        new HttpResponse({ status: 200, body: response.body })
-    )
+    map((response: HttpEvent<unknown>) => {
+      if (response instanceof HttpResponse) {
+        return new HttpResponse({ status: 200, body: response.body });
+      }
+
+      return response;
+    })
   );
 
   return openCache$.pipe(
@@ -30,14 +26,16 @@ export const offlineInterceptor: HttpInterceptorFn = (
       }
 
       return from(cache.match(req.url)).pipe(
-        switchMap((cacheValue: Response | undefined) => cacheValue? cacheValue.json(): EMPTY),
-        map((response: Response) => new HttpResponse({ status: 200, body: response })),
+        switchMap((cacheValue: any) => cacheValue.json()),
+        map((response: unknown) => new HttpResponse({ status: 200, body: response })),
         catchError(() => {
           // No cached response found, go to network if online
           return continueRequest$.pipe(
-            tap((response) =>
-              cache!.put(req.url, new Response(JSON.stringify(response.body)))
-            )
+            tap((response: HttpEvent<unknown>) => {
+              if (response instanceof HttpResponse) {
+                cache!.put(req.url, new Response(JSON.stringify(response.body)));
+              }
+            })
           );
         })
       );

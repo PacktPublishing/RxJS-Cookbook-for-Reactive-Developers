@@ -29,10 +29,10 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              "src/mockServiceWorker.js",
-              "src/manifest.webmanifest"
+              "src/mockServiceWorker.js"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/deeppurple-amber.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -96,6 +96,7 @@
               "src/manifest.webmanifest"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/deeppurple-amber.css",
               "src/styles.scss"
             ],
             "scripts": []
