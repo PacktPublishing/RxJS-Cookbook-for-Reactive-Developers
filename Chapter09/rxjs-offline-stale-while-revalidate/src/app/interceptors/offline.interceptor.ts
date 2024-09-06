@@ -22,20 +22,17 @@ export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
 
   return concat(
     openCache$.pipe(
-      switchMap((cache: Cache) => {
-        return from(cache.match(req.url)).pipe(
-          switchMap((cacheValue: Response | undefined) => {
-            if (cacheValue) {
-              console.log('Cache hit');
-              return from(cacheValue.json());
-            }
+      switchMap((cache: Cache) => from(cache.match(req.url))),
+      switchMap((cacheValue: Response | undefined) => {
+        if (cacheValue) {
+          console.log('Cache hit');
+          return from(cacheValue.json());
+        }
 
-            return EMPTY;
-          }),
-          map((response: unknown) => new HttpResponse({ status: 200, body: response })),
-          catchError(() => EMPTY)
-        );
-      })
+        return EMPTY;
+      }),
+      map((response: unknown) => new HttpResponse({ status: 200, body: response })),
+      catchError(() => EMPTY)
     ),
     continueRequest$
   )
