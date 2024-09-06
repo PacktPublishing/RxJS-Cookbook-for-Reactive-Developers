@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'rxjs-offline-stale-while-revalidate' title`, () => {
+  it(`should have the 'rxjs-offline-cache-first' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('rxjs-offline-stale-while-revalidate');
+    expect(app.title).toEqual('rxjs-offline-cache-first');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, rxjs-offline-stale-while-revalidate');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, rxjs-offline-cache-first');
   });
 });
