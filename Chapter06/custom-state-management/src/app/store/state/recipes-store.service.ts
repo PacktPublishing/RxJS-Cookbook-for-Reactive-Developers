@@ -19,7 +19,7 @@ export class RecipesStoreService {
       orders: [],
     },
   };
-  private state$ = new BehaviorSubject<AppState>(this.initialState);
+  private state$ = new BehaviorSubject<Readonly<AppState>>(this.initialState);
   public actions$ = new Subject<Action>();
 
   constructor() {
