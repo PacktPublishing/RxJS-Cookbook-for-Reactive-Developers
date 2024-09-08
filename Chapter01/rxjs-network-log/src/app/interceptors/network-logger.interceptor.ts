@@ -1,17 +1,19 @@
 import {
   HttpErrorResponse,
+  HttpHandlerFn,
   HttpInterceptorFn,
+  HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { EMPTY, Observable, catchError, finalize, retry, tap } from 'rxjs';
 import { RecipesService } from '../services/recipes.service';
 
-export const networkLoggerInterceptor: HttpInterceptorFn = (req, next) => {
+export const networkLoggerInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
   const started = Date.now();
   const recipeService = inject(RecipesService);
 
-  function logSuccessfulResponse(event: any) {
+  function logSuccessfulResponse(event) {
     if (event instanceof HttpResponse) {
       const elapsed = Date.now() - started;
       console.log(`Request took %c${elapsed} ms`, 'color: #ffc26e');
