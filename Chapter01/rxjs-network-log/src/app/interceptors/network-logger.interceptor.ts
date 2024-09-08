@@ -1,21 +1,14 @@
 import {
-  HttpClient,
   HttpErrorResponse,
   HttpInterceptorFn,
   HttpResponse,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import {
-  Observable,
-  Subject,
-  catchError, exhaustMap,
-  finalize, of, retry, tap
-} from 'rxjs';
+import { EMPTY, Observable, catchError, finalize, retry, tap } from 'rxjs';
 import { RecipesService } from '../services/recipes.service';
 
 export const networkLoggerInterceptor: HttpInterceptorFn = (req, next) => {
   const started = Date.now();
-  const httpClient = inject(HttpClient);
   const recipeService = inject(RecipesService);
 
   function logSuccessfulResponse(event: any) {
@@ -33,12 +26,13 @@ export const networkLoggerInterceptor: HttpInterceptorFn = (req, next) => {
       'color: #ffc26e'
     );
     console.log('%cError:', 'color: #d30b8e', error);
-    recipeService.errorSubject.next(error);
+    // Avoid infinite loop if analytics endpoint fails
+    if (error.url !== 'https://super-recipes.com/api/analytics') {
+      recipeService.errorSubject.next(error);
+    }
 
-    return of();
+    return EMPTY;
   }
-
-  
 
   return next(req).pipe(
     tap(() =>

@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject, exhaustMap } from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, concatMap } from 'rxjs';
 import { Recipe } from '../types/recipes.type';
 
 @Injectable({
@@ -12,9 +12,10 @@ export class RecipesService {
   constructor(private http: HttpClient) {
     this.errorSubject
     .pipe(
-      exhaustMap((error: HttpErrorResponse) =>
+      concatMap((error: HttpErrorResponse) =>
         this.http.post('https://super-recipes.com/api/analytics', error)
-      )
+      ),
+      catchError(() => EMPTY)
     )
     .subscribe();
   }
