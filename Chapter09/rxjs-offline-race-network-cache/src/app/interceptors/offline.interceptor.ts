@@ -5,16 +5,23 @@ import {
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
-import { Observable, catchError, delay, from, map, raceWith, switchMap, withLatestFrom } from 'rxjs';
+import { EMPTY, Observable, catchError, delay, from, map, raceWith, switchMap, withLatestFrom } from 'rxjs';
 
 export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-  let cacheValue$: Observable<HttpEvent<unknown>>;
+  let dataFromCache$: Observable<HttpEvent<unknown>>;
   let continueRequestWithCacheSave$: Observable<HttpEvent<unknown>>;
 
   const openCache$ = from(caches.open('my-app-cache'));
-  cacheValue$ = openCache$.pipe(
+  dataFromCache$ = openCache$.pipe(
     switchMap((cache: Cache) => from(cache.match(req.url))),
-    switchMap((cacheValue: any) => cacheValue?.json()),
+    switchMap((cacheValue: Response | undefined) => {
+      if (cacheValue) {
+        console.log('Cache hit');
+        return from(cacheValue.json());
+      }
+
+      return EMPTY;
+    }),
     map((response: unknown) => {
       console.log('Offline response from Cache storage', response);
       return new HttpResponse({ status: 200, body: response })
@@ -32,11 +39,11 @@ export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
 
       return response;
     }),
-    catchError(() => cacheValue$),
+    catchError(() => dataFromCache$),
   );
 
   return continueRequestWithCacheSave$.pipe(
-    raceWith(cacheValue$),
+    raceWith(dataFromCache$),
   );
   
 };
