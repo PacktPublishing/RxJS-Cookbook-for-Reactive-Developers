@@ -36,10 +36,11 @@ export class SwipeUnlockComponent {
   numbersElement: HTMLDivElement[] = [];
   patternAttempt: number[] = [];
   pattern = [1, 2, 5, 8, 7];
-  message = {
-    type: 'iddle',
+  startMessage = {
+    type: 'idle',
     content: '',
   };
+  message = this.startMessage;
 
   ngAfterViewInit() {
     this.numbersElement = this.numbers
@@ -82,21 +83,19 @@ export class SwipeUnlockComponent {
   }
 
   private showMessage(): void {
-    if (arraysHaveSameElements(this.patternAttempt, this.pattern)) {
-      this.message = {
-        type: 'success',
-        content: 'Unlocked',
-      };
-    } else {
-      this.message = {
-        type: 'error',
-        content: 'Try again',
-      };
-    }
+    const isSuccess = arraysHaveSameElements(this.patternAttempt, this.pattern);
+    this.message = isSuccess ? {
+      type: 'success',
+      content: 'Unlocked',
+    } : {
+      type: 'error',
+      content: 'Try again',
+    };
   }
 
   private cleanup(): void {
     this.patternAttempt = [];
+    this.message = this.startMessage;
     this.numbersElement.forEach((number) =>
       number.classList.remove('selected')
     );
