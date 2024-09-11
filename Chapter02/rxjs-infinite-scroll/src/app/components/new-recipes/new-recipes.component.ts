@@ -24,6 +24,7 @@ export class NewRecipesComponent {
 
   refreshList(): void {
     this.refresh.emit();
+    this.number = 0;
   }
 
 }

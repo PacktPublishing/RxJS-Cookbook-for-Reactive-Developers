@@ -9,13 +9,16 @@ import {
   distinctUntilChanged,
   merge,
   switchMap,
-  debounceTime,
   Subject,
   takeUntil,
   finalize,
   BehaviorSubject,
   tap,
   startWith,
+  throttleTime,
+  auditTime,
+  observeOn,
+  animationFrameScheduler,
 } from 'rxjs';
 import { RecipesService } from './services/recipes.service';
 import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
@@ -39,6 +42,7 @@ export class AppComponent {
   constructor(private recipesService: RecipesService) {}
 
   private isNearBottom(): boolean {
+    console.log('scrolling');
     const threshold = 100; // Pixels from bottom
     const position = window.innerHeight + window.scrollY;
     const height = document.documentElement.scrollHeight;
@@ -52,7 +56,8 @@ export class AppComponent {
     scrollEvent$
       .pipe(
         startWith(null),
-        debounceTime(10), // Prevent excessive event triggering
+        auditTime(50), // Prevent excessive event triggering
+        observeOn(animationFrameScheduler),
         map(() => this.isNearBottom()),
         distinctUntilChanged(), // Emit only when near-bottom state changes
         filter((isNearBottom) => isNearBottom && !this.loading$.value),
@@ -81,6 +86,7 @@ export class AppComponent {
     this.page = 1;
     this.recipes = [];
     this.loading$.next(true);
+    this.noMoreData$.complete();
     window.scrollTo(0, 0);
     this.recipesService.getRecipes(this.page).subscribe((recipes) => {
       this.loading$.next(false);
