@@ -42,7 +42,6 @@ export class AppComponent {
   constructor(private recipesService: RecipesService) {}
 
   private isNearBottom(): boolean {
-    console.log('scrolling');
     const threshold = 100; // Pixels from bottom
     const position = window.innerHeight + window.scrollY;
     const height = document.documentElement.scrollHeight;
