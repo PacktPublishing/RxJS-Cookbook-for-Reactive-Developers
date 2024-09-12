@@ -7,7 +7,7 @@
     }
     <div class="audio-player-time">
         <p>{{ currentTime | time }}</p>
-        <audio #audio muted>
+        <audio #audio>
             Your browser does not support the audio element.
         </audio>
         <input type="range" class="song" [value]="currentTime" min="0" [max]="duration" (input)="skip($event)"  />
