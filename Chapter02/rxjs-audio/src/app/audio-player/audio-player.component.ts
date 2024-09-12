@@ -29,6 +29,7 @@ export class AudioPlayerComponent {
   isPlaying: boolean = false;
   volume: number = 0.5;
   currentTrack: Track | null = null;
+  errorMessage = '';
 
   constructor(private audioService: AudioService, private cdRef: ChangeDetectorRef) {}
 
@@ -50,8 +51,10 @@ export class AudioPlayerComponent {
     const time$ = fromEvent(audio, 'timeupdate').pipe(
       map(() => ({ time: audio.currentTime }))
     );
+    const error$ = fromEvent(audio, 'error');
   
     time$.subscribe(({ time }) => this.currentTime = time);
+    error$.subscribe((error: Event) => this.errorMessage = 'An error occurred while loading the audio file.');
 
     merge(duration$, playPauseClick$, pauseClick$, volumeChange$).subscribe(
       (state) => {
