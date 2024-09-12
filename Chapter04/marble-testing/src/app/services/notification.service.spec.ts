@@ -1,8 +1,7 @@
-import { TestBed, fakeAsync, flush } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { NotificationService } from './notification.service';
 import { TestScheduler } from 'rxjs/testing';
 import { Notification } from './notification.service';
-import { skip } from 'rxjs/operators';
 
 describe('NotificationService', () => {
   let service: NotificationService;
