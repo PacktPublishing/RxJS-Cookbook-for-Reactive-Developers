@@ -6,7 +6,6 @@ import { RecipesEffects } from './recipes.effects';
 import { RecipesService } from '../services/recipes.service';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Action } from '@ngrx/store';
-import { TestScheduler } from 'rxjs/testing';
 import { loadRecipesAction, loadRecipesActionSuccess, loadRecipesActionError } from './recipes.actions';
 import { provideHttpClient } from '@angular/common/http';
 
