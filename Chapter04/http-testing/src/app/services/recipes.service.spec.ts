@@ -35,7 +35,7 @@ describe('RecipesService', () => {
     httpMock.verify();
   });
 
-  fit('should fetch a list of recipes', async () => {
+  it('should fetch a list of recipes', async () => {
     const mockResponse = [
       {
         "id": 1,
@@ -125,7 +125,7 @@ describe('RecipesService', () => {
     expect(await recipeImages).toEqual(dummyImages);
   });
 
-  fit('should handle error when fetching recipes', async () => {
+  it('should handle error when fetching recipes', async () => {
     const recipes$ = service.getRecipes$();
     const recipes = firstValueFrom(recipes$);
 
