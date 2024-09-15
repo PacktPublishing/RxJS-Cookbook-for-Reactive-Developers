@@ -34,9 +34,12 @@ export class NotificationService {
     )
   }
 
-  addNotification(notification: Notification, timeout = 5000) {
+  addNotification(notification: Notification, autodismiss = true, timeout = 5000) {
     this.addNotification$.next(notification);
-    // timer(timeout).subscribe(() => this.removeNotification(notification.id)); 
+
+    if (autodismiss) {
+      timer(timeout).subscribe(() => this.removeNotification(notification.id)); 
+    }
   }
 
   removeNotification(id: string) {
