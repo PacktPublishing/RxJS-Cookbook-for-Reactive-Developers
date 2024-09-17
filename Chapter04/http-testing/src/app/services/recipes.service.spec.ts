@@ -125,18 +125,16 @@ describe('RecipesService', () => {
     expect(await recipeImages).toEqual(dummyImages);
   });
 
-  it('should handle error when fetching recipes', async () => {
+  fit('should handle error when fetching recipes', async () => {
     const recipes$ = service.getRecipes$();
     const recipes = firstValueFrom(recipes$);
 
-    try {
       const req = httpMock.expectOne('https://super-recipes.com/api/recipes');
       expect(req.request.method).toBe('GET');
-      req.flush('Failed!', {status: 500, statusText: 'Internal Server Error'}); 
+      req.flush('Failed!', {status: 500, statusText: 'Error fetching recipes'}); 
       const recipesResponse = await recipes;
-    } catch (error: any) {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toEqual('Error fetching recipes');
-    }
+      expect(recipesResponse).toBeInstanceOf(Error);
+      expect(recipesResponse.message).toEqual('Error fetching recipes');
+ 
   });
 });

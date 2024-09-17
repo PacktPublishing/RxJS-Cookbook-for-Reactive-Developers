@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
-  BehaviorSubject,
-  Observable,
+  BehaviorSubject, Observable,
   catchError,
   forkJoin,
   from,
@@ -9,8 +8,7 @@ import {
   mergeMap,
   of,
   switchMap,
-  tap,
-  throwError,
+  tap
 } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Recipe, RecipeDetails } from '../types/recipes.type';
@@ -27,9 +25,7 @@ export class RecipesService {
     return this.httpClient.get<Recipe[]>(
       'https://super-recipes.com/api/recipes'
     ).pipe(
-      catchError((error) => {
-        return throwError(() => new Error('Error fetching recipes'));
-      })
+      catchError(() => of(new Error('Error fetching recipes')))
     );
   }
 
