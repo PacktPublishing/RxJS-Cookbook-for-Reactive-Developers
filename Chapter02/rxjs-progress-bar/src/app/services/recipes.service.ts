@@ -2,10 +2,12 @@ import { Injectable } from '@angular/core';
 import {
   Observable,
   Subject, 
+  catchError, 
   finalize,
   interval,
   map,
   merge,
+  of,
   scan,
   takeUntil
 } from 'rxjs';
@@ -30,6 +32,7 @@ export class RecipesService {
       this.randomProgress$,
       this.httpClient.post<Recipe>('https://super-recipes.com/api/recipes', recipe).pipe(
         map(() => 100),
+        catchError(() => of(-1)),
         finalize(() => this.complete$.next()),
       )
     )

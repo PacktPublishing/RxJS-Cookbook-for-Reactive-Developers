@@ -1,5 +1,9 @@
 Progress:
-<div class="progress-bar-container">
-    <mat-progress-bar class="progress-bar" mode="determinate" [value]="progress"></mat-progress-bar>
-    <p>{{ progress }}%</p>
-</div>
+@if (progress === -1) {
+    <span class="complete">Something went wrong!</span>
+} @else {
+    <div class="progress-bar-container">
+        <mat-progress-bar class="progress-bar" mode="determinate" [value]="progress"></mat-progress-bar>
+        <p>{{ progress }}%</p>
+    </div>
+}

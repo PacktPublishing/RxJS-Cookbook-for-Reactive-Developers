@@ -24,9 +24,6 @@ export class ProgressBarComponent implements OnInit {
     }).subscribe({
       next: (value: number) => {
         this.progress = value;
-      },
-      complete: () => {
-        this.progress = 100;
       }
     });
   }
