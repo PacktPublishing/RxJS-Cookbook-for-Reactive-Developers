@@ -1,6 +1,7 @@
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatButtonModule } from '@angular/material/button';
 import {
   Component,
   ElementRef, ViewChild
@@ -16,23 +17,24 @@ import {
   takeUntil,
   repeat, from, mergeAll,
   Observable,
-  EMPTY
+  EMPTY, Subject
 } from 'rxjs';
-import { RecipesService } from '../../services/recipes.service';
-import { FileWithProgress } from '../../types/recipes.type';
+import { FileWithProgress } from '../../types/file-upload.type';
+import { FileUploadService } from '../../services/file-upload.service';
 
 @Component({
   selector: 'app-dnd-file-upload',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatProgressBarModule],
+  imports: [CommonModule, MatIconModule, MatProgressBarModule, MatButtonModule],
   templateUrl: './dnd-file-upload.component.html',
   styleUrl: './dnd-file-upload.component.scss'
 })
 export class DndFileUploadComponent {
   validFiles = new Map<string, FileWithProgress>();
   @ViewChild('dropzoneElement') dropzoneElement!: ElementRef;
+  private destroy$ = new Subject<void>();
 
-  constructor(private recipeService: RecipesService, private _snackBar: MatSnackBar) {}
+  constructor(private fileUploadService: FileUploadService, private _snackBar: MatSnackBar) {}
 
   ngAfterViewInit(): void {
     const dropzone = this.dropzoneElement.nativeElement;
@@ -65,23 +67,26 @@ export class DndFileUploadComponent {
     drop$
       .pipe(
         tap((event: DragEvent) => event.preventDefault()),
-        switchMap((event: DragEvent) => this.validateFiles$(event)),
+        switchMap((event: DragEvent) => {
+          const files$ = from(Array.from(event.dataTransfer!.files));
+
+          return this.fileUploadService.validateFiles$(files$);
+        }),
         map((file: FileWithProgress) => this.handleFileValidation$(file)),
         mergeAll(),
         takeUntil(droppable$.pipe(filter((isDroppable) => !isDroppable))),
         repeat()
       )
       .subscribe({
-        next: (file: FileWithProgress) => this.validFiles.set(file.name, file)
+        next: (file: FileWithProgress) => this.validFiles.set(file.name, file),
+        error: (err) => console.error(err),
       });
   }
 
-  validateFiles$(event: DragEvent): Observable<FileWithProgress> {
-    const files$ = from(Array.from(event.dataTransfer!.files));
-
-    return this.recipeService.validateFiles$(files$);
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
-  
 
   handleFileValidation$(file: FileWithProgress): Observable<FileWithProgress | never> {
     if (!file.valid) {
@@ -92,8 +97,13 @@ export class DndFileUploadComponent {
       return EMPTY;
     }
 
-    this.validFiles.set(file.name, file);
+    return this.fileUploadService.uploadFileWithProgress$(file);
+  }
 
-    return this.recipeService.uploadFileWithProgress$(file);
+  retryUpload(file: FileWithProgress): void {
+    this.fileUploadService.uploadFileWithProgress$(file).subscribe({
+      next: (file: FileWithProgress) => this.validFiles.set(file.name, file),
+      error: (err) => console.error(err),
+    });
   }
 }

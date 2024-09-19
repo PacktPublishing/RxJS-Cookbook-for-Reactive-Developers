@@ -14,6 +14,8 @@ import {
   catchError,
   of,
   shareReplay,
+  audit,
+  auditTime,
 } from 'rxjs';
 
 @Component({
@@ -38,14 +40,41 @@ export class ProImgComponent implements OnInit {
     img.src = !this.src.startsWith('http')
       ? `assets/images/${this.src}`
       : this.src;
+      const loadImageWithProgress = (url: string): Observable<string> => {
+        return new Observable((observer) => {
+          const xhr = new XMLHttpRequest();
+      
+          xhr.open('GET', url, true);
+          xhr.responseType = 'blob';
+      
+          xhr.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = Math.round((event.loaded / event.total) * 100);
+              this.loadingProgress$.next(+percentComplete);
+            }
+          };
+      
+          xhr.onload = () => {
+            const blobUrl = URL.createObjectURL(xhr.response);
+            observer.next(blobUrl);
+            observer.complete();
+          };
+      
+          xhr.onerror = () => {
+            this.loadingProgress$.next(-1);
+            observer.error(new Error('Image load failed'));
+          };
+      
+          xhr.send();
+        });
+      };
+      
 
-    const loadProgress$ = timer(0, 100); // Emit 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...
-    const loadComplete$ = fromEvent(img, 'load').pipe(map(() => 100)); // Emit 100 on load
-    const loadError$ = fromEvent(img, 'error').pipe(map(() => -1)); // Emit -1 on error
+    // const loadComplete$ = fromEvent(img, 'load').pipe(map(() => 100)); // Emit 100 on load
+    // const loadError$ = fromEvent(img, 'error').pipe(map(() => -1)); // Emit -1 on error
 
-    this.imageSrc$ = merge(loadProgress$, loadComplete$, loadError$).pipe(
-      tap((progress) => this.loadingProgress$.next(progress)),
-      map((progress) => (progress === 100 ? img.src : placeholderImg.src)),
+    this.imageSrc$ = loadImageWithProgress(img.src).pipe(
+      auditTime(1000),
       startWith(placeholderImg.src),
       takeWhile((src) => src === placeholderImg.src, true),
       catchError(() => of(placeholderImg.src)),

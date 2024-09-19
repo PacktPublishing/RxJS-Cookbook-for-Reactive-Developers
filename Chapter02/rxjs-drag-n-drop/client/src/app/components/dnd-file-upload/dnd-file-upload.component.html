@@ -1,0 +1,23 @@
+<div #dropzoneElement class="drop-zone-element">
+    <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="add_circle" class="add"></mat-icon>
+    <p>Drag and drop png image into the area below</p>
+</div>
+<div *ngFor="let file of validFiles | keyvalue" class="file-list">
+    <div class="file-element-container">
+        <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="folder" class="folder"></mat-icon>
+        <div class="file-element">
+            <p>{{ file.key }}</p>
+            <p>{{ (file.value.size / 1024).toFixed(2) }}kb</p>
+            <div class="progress-container">
+                <mat-progress-bar class="progress-bar" mode="determinate" [value]="file.value.progress"></mat-progress-bar>
+                @if (file.value.progress !== -1) {
+                    {{ file.value.progress }}%
+                } @else {
+                    <button mat-icon-button aria-label="Example icon button with a vertical three dot icon" color="primary" (click)="retryUpload(file.value)">
+                        <mat-icon aria-hidden="false" aria-label="Example redo icon" fontIcon="redo"></mat-icon>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
