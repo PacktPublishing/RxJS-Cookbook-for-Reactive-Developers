@@ -18,8 +18,8 @@ import { Recipe } from '../types/recipes.type';
 export class RecipesService {
   private complete$ = new Subject<void>();  
   private randomProgress$ = interval(800).pipe(
-    map(() => Number((Math.random() * 25 + 5).toFixed(2))),
-    scan((acc, curr) => Math.min(acc + curr, 95), 0),
+    map(() => Number((Math.random() * 25 + 5))),
+    scan((acc, curr) => +Math.min(acc + curr, 95).toFixed(2), 0),
     takeUntil(this.complete$)
   );
 
