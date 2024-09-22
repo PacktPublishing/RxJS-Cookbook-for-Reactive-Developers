@@ -1,5 +1,6 @@
 import {
   HttpErrorResponse,
+  HttpEvent,
   HttpHandlerFn,
   HttpInterceptorFn,
   HttpRequest,
@@ -13,7 +14,7 @@ export const networkLoggerInterceptor: HttpInterceptorFn = (req: HttpRequest<unk
   const started = Date.now();
   const recipeService = inject(RecipesService);
 
-  function logSuccessfulResponse(event) {
+  function logSuccessfulResponse(event: HttpEvent<unknown>): void {
     if (event instanceof HttpResponse) {
       const elapsed = Date.now() - started;
       console.log(`Request took %c${elapsed} ms`, 'color: #ffc26e');

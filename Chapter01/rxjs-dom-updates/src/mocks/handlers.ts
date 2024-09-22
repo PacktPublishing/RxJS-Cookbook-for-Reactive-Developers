@@ -10,7 +10,7 @@ export const handlers = [
 
     if (recipeName) {
       filteredRecipes = filteredRecipes.filter((recipe) =>
-        recipe.name.toLowerCase() === recipeName.toLowerCase()
+        recipe.name.toLowerCase().includes(recipeName.toLowerCase())
       );
     }
 
