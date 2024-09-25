@@ -1,10 +1,14 @@
-Player {{ currentPlayer }}'s turn
-<div (click)="handleMove(1)">1</div>
-<div (click)="handleMove(2)">2</div>
-<div (click)="handleMove(3)">3</div>
-<div (click)="handleMove(4)">4</div>
-<div (click)="handleMove(5)">5</div>
-<div (click)="handleMove(6)">6</div>
-<div (click)="handleMove(7)">7</div>
-<div (click)="handleMove(8)">8</div>
-<div (click)="handleMove(9)">9</div>
+Joined: {{ playerJoined }}
+Player {{ currentPlayerTurn }}'s turn
+<div class="board">
+    <div class="cell" (click)="handleMove(0)">{{ board[0] }}</div>
+    <div class="cell" (click)="handleMove(1)">{{ board[1] }}</div>
+    <div class="cell" (click)="handleMove(2)">{{ board[2] }}</div>
+    <div class="cell" (click)="handleMove(3)">{{ board[3] }}</div>
+    <div class="cell" (click)="handleMove(4)">{{ board[4] }}</div>
+    <div class="cell" (click)="handleMove(5)">{{ board[5] }}</div>
+    <div class="cell" (click)="handleMove(6)">{{ board[6] }}</div>
+    <div class="cell" (click)="handleMove(7)">{{ board[7] }}</div>
+    <div class="cell" (click)="handleMove(8)">{{ board[8] }}</div>
+</div>
+Winner: {{ winner }}

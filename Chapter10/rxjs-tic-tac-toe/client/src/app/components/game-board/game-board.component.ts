@@ -9,14 +9,27 @@ import { GameService } from '../../services/game.service';
   styleUrl: './game-board.component.scss'
 })
 export class GameBoardComponent implements OnInit {
-  currentPlayer = '';
+  currentPlayerTurn = '';
+  playerJoined = '';
+  board: any = [];
+  winner = '';
 
   constructor(private gameService: GameService) { }
 
   ngOnInit() {
-    this.gameService.move(1);
-    this.gameService.currentPlayer.subscribe((player) => {
-      this.currentPlayer = player;
+    this.gameService.join();
+    this.gameService.currentPlayerTurn.subscribe((player) => {
+      console.log('currentPlayerTurn', player);
+      this.currentPlayerTurn = player;
+    });
+    this.gameService.playerJoined.subscribe((player) => {
+      this.playerJoined = player;
+    });
+    this.gameService.board.subscribe((board) => {
+      this.board = board
+    });
+    this.gameService.winner.subscribe((winner) => {
+      this.winner = winner
     });
   }
 
