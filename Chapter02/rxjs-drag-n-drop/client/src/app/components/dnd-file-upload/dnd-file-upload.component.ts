@@ -37,7 +37,7 @@ export class DndFileUploadComponent {
   constructor(private fileUploadService: FileUploadService, private _snackBar: MatSnackBar) {}
 
   ngAfterViewInit(): void {
-    const dropzone = this.dropzoneElement.nativeElement;
+    const dropzone = this.dropzoneElement.nativeElement as HTMLDivElement;
 
     const dragenter$ = fromEvent<DragEvent>(dropzone, 'dragenter');
     const dragover$ = fromEvent<DragEvent>(dropzone, 'dragover').pipe(
