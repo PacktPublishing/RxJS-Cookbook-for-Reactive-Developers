@@ -58,7 +58,7 @@ export class FileUploadService {
     return newFile;
   }
 
-  uploadFile$(file: File): Observable<any> {
+  uploadFile$(file: File): Observable<number> {
     const formData = new FormData();
     formData.append('upload', file);
     const req = new HttpRequest('POST', 'http://localhost:3333/api/recipes/upload', formData, {
