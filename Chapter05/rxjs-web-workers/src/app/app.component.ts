@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { bufferCount, debounceTime, distinctUntilChanged, distinctUntilKeyChanged, filter, fromEvent, map, share, throttleTime } from 'rxjs';
+import { bufferCount, distinctUntilChanged, filter, fromEvent, map, share, throttleTime } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +15,7 @@ export class AppComponent {
   ngOnInit(): void {
     if (typeof Worker !== 'undefined') {
       const worker = new Worker(new URL('./app.worker', import.meta.url));
-      worker.postMessage({ iterations: 1_000 });
+      worker.postMessage({ iterations: 1_000_000 });
       const message$ = fromEvent<MessageEvent>(worker, 'message').pipe(
         filter(( { data } ) => data !== null), 
         map(({ data }) => data),
@@ -24,7 +24,6 @@ export class AppComponent {
         throttleTime(10),
         share() 
       );
-
 
       message$.subscribe((data) => {
         console.log('Received message from worker:', data);
