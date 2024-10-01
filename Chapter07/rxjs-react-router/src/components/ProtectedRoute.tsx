@@ -15,8 +15,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       })
   );
   const hasAccess = useObservableState(hasAccess$)
+  const location = useObservableState(useObservableLocation$());
 
-  if (!hasAccess) return;
+  if (hasAccess === undefined) return;
   
   return (
     <> 

@@ -4,10 +4,10 @@ import { useRouter } from "./useRouter";
 import { findMathingRoutePattern } from "../components/Routes";
 
 function extractParamsFromPath(
-  params: { [key: string]: string },
+  params: Record<string, string>,
   path: string,
   patternParts: string[]
-): { [key: string]: string } {
+): Record<string, string> {
   const pathParts = path?.split("/");
 
   for (let i = 0; i < patternParts.length; i++) {

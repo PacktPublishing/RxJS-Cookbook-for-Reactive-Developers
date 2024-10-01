@@ -1,4 +1,3 @@
-import { AuthService } from './auth.service';
 import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
@@ -25,8 +24,8 @@ export class RouterService {
   constructor() {
     fromEvent(window, 'popstate')
       .pipe(
-        map(() => location.pathname + location.search),
-        startWith(location.pathname + location.search)
+        map(() => window.location.pathname + window.location.search),
+        startWith(window.location.pathname + window.location.search)
       )
       .subscribe({
         next: (path) => {
@@ -78,7 +77,7 @@ export class RouterService {
 
   private matchRoute(path: string): CustomRoute | null {
     const currentRoute =
-      routes.find((route) => path.includes(route.path)) || null;
+      routes.find((route) => path.startsWith(route.path)) || null;
 
     if (!currentRoute) {
       return null;
@@ -94,7 +93,7 @@ export class RouterService {
     return this.currentRoute$.asObservable();
   }
 
-  navigate(path: string, queryParams?: { [key: string]: string }) {
+  navigate(path: string, queryParams?: Record<string, string>) {
     const url = new URL(path, window.location.origin);
 
     if (queryParams) {

@@ -25,7 +25,7 @@ export function RouterProvider({ router, children }: RouterProviderProps) {
     ), ['']
   );
 
-  function navigate(path: string, queryParams?: { [key: string]: string }) {
+  function navigate(path: string, queryParams?: Record<string, string>) {
     const url = new URL(path, window.location.origin);
 
     if (queryParams) {
