@@ -1,9 +1,8 @@
 import { MatButtonModule } from '@angular/material/button';
 import { Component } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Observable, catchError, of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { RecipeItemComponent } from '../recipe-item/recipe-item.component';
-import { Recipe } from '../../types/recipes.type';
 import { RecipesService } from '../../services/recipes.service';
 
 
@@ -15,15 +14,16 @@ import { RecipesService } from '../../services/recipes.service';
   styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent {
-  recipe$: Observable<Recipe> = new Observable<Recipe>();
-  recipeError$: Observable<Error> = new Observable<Error>();
+  recipe$: Subject<any> = new Subject();
 
   constructor(private recipesService: RecipesService) { }
 
+  ngOnInit(): void {
+    this.recipe$ = this.recipesService.recipes$;
+  }
+
   postRecipe(): void {
-    this.recipe$ = this.recipesService.postRecipe().pipe(
-      catchError(error =>  of(error))
-    );
+    this.recipesService.postRecipe();
   }
 
 }

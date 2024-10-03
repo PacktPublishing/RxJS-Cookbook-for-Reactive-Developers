@@ -1,6 +1,6 @@
 <button mat-flat-button color="primary" (click)="postRecipe()">Post Recipe</button>
 @if(recipe$ | async; as recipe) {
-    @if(recipe.id) {
+    @if(recipe?.id) {
         <div class="recipes-list">
             <div class="item">
                 <app-recipe-item [recipe]="recipe"></app-recipe-item>
