@@ -1,9 +1,12 @@
-@if(recipes) {
-    <div class="recipes-list">
-        @for (item of recipes; track item.id) {
+<button mat-flat-button color="primary" (click)="postRecipe()">Post Recipe</button>
+@if(recipe$ | async; as recipe) {
+    @if(recipe.id) {
+        <div class="recipes-list">
             <div class="item">
-                <app-recipe-item [recipe]="item"></app-recipe-item>
+                <app-recipe-item [recipe]="recipe"></app-recipe-item>
             </div>
-        }
-    </div>
+        </div>
+    } @else {
+        <div class="error-banner">Error posting recipe</div>
+    }
 }

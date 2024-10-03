@@ -4,10 +4,21 @@
     gap: 30px;
     align-items: stretch;
     height: 100%;
+    margin-top: 20px;
 }
 
 .item {
     width: calc(50% - 15px);
+}
+
+.error-banner {
+    margin-top: 20px;
+    background-color: #f8d7da;
+    color: #721c24;
+    margin-bottom: 1rem;
+    padding: .75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
 }
 
 // .item:nth-child(4n + 1) {

@@ -21,12 +21,10 @@ export class RecipesService {
   constructor(private http: HttpClient) { }
 
   postRecipe(): Observable<Recipe> {
-    this.recipes.next([...this.recipes.value, this.recipe]);
     return this.http.post<Recipe>('https://super-recipes.com/api/recipes', this.recipe).pipe(
       optimisticUpdate(this.recipe, (originalItem, error) => { 
         // Rollback UI changes here
         console.error('Error updating item:', error); 
-        this.recipes.next(this.recipes.value.filter((item) => item !== originalItem));
     }));
   }
 }
