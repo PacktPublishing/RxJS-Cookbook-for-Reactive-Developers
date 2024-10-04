@@ -11,6 +11,6 @@ export class RecipesService {
   constructor(private http: HttpClient) {}
 
   getRecipes(): Observable<Recipe[]> {    
-    return this.http.get<Recipe[]>('https://super-recipes.com/api/recipes');
+    return this.http.get<Recipe[]>('/api/recipes');
   }
 }

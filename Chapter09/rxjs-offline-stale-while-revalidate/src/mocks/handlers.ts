@@ -1,13 +1,26 @@
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { recipes } from './mock.json'
 
 export const handlers = [
-  http.get('https://super-recipes.com/api/recipes', async () => {
+  http.get('/api/recipes', async () => {
+    await delay(7000);
     return HttpResponse.json([...recipes, {
-      id: recipes.length + 1,
-      title: `Recipe ${recipes.length + 1}`,
-      description: 'This is a new recipe',
-      ingredients: ['Ingredient 1', 'Ingredient 2'],
-    }])
+      id: '6',
+      title: 'Chicken Alfredo',
+      description: 'A delicious pasta dish with chicken and creamy Alfredo sauce.',
+      image: '/assets/images/chicken-alfredo.png',
+      "ingredients": [
+        "chicken breasts", 
+        "fettuccine pasta", 
+        "butter", 
+        "heavy cream", 
+        "garlic", 
+        "parmesan cheese", 
+        "Italian seasoning", 
+        "salt", 
+        "pepper"
+      ],
+      }
+    ])
   }),
 ]
