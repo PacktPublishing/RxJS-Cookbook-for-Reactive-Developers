@@ -21,7 +21,6 @@ export class RecipesListComponent {
   ngOnInit() {
     this.recipesSubscription = this.recipesService.getRecipes().subscribe({
       next: (recipes: Recipe[]) => {
-        console.log(recipes)
         this.recipes = recipes;
       },
     });

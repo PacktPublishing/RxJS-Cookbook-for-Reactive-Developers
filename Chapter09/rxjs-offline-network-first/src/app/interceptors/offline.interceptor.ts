@@ -11,7 +11,6 @@ const cacheFallback = (req: HttpRequest<unknown>, openCache$: Observable<Cache>)
     switchMap((cache: Cache) => from(cache.match(req.url))),
     switchMap((cacheValue: Response | undefined) => {
       if (cacheValue) {
-        console.log('Cache hit');
         return from(cacheValue.json());
       }
 
@@ -32,6 +31,7 @@ export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
     withLatestFrom(openCache$),
     map(([response, cache]) => {
       if (response instanceof HttpResponse) {
+        console.log('Network hit', response.body);
         cache.put(req.url, new Response(JSON.stringify(response.body)));
       }
 

@@ -12,9 +12,13 @@ async function enableMocking() {
  
   // `worker.start()` returns a Promise that resolves
   // once the Service Worker is up and ready to intercept requests.
-  return worker.start({
-    onUnhandledRequest: "bypass", // Optional: Let real requests pass through if not mocked
-  })
+  if (navigator.onLine) {
+    return worker.start({
+      onUnhandledRequest: "bypass", // Optional: Let real requests pass through if not mocked
+    });
+  } 
+  
+  return Promise.resolve();
 }
 
 enableMocking().then(() => {
