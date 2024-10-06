@@ -4,15 +4,16 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 export interface Message {
   event: string;
-  payload?: any;
+  data?: any;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private socket$: WebSocketSubject<any>;
+  private socket$: WebSocketSubject<Message>;
   public chat$!: Observable<Message>;
+  public clientId$!: Observable<Message>;
 
   constructor() {
     this.socket$ = webSocket<Message>({
@@ -22,7 +23,12 @@ export class ChatService {
     this.chat$ = this.socket$.multiplex(
       () => ({ subscribe: 'chat' }), 
       () => ({ unsubscribe: 'chat' }), 
-      (message) => message.type === 'chat'
+      (message) => message.event === 'chat'
+    );
+    this.clientId$ = this.socket$.multiplex(
+      () => ({ subscribe: 'connect' }), 
+      () => ({ unsubscribe: 'connect' }), 
+      (message) => message.event === 'connect'
     );
     this.socket$.next({ event: 'connect', data: 'chat' });
   }
@@ -31,7 +37,11 @@ export class ChatService {
     this.socket$.next(msg);
   }
 
-  getMessages() {
-    return this.socket$.asObservable();
+  getSocket$() {
+    return this.clientId$;
+  }
+
+  getMessages$() {
+    return this.chat$;
   }
 }

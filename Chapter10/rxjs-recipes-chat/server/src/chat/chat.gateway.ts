@@ -1,77 +1,70 @@
-// import { SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
-// import { Observable, from, groupBy, map, mergeAll, mergeMap, tap, toArray } from 'rxjs';
-// import * as WebSocket from 'ws';
-
-// const messages$ = from([
-//   { topic: 'topic1', content: 'Hello, world!' },
-//   { topic: 'topic2', content: 'How are you?' },
-//   { topic: 'topic1', content: 'I\'m fine, thank you.' },
-//   // More messages...
-// ]);
-
-// const groupedMessages$ = messages$.pipe(
-//   groupBy(message => message.topic),
-//   mergeMap(group$ =>
-//     group$.pipe(toArray())
-//   ),
-//   tap(console.log)
-//   // mergeAll()
-// );
-
-// @WebSocketGateway(8080)
-// export class ChatGateway {
-//   @WebSocketServer()
-//   server: WebSocket.Server;
-
-//   @SubscribeMessage('message')
-//   handleMessage(client: WebSocket, payload: any): Observable<WsResponse<string>> {
-//     return groupedMessages$;
-//   }
-// }
-
-import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets';
-import { time } from 'console';
-import { from, Observable, ReplaySubject, Subject } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { BehaviorSubject, ReplaySubject, Subject } from 'rxjs';
+import { map, scan, shareReplay, tap, withLatestFrom } from 'rxjs/operators';
 import * as WebSocket from 'ws';
+
+export interface Message {
+  event: string;
+  data?: any;
+}
 
 @WebSocketGateway(8080)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: WebSocket.Server;
 
-  private topics: { [topic: string]: Subject<any> } = {};
-
+  private clientMap = new Map<string, WebSocket>();
+  private clients$ = new BehaviorSubject<Map<string, { clientId: string, client: WebSocket }>>(this.clientMap);
+  private topics: { [topic: string]: ReplaySubject<{ message: string, clientId: string }> } = {};
+  
   @SubscribeMessage('connect')
-  handleSubscribe(client: WebSocket, topic: string): void {
+  handleSubscribe(
+    @MessageBody() topic: string,
+    @ConnectedSocket() client: WebSocket,
+  ): void {
     if (!this.topics[topic]) {
       this.topics[topic] = new ReplaySubject();
     }
-
     const subscription = this.topics[topic].pipe(
-      map(data => ({ message: data, timestamp: new Date() })),
-      map(data => ({ event: 'message', payload: data }))
-    ).subscribe(
-      (response) => client.send(JSON.stringify(response))
-    );
+      withLatestFrom(this.clients$),
+      map(([data, clients]) => ({ 
+        id: crypto.randomUUID(), 
+        message: data.message, 
+        timestamp: new Date(),
+        sender: clients.get(data.clientId).clientId
+      })),
+      tap(data => console.log(data)),
+      scan((acc, message) => [...acc, message], []),
+      map(data => ({ event: 'chat', data })),
+      shareReplay(1)
+    ).subscribe((response) => client.send(JSON.stringify(response)));
 
     client.on('close', () => subscription.unsubscribe());
   }
 
   @SubscribeMessage('message')
-  handleMessage(client: WebSocket, payload: { topic: string, message: string }): void {
-    const { topic, message } = payload;
+  handleMessage(
+    @MessageBody() payload: { topic: string, message: string, clientId: string }
+  ): void {
+    const { topic, message, clientId } = payload;
 
     if (this.topics[topic]) {
-      this.topics[topic].next(message);
+      this.topics[topic].next({
+        message,
+        clientId,
+      });
     }
   }
 
   handleConnection(client: WebSocket, ...args: any[]): void {
-    console.log('Client connected');
+    const clientId = crypto.randomUUID();
+    this.clientMap.set(clientId, { clientId, client });
+    this.clients$.next(this.clientMap);
+    client.send(JSON.stringify({ event: 'connect', data: clientId }));
   }
-
-  handleDisconnect(client: WebSocket): void {
-    console.log('Client disconnected');
+  
+  handleDisconnect(): void {
+    this.clientMap.clear();
+    this.clients$.next(this.clientMap);
   }
 }

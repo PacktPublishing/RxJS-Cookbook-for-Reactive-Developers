@@ -1,25 +1,33 @@
-// chat.component.ts
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ChatService } from '../../services/chat.service';
+import { Observable, map } from 'rxjs';
+import { ChatService, Message } from '../../services/chat.service';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
+  imports: [CommonModule, AsyncPipe],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent {
-  messages$ = this.chatService.getMessages();
+  messages$: Observable<any> | undefined;
+  clientId: string = '';
 
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this.chatService.getMessages().subscribe(console.log);
+    this.chatService.getSocket$().pipe(
+      map((msg: Message) => msg.data)
+    ).subscribe(clientId => this.clientId = clientId);
+    this.messages$ = this.chatService.getMessages$();
   }
 
-  sendMessage(msg = { event: 'message', data: { topic: 'chat', message: 'Hola!' } }) {
+  sendMessage(msg = { event: 'message', data: { topic: 'chat', message: 'Hola!', clientId: this.clientId } }) {
     this.chatService.sendChatMessage(msg);
+  }
+
+  isSender(sender: string): boolean {
+    return sender === this.clientId;
   }
 }

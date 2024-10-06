@@ -1,1 +1,15 @@
 <button (click)="sendMessage()">SEND</button>
+@if (messages$ | async; as messages) {
+    <div class="chat-container">
+        @for (chatMessage of messages.data; track chatMessage.message) {
+            <div class="message" [ngClass]="{
+                'sent': isSender(chatMessage.sender),
+                'received': !isSender(chatMessage.sender),
+            }">
+                <span>{{ chatMessage.message }}</span>
+                <span>{{ chatMessage.timestamp }}</span>
+            </div>
+        }
+    </div>
+}
+<input type="text" />
