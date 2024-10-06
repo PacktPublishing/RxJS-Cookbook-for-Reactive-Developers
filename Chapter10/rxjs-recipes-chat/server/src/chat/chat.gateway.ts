@@ -13,8 +13,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: WebSocket.Server;
 
-  private clientMap = new Map<string, WebSocket>();
-  private clients$ = new BehaviorSubject<Map<string, { clientId: string, client: WebSocket }>>(this.clientMap);
   private topics: { [topic: string]: ReplaySubject<{ message: string, clientId: string }> } = {};
   
   @SubscribeMessage('connect')
@@ -26,12 +24,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.topics[topic] = new ReplaySubject();
     }
     const subscription = this.topics[topic].pipe(
-      withLatestFrom(this.clients$),
-      map(([data, clients]) => ({ 
+      map(({ message, clientId }) => ({ 
         id: crypto.randomUUID(), 
-        message: data.message, 
+        message: message, 
         timestamp: new Date(),
-        sender: clients.get(data.clientId).clientId
+        sender: clientId
       })),
       tap(data => console.log(data)),
       scan((acc, message) => [...acc, message], []),
@@ -58,13 +55,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: WebSocket, ...args: any[]): void {
     const clientId = crypto.randomUUID();
-    this.clientMap.set(clientId, { clientId, client });
-    this.clients$.next(this.clientMap);
     client.send(JSON.stringify({ event: 'connect', data: clientId }));
   }
   
   handleDisconnect(): void {
-    this.clientMap.clear();
-    this.clients$.next(this.clientMap);
+
   }
 }
