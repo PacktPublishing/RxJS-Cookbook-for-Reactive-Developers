@@ -14,6 +14,7 @@ export class ChatService {
   private socket$: WebSocketSubject<Message>;
   public chat$!: Observable<Message>;
   public clientId$!: Observable<Message>;
+  public isTyping$!: Observable<Message>;
 
   constructor() {
     this.socket$ = webSocket<Message>({
@@ -30,6 +31,11 @@ export class ChatService {
       () => ({ unsubscribe: 'connect' }), 
       (message) => message.event === 'connect'
     );
+    // this.isTyping$ = this.socket$.multiplex(
+    //   () => ({ subscribe: 'typing' }), 
+    //   () => ({ unsubscribe: 'typing' }), 
+    //   (message) => message.event === 'typing'
+    // );
     this.socket$.next({ event: 'connect', data: 'chat' });
   }
 
@@ -37,11 +43,19 @@ export class ChatService {
     this.socket$.next(msg);
   }
 
+  sendIsTyping(clientId: string, isTyping: boolean = true) {
+    this.socket$.next({ event: 'typing', data: { topic: 'chat', clientId, isTyping } });
+  }
+
   getSocket$() {
     return this.clientId$;
   }
 
-  getMessages$() {
+  getChatSocket$() {
     return this.chat$;
+  }
+
+  getIsTyping$() {
+    return this.isTyping$;
   }
 }

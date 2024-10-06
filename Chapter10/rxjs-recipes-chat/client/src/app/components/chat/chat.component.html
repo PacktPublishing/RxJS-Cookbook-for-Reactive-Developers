@@ -1,10 +1,16 @@
+Client ID: {{ clientId }}
 <button (click)="sendMessage()">SEND</button>
-@if (messages$ | async; as messages) {
+<input type="text" (input)="handleTypeMessage($event)" />
+
+@if(isTyping) {
+    <div class="typing">Typing...</div>
+}
+@if (messages.length > 0) {
     <div class="chat-container">
-        @for (chatMessage of messages.data; track chatMessage.message) {
+        @for (chatMessage of messages; track chatMessage.id) {
             <div class="message" [ngClass]="{
-                'sent': isSender(chatMessage.sender),
-                'received': !isSender(chatMessage.sender),
+                'sent': isSender(chatMessage.clientId),
+                'received': !isSender(chatMessage.clientId),
             }">
                 <span>{{ chatMessage.message }}</span>
                 <span>{{ chatMessage.timestamp }}</span>
@@ -12,4 +18,3 @@
         }
     </div>
 }
-<input type="text" />
