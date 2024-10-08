@@ -1,7 +1,7 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Observable, map } from 'rxjs';
-import { ChatService, Message } from '../../services/chat.service';
+import { map } from 'rxjs';
+import { ChatService, Message, WsMessage } from '../../services/chat.service';
 
 @Component({
   selector: 'app-chat',
@@ -11,7 +11,7 @@ import { ChatService, Message } from '../../services/chat.service';
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent {
-  messages: Array<any> = [];
+  messages: Array<Message> = [];
   clientId: string = '';
   isTyping = false;
 
@@ -19,26 +19,21 @@ export class ChatComponent {
 
   ngOnInit(): void {
     this.chatService.getSocket$().pipe(
-      map((msg: Message) => msg.data)
+      map((msg: WsMessage) => msg.data)
     ).subscribe(clientId => this.clientId = clientId);
-    // this.messages$ = this.chatService.getMessages$();
-    this.chatService.getChatSocket$().subscribe(({ data }: Message) => {
+    this.chatService.getChatSocket$().subscribe(({ data }: WsMessage) => {
       if ('clientId' in data) {
         this.isTyping = data.clientId !== this.clientId;
         
         return;
       }
 
-      console.log('chatMessageschatMessages', data)
       this.messages = data;
     });
-    // this.chatService.getIsTyping$().subscribe((isTypingMessage: Message) => {
-    //   this.isTyping = isTypingMessage.data.clientId !== this.clientId;  
-    // });
   }
 
-  sendMessage(msg = { event: 'message', data: { topic: 'chat', message: 'Hola!', clientId: this.clientId } }) {
-    this.chatService.sendChatMessage(msg);
+  sendMessage(msg = 'Hola') {
+    this.chatService.sendChatMessage(msg, this.clientId);
   }
 
   isSender(sender: string): boolean {

@@ -3,6 +3,13 @@ import { Observable } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 export interface Message {
+  id: string;
+  message: string;
+  clientId: string;
+  timestamp: Date;
+}
+
+export interface WsMessage {
   event: string;
   data?: any;
 }
@@ -11,15 +18,15 @@ export interface Message {
   providedIn: 'root'
 })
 export class ChatService {
-  private socket$: WebSocketSubject<Message>;
-  public chat$!: Observable<Message>;
-  public clientId$!: Observable<Message>;
-  public isTyping$!: Observable<Message>;
+  private socket$: WebSocketSubject<WsMessage>;
+  public chat$!: Observable<WsMessage>;
+  public clientId$!: Observable<WsMessage>;
+  public isTyping$!: Observable<WsMessage>;
 
   constructor() {
-    this.socket$ = webSocket<Message>({
+    this.socket$ = webSocket<WsMessage>({
       url: 'ws://localhost:8080',
-      deserializer: (e) => JSON.parse(e.data) as Message,
+      deserializer: (e) => JSON.parse(e.data) as WsMessage,
     });
     this.chat$ = this.socket$.multiplex(
       () => ({ subscribe: 'chat' }), 
@@ -27,8 +34,8 @@ export class ChatService {
       (message) => message.event === 'chat'
     );
     this.clientId$ = this.socket$.multiplex(
-      () => ({ subscribe: 'connect' }), 
-      () => ({ unsubscribe: 'connect' }), 
+      () => ({ subscribe: 'connection' }), 
+      () => ({ unsubscribe: 'connection' }), 
       (message) => message.event === 'connect'
     );
     // this.isTyping$ = this.socket$.multiplex(
@@ -39,8 +46,8 @@ export class ChatService {
     this.socket$.next({ event: 'connect', data: 'chat' });
   }
 
-  sendChatMessage(msg: Message) {
-    this.socket$.next(msg);
+  sendChatMessage(message: string, clientId: string) {
+    this.socket$.next({ event: 'message', data: { topic: 'chat', message, clientId }});
   }
 
   sendIsTyping(clientId: string, isTyping: boolean = true) {
@@ -51,7 +58,7 @@ export class ChatService {
     return this.clientId$;
   }
 
-  getChatSocket$() {
+  getChatSocket$(): Observable<WsMessage> {
     return this.chat$;
   }
 
