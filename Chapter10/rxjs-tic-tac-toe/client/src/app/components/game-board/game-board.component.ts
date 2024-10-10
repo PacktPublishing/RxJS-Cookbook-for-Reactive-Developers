@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameService } from '../../services/game.service';
+import { WebSocketService, WsMessage } from '../../services/web-socket.service';
 
 @Component({
   selector: 'app-game-board',
@@ -9,31 +10,28 @@ import { GameService } from '../../services/game.service';
   styleUrl: './game-board.component.scss'
 })
 export class GameBoardComponent implements OnInit {
-  currentPlayerTurn = '';
+  currentPlayerTurn = 'X';
   playerJoined = '';
-  board: any = [];
+  board = Array(9).fill(null);
   winner = '';
 
-  constructor(private gameService: GameService) { }
+  constructor(private wsService: WebSocketService) { }
 
   ngOnInit() {
-    this.gameService.join();
-    this.gameService.currentPlayerTurn.subscribe((player) => {
-      console.log('currentPlayerTurn', player);
-      this.currentPlayerTurn = player;
+    this.wsService.getPlayers$().subscribe(({ data }: WsMessage) => {
+      this.playerJoined = data;
     });
-    this.gameService.playerJoined.subscribe((player) => {
-      this.playerJoined = player;
+    this.wsService.getWinner$().subscribe(({ data }: WsMessage) => {
+      this.winner = data;
     });
-    this.gameService.board.subscribe((board) => {
-      this.board = board
-    });
-    this.gameService.winner.subscribe((winner) => {
-      this.winner = winner
+    this.wsService.getBoardUpdate$().subscribe(({ data }: WsMessage) => {
+      const { move, currentPlayer, nextPlayer } = data;
+      this.board[move] = currentPlayer;
+      this.currentPlayerTurn = nextPlayer;
     });
   }
 
   handleMove(field: number) {
-    this.gameService.move(field);
+    this.wsService.move(field, this.playerJoined, this.currentPlayerTurn);
   }
 }
