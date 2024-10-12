@@ -20,7 +20,7 @@ export interface WsMessage {
 export class ChatService {
   private socket$: WebSocketSubject<WsMessage>;
   public chat$!: Observable<WsMessage>;
-  public clientId$!: Observable<WsMessage>;
+  public clientConnection$!: Observable<WsMessage>;
   public isTyping$!: Observable<WsMessage>;
 
   constructor() {
@@ -33,16 +33,16 @@ export class ChatService {
       () => ({ unsubscribe: 'chat' }), 
       (message) => message.event === 'chat'
     );
-    this.clientId$ = this.socket$.multiplex(
+    this.clientConnection$ = this.socket$.multiplex(
       () => ({ subscribe: 'connection' }), 
       () => ({ unsubscribe: 'connection' }), 
       (message) => message.event === 'connect'
     );
-    // this.isTyping$ = this.socket$.multiplex(
-    //   () => ({ subscribe: 'typing' }), 
-    //   () => ({ unsubscribe: 'typing' }), 
-    //   (message) => message.event === 'typing'
-    // );
+    this.isTyping$ = this.socket$.multiplex(
+      () => ({ subscribe: 'typing' }), 
+      () => ({ unsubscribe: 'typing' }), 
+      (message) => message.event === 'typing'
+    );
     this.socket$.next({ event: 'connect', data: 'chat' });
   }
 
@@ -54,8 +54,8 @@ export class ChatService {
     this.socket$.next({ event: 'typing', data: { topic: 'chat', clientId, isTyping } });
   }
 
-  getSocket$() {
-    return this.clientId$;
+  getClientConnection$(): Observable<WsMessage> {
+    return this.clientConnection$;
   }
 
   getChatSocket$(): Observable<WsMessage> {

@@ -1,6 +1,5 @@
-Client ID: {{ clientId }}
 <button (click)="sendMessage()">SEND</button>
-<input type="text" (input)="handleTypeMessage($event)" />
+<input class="new-message" type="text" (input)="handleTypeMessage($event)" />
 
 @if(isTyping) {
     <div class="typing">Typing...</div>
@@ -12,8 +11,8 @@ Client ID: {{ clientId }}
                 'sent': isSender(chatMessage.clientId),
                 'received': !isSender(chatMessage.clientId),
             }">
-                <span>{{ chatMessage.message }}</span>
-                <span>{{ chatMessage.timestamp }}</span>
+                <p>{{ chatMessage.message }}</p>
+                <span class="time">{{ chatMessage.timestamp | date:'shortTime' }}</span>
             </div>
         }
     </div>

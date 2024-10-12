@@ -1,6 +1,6 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { map } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 import { ChatService, Message, WsMessage } from '../../services/chat.service';
 
 @Component({
@@ -18,10 +18,15 @@ export class ChatComponent {
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
-    this.chatService.getSocket$().pipe(
+    this.chatService.getClientConnection$().pipe(
       map((msg: WsMessage) => msg.data)
-    ).subscribe(clientId => this.clientId = clientId);
-    this.chatService.getChatSocket$().subscribe(({ data }: WsMessage) => {
+    ).subscribe(({ clientId, isOnline }) => {
+      console.log(isOnline)
+      this.clientId = clientId
+    });
+    this.chatService.getChatSocket$().pipe(
+      shareReplay({ bufferSize: 1, refCount: true })
+    ).subscribe(({ data }: WsMessage) => {
       if ('clientId' in data) {
         this.isTyping = data.clientId !== this.clientId;
         
@@ -32,7 +37,7 @@ export class ChatComponent {
     });
   }
 
-  sendMessage(msg = 'Hola') {
+  sendMessage(msg = 'HolaHolaHolaHolaHola') {
     this.chatService.sendChatMessage(msg, this.clientId);
   }
 

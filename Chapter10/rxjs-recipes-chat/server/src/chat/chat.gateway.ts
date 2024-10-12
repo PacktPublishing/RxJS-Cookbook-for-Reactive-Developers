@@ -1,6 +1,6 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { ReplaySubject, merge } from 'rxjs';
-import { filter, map, scan, shareReplay } from 'rxjs/operators';
+import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ReplaySubject, Subscription, merge } from 'rxjs';
+import { filter, map, scan, shareReplay, withLatestFrom } from 'rxjs/operators';
 import * as WebSocket from 'ws';
 
 export interface WsMessage {
@@ -20,33 +20,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: WebSocket.Server;
 
-  private topics: { [topicKey: string]: ReplaySubject<Message | { typing: string } | any> } = {};
+  private topics: { [topicKey: string]: ReplaySubject<Message | { typing: string } | any> } = {
+    chat: new ReplaySubject(100),
+  };
+  private chatSubscription: Subscription;
   
-  @SubscribeMessage('connect')
-  handleSubscribe(
-    @MessageBody() topicKey: string,
-    @ConnectedSocket() client: WebSocket,
-  ): void {
-    if (!this.topics[topicKey]) {
-      this.topics[topicKey] = new ReplaySubject();
-    }
+  constructor() {
+    const chatTopic$ = this.topics['chat'].pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
-    const topics$ = this.topics[topicKey].pipe(shareReplay(1));
-
-    const chat$ = topics$.pipe(
-      filter(data => 'message' in data),
+    const messages$ = chatTopic$.pipe(
+      filter((data: WsMessage) => 'message' in data),
       scan((acc, message) => [...acc, message], []),
       map(messages => ({ event: 'chat', data: messages }))
     );
 
-    const typing$ = topics$.pipe(
-      filter(data => 'typing' in data),
+    const typing$ = chatTopic$.pipe(
+      filter((data: { typing: string }) => 'typing' in data),
       map((data: { typing: string }) => ({ event: 'chat', data: { clientId: data.typing } })),
     );
 
-    const subscription = merge(chat$, typing$).subscribe(response => client.send(JSON.stringify(response)));
+    this.chatSubscription = merge(messages$, typing$).subscribe((response) => {
+      this.server.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(response));
+        }
 
-    client.on('close', () => subscription.unsubscribe());
+      });
+    });    
+  }
+  
+  @SubscribeMessage('connect')
+  handleSubscribe(
+    @MessageBody() topicKey: string,
+  ): void {
+    if (!this.topics[topicKey]) {
+      this.topics[topicKey] = new ReplaySubject();
+    }
   }
 
   @SubscribeMessage('typing')
@@ -78,18 +87,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleConnection(client: WebSocket, ...args: any[]): void {
+  handleConnection(client: WebSocket): void {
     const clientId = crypto.randomUUID();
-    client.send(JSON.stringify({ event: 'connect', data: clientId }));
-    // this.topics['connection'].next({ id: clientId, timestamp: new Date() });
+    client.id = clientId;
+    client.send(JSON.stringify({ event: 'connect', data: { clientId, isOnline: true } }));
   }
   
   handleDisconnect(client: WebSocket): void {
-    // this.server.clients.forEach(client => {
-    //   if (client.readyState === WebSocket.OPEN) {
-    //     client.send(JSON.stringify({ event: 'connect', data: null }));
-    //   }
-    // });
-    // client.send(JSON.stringify({ event: 'connect', data: null }));
+    this.server.clients.forEach(c => {
+      if (c.id === client.id) {
+        c.close();
+      } else {
+        c.send(JSON.stringify({ event: 'connect', data: { clientId: client.id, isOnline: false } }));
+      }
+    });
   }
 }

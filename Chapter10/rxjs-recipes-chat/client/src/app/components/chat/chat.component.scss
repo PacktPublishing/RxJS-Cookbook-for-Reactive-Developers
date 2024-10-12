@@ -8,26 +8,59 @@
     overflow-y: auto;
     border: 1px solid #ddd;
     border-radius: 10px;
-    background-color: #fafafa;
+    background: linear-gradient(to right, #ece9e6, #ffffff); /* Gradient background */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for 3D effect */
 }
 
-.message {
-    margin-bottom: 10px;
-    padding: 10px;
+.new-message {
+    width: 100%;
+    padding: 10px 20px;
+    margin: 20px 0;
+    font-size: 16px;
+    border: none;
     border-radius: 20px;
+    box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2); /* Shadow for 3D effect */
+    outline: none;
+    transition: box-shadow 0.3s ease; /* Transition effect for box-shadow */
+}
+
+// .new-message:focus {
+//     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5); /* Different shadow when the input is focused */
+// }
+
+.message {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 40px;
+    padding: 15px;
+    border-radius: 1.2rem;
     clear: both;
     line-height: 1.5;
     font-size: 14px;
+    border: 1px solid #ddd; /* Border around the message */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for 3D effect */
+
+    p {
+        margin: 0;
+    }
+
+    .time {
+        text-align: right;
+        color: #989898;
+        font-style: italic; /* Italic text for time */
+    }
 }
 
 .sent {
     align-self: flex-end;
-    background-color: #0095f6;
+    background-color: #567AF3;
     color: white;
+    border-top-right-radius: 0; /* Different border radius for sent messages */
 }
 
 .received {
     align-self: flex-start;
-    background-color: #ff9494;
+    background-color: #F6F8FD;
     color: black;
+    border-top-left-radius: 0; /* Different border radius for received messages */
 }
