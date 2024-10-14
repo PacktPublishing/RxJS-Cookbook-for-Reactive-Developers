@@ -1,8 +1,15 @@
+import { Observable } from 'rxjs';
 import { Injectable } from '@nestjs/common';
+import { MessageBrokerService } from './message-broker/message-broker.service';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  constructor(private messageBroker: MessageBrokerService) {}
+
+  async getHello(): Promise<string> {
+    await this.messageBroker.produce('my-topic', 'Hello from NestJS!');
+
+    return 'Message sent to Kafka';
   }
+
 }
