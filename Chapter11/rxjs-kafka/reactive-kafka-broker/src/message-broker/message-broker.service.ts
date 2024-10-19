@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { CompressionTypes, Kafka, KafkaJSError, Producer } from 'kafkajs';
-import { Subject, bufferToggle, catchError, filter, from, merge, fromEvent, mergeAll, retry, throwError, timer, windowToggle, fromEventPattern, switchMap, EMPTY, tap, of, NEVER, repeat, ReplaySubject } from 'rxjs';
+import { Subject, bufferToggle, catchError, filter, from, merge, fromEvent, mergeAll, retry, throwError, timer, windowToggle, fromEventPattern, switchMap, EMPTY, tap, of, NEVER, repeat, ReplaySubject, bufferTime, groupBy, reduce, map, mergeMap, toArray, concatMap, interval } from 'rxjs';
 
 interface KafkaMessage {
   topic: string;
@@ -38,12 +38,16 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     const producerActive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => activeState));
     const producerInactive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => !activeState));
 
+    this.kafka.admin().listGroups().then(console.log).catch(console.error);
     merge(
       this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$)),
       this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$))
     ).pipe(
       mergeAll(),
-      switchMap((kafkaMessage) => from(this.producer.send(kafkaMessage))),
+      bufferTime(2000),
+      filter(messages => messages.length > 0),
+      tap(messages => console.log('SEnding', messages)),
+      concatMap((kafkaMessage) => from(this.producer.sendBatch({ topicMessages: kafkaMessage }))),
       catchError(() => of('Error sending messages to Kafka!')),
     ).subscribe();
     

@@ -16,8 +16,9 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
     }
 
     async consume(topic: any, config?: ConsumerConfig) {
-        console.log(topic)
         const consumer = this.kafka.consumer({ groupId: 'my-group' });
+        const consumer2 = this.kafka.consumer({ groupId: 'my-group2' });
+        const consumer3 = this.kafka.consumer({ groupId: 'my-group3' });
         await consumer.connect();
         await consumer.subscribe({ topic: topic, fromBeginning: true });
         await consumer.run({
@@ -30,6 +31,11 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
             },
         });
         this.consumers.push(consumer);
+
+    //     groupBy(p => p.topic, { element: p => p.messages }),
+    //   concatMap(group$ => group$.pipe(
+    //     map(obj => ({ topic: group$.key, messages: obj }))
+    //   )),
     }
 
     async onApplicationShutdown() {
