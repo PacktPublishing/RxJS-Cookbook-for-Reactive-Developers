@@ -26,38 +26,26 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
   }
 
   async onModuleInit() {
-    // setTimeout(() => {
-    //   console.log('Disconnecting producer...');
-    //   this.producer.disconnect();
-    // }, 50000);
-    // setTimeout(() => {
-    //   console.log('Connecting producer...');
-    //   this.producer.connect();
-    //   this.producerActiveState$.next(true);
-    // }, 20000);
+    setTimeout(() => {
+      console.log('Disconnecting producer...');
+      this.producer.disconnect();
+    }, 40000);
+    setTimeout(() => {
+      console.log('Connecting producer...');
+      this.producer.connect();
+    }, 50000);
 
     const producerActive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => activeState));
     const producerInactive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => !activeState));
 
     merge(
-      this.kafkaMessage$.pipe(
-        windowToggle(producerActive$, () => producerInactive$)
-      ),
-      this.kafkaMessage$.pipe(
-        bufferToggle(producerInactive$, () => producerActive$)
-      )
+      this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$)),
+      this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$))
     ).pipe(
       mergeAll(),
       switchMap((kafkaMessage) => from(this.producer.send(kafkaMessage))),
-      catchError((error: KafkaJSError) => {
-        console.error(`Error sending messages to Kafka: ${error}`);
-        return of('Error sending messages to Kafka!');
-      }),
-    ).subscribe({
-      next: (result) => console.log('RESULT', result),
-      error: (error) => console.error('ERROR', error),
-      complete: () => console.log('COMPLETE sending messages to Kafka')
-    });
+      catchError(() => of('Error sending messages to Kafka!')),
+    ).subscribe();
     
     this.handleBrokerConnection();
   }
@@ -76,7 +64,6 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
 
   handleBrokerConnection(): void {
     const producerConnect$ = from(this.producer.connect()).pipe(
-      tap(() => console.log('Producer reconnected')),
       retry({
         count: 3,
         delay: (error, retryCount) => {
@@ -87,20 +74,17 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
         },
       }),
       catchError(error => {
-        console.error(`Error consuming messages from Kafka: ${error}`);
+        console.error(`Error connecting to Kafka: ${error}`);
+        this.producerActiveState$.next(false);
         return EMPTY;
       }),
     );
     producerConnect$.subscribe();
 
     this.producer.on(this.producer.events.CONNECT, () => {
-      console.log('CONNECTED');
       this.producerActiveState$.next(true);
     });
-    this.producer.on(this.producer.events.DISCONNECT, () => {
-      console.log('DISCONNECTED');
-      this.producerActiveState$.next(false);
-    });
+
     const producerDisconnect$ = fromEventPattern(
       (handler) => this.producer.on('producer.disconnect', handler),
     );
