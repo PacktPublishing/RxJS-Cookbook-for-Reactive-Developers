@@ -1,6 +1,6 @@
 import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
-import { CompressionTypes, Consumer, ConsumerConfig, Kafka } from 'kafkajs';
-import { ReplaySubject, asyncScheduler, bufferTime, catchError, concatMap, delay, filter, groupBy, materialize, of, scan, subscribeOn, tap } from 'rxjs';
+import { CompressionTypes, Consumer, ConsumerConfig, Kafka, Message } from 'kafkajs';
+import { EMPTY, Observable, ReplaySubject, Subject, asyncScheduler, bufferTime, catchError, concatMap, delay, filter, groupBy, materialize, of, scan, subscribeOn, tap } from 'rxjs';
 
 interface KafkaMessage {
     topic: string;
@@ -19,7 +19,7 @@ interface KafkaConsumedMessage {
 export class RxjsKafkaConsumerService implements OnModuleInit, OnApplicationShutdown {
     private readonly kafka: Kafka;
     private readonly consumers: Consumer[] = [];
-    private readonly messages$ = new ReplaySubject<KafkaMessage>();
+    private readonly messages$ = new Subject<KafkaMessage>();
     private readonly dlq$ = new ReplaySubject<KafkaMessage>();
 
     constructor() {
@@ -48,6 +48,13 @@ export class RxjsKafkaConsumerService implements OnModuleInit, OnApplicationShut
         await consumer.subscribe({ topics, fromBeginning: true });
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
+                // Step 2
+                // console.log('consumed message', {
+                //     topic,
+                //     partition,
+                //     offset: message.offset,
+                //     value: message.value.toString(),
+                // });
                 const kafkaMessage = { 
                     topic, 
                     compression: CompressionTypes.GZIP, 
@@ -93,8 +100,24 @@ export class RxjsKafkaConsumerService implements OnModuleInit, OnApplicationShut
         };
     }
 
-    consumeMessages() {
-        return this.messages$.asObservable().pipe(
+    consumeMessages(): void {
+        // Step 7
+        // this.messages$.asObservable().pipe(
+        //     groupBy(person => person.topic, { connector: () => new ReplaySubject(100) }),
+        //     concatMap(group$ => group$.pipe(
+        //         scan((acc, cur) => ({
+        //             topic: group$.key,
+        //             messages: acc.messages ? cur.messages.concat(acc.messages) : cur.messages,
+        //         }), {} as KafkaConsumedMessage))
+        //     ),
+        //     catchError((error) => {
+        //         console.log('Error consuming messages from Kafka!');
+        //
+        //         return EMPTY;
+        //     }),
+        //     tap(console.log),
+        // ).subscribe();
+        this.messages$.asObservable().pipe(
             bufferTime(1000),
             concatMap(messages => messages),
             groupBy(person => person.topic, { connector: () => new ReplaySubject(100) }),
@@ -113,7 +136,7 @@ export class RxjsKafkaConsumerService implements OnModuleInit, OnApplicationShut
                     error
                 });
 
-                return of(null);
+                return EMPTY;
             }),
             tap(console.log),
         ).subscribe();

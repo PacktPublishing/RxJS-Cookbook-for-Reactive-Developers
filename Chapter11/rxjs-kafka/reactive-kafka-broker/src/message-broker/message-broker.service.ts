@@ -20,9 +20,11 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
       brokers: ['localhost:9092'],
       retry: {
         retries: 0
-      }
+      },
     });
-    this.producer = this.kafka.producer();
+    this.producer = this.kafka.producer({
+      allowAutoTopicCreation: true
+    });
   }
 
   async onModuleInit() {
@@ -37,10 +39,28 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
 
     const producerActive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => activeState));
     const producerInactive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => !activeState));
+    const acceptIncomingMessages$ = this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$));
+    const bufferIncomingMessages$ = this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$));
 
+    // Step 3
+    // this.kafkaMessage$.pipe(
+    //   concatMap((kafkaMessage) => from(this.producer.send(kafkaMessage))),
+    // ).subscribe();
+
+    // Step 4 & Step 5
+    // merge(
+    //   acceptIncomingMessages$,
+    //   bufferIncomingMessages$
+    // ).pipe(
+    //   mergeAll(),
+    //   concatMap((kafkaMessage) => from(this.producer.send(kafkaMessage))),
+    //   catchError(() => of('Error sending messages to Kafka!')),
+    // ).subscribe();
+
+    // Step 6
     merge(
-      this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$)),
-      this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$))
+      acceptIncomingMessages$,
+      bufferIncomingMessages$
     ).pipe(
       mergeAll(),
       bufferTime(2000),
@@ -88,7 +108,7 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     });
 
     const producerDisconnect$ = fromEventPattern(
-      (handler) => this.producer.on('producer.disconnect', handler),
+      (handler) => this.producer.on(this.producer.events.DISCONNECT, handler),
     );
 
     producerDisconnect$.pipe(
