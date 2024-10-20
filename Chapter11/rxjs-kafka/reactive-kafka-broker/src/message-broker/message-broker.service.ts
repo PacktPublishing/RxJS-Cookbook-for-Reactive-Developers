@@ -38,7 +38,6 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     const producerActive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => activeState));
     const producerInactive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => !activeState));
 
-    this.kafka.admin().listGroups().then(console.log).catch(console.error);
     merge(
       this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$)),
       this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$))
@@ -46,7 +45,6 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
       mergeAll(),
       bufferTime(2000),
       filter(messages => messages.length > 0),
-      tap(messages => console.log('SEnding', messages)),
       concatMap((kafkaMessage) => from(this.producer.sendBatch({ topicMessages: kafkaMessage }))),
       catchError(() => of('Error sending messages to Kafka!')),
     ).subscribe();
