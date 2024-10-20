@@ -9,8 +9,8 @@ export class AppService {
     this.rxjsKafkaSocumer.consume(['my-topic', 'my-topic-2']);
   }
 
-  async getHello(): Promise<string> {
-    await this.messageBroker.produce('my-topic-2', 'Hello from NestJS!');
+  async getHello(message: string): Promise<string> {
+    await this.messageBroker.produce('my-topic', message);
 
     return 'Message sent to Kafka';
   }

@@ -1,12 +1,13 @@
-import { Injectable, OnApplicationShutdown } from '@nestjs/common';
+import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 import { CompressionTypes, Consumer, ConsumerConfig, Kafka } from 'kafkajs';
-import { ReplaySubject, auditTime, bufferCount, bufferTime, catchError, concatMap, debounceTime, groupBy, last, map, mergeMap, of, reduce, sampleTime, scan, switchMap, tap, throttleTime, toArray } from 'rxjs';
+import { ReplaySubject, asyncScheduler, bufferTime, catchError, concatMap, delay, filter, groupBy, materialize, of, scan, subscribeOn, tap } from 'rxjs';
 
 interface KafkaMessage {
     topic: string;
     compression: CompressionTypes;
-    offset: string;
+    offset?: string;
     messages: { value: string }[];
+    error?: Error;
 }
 
 interface KafkaConsumedMessage {
@@ -15,10 +16,11 @@ interface KafkaConsumedMessage {
 }
 
 @Injectable()
-export class RxjsKafkaConsumerService implements OnApplicationShutdown {
+export class RxjsKafkaConsumerService implements OnModuleInit, OnApplicationShutdown {
     private readonly kafka: Kafka;
     private readonly consumers: Consumer[] = [];
     private readonly messages$ = new ReplaySubject<KafkaMessage>();
+    private readonly dlq$ = new ReplaySubject<KafkaMessage>();
 
     constructor() {
         this.kafka = new Kafka({
@@ -27,7 +29,17 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
             retries: 0
           }
         });
+    }
+
+    async onModuleInit() {
         this.consumeMessages();
+        this.dlq$.pipe(
+            delay(5000),
+            // send DLQ error to monitoring service every night at 2am
+            subscribeOn(asyncScheduler),
+            materialize(),
+            tap(console.log)
+        ).subscribe();
     }
 
     async consume(topics: string[], config?: ConsumerConfig) {
@@ -36,12 +48,27 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
         await consumer.subscribe({ topics, fromBeginning: true });
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                this.messages$.next({
-                    topic,
-                    compression: CompressionTypes.GZIP,
-                    offset: message.offset,
-                    messages: [{ value: message.value.toString() }],
-                });
+                const kafkaMessage = { 
+                    topic, 
+                    compression: CompressionTypes.GZIP, 
+                    offset: message.offset, 
+                    messages: [{ value: message.value.toString() }] 
+                };
+                let parsedMessage = null;
+                
+                try {
+                    parsedMessage = this.deserializeMessage(kafkaMessage);
+                } catch (error) {
+                    this.dlq$.next({
+                        topic: 'dlq',
+                        compression: CompressionTypes.GZIP,
+                        messages: [{ value: message.value.toString() }],
+                        error
+                    });
+                    return;
+                }
+
+                this.messages$.next(parsedMessage);
             },
         });
         this.consumers.push(consumer);
@@ -49,6 +76,21 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
 
     async onApplicationShutdown() {
         await Promise.all(this.consumers.map(consumer => consumer.disconnect()));
+    }
+
+    deserializeMessage(kafkaMessage: KafkaMessage): KafkaConsumedMessage | Error {
+        let parseMessages: { value: string }[];
+        try {
+            parseMessages = kafkaMessage.messages.map(x => JSON.parse(x.value));
+        } catch (error) {
+            // console.log('Error deserializing message: ', error);
+            throw new Error(error);
+        }
+
+        return {
+            ...kafkaMessage,
+            messages: parseMessages,
+        };
     }
 
     consumeMessages() {
@@ -62,6 +104,17 @@ export class RxjsKafkaConsumerService implements OnApplicationShutdown {
                     messages: acc.messages ? cur.messages.concat(acc.messages) : cur.messages,
                 }), {} as KafkaConsumedMessage))
             ),
+            catchError((error) => {
+                console.log('Error consuming messages from Kafka!');
+                this.dlq$.next({
+                    topic: 'dlq',
+                    compression: CompressionTypes.GZIP,
+                    messages: [{ value: 'Error consuming messages from Kafka!' }],
+                    error
+                });
+
+                return of(null);
+            }),
             tap(console.log),
         ).subscribe();
     }
