@@ -4,7 +4,7 @@ import {
   HttpRequest,
   HttpResponse
 } from '@angular/common/http';
-import { EMPTY, catchError, concat, from, map, switchMap, withLatestFrom } from 'rxjs';
+import { EMPTY, concat, from, map, switchMap, withLatestFrom } from 'rxjs';
 
 export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
   const openCache$ = from(caches.open('my-app-cache'));
