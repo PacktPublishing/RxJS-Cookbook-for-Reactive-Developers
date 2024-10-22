@@ -15,21 +15,23 @@ export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
         cache.put(req.url, new Response(JSON.stringify(response.body)));
       }
 
+      console.log('Network response', response);
       return response;
-    })
+    }),
+    // exponential backoff if request fails (check Chapter01)
   );
 
   return openCache$.pipe(
     switchMap((cache: Cache) => from(cache.match(req.url))),
-    switchMap((cacheValue: Response | undefined) => {
-      if (cacheValue) {
-        return from(cacheValue.json());
+    switchMap((cacheResponse: Response | undefined) => {
+      if (cacheResponse) {
+        console.log('Offline response from Cache storage', cacheResponse);
+        return from(cacheResponse.json());
       }
 
       return continueRequest$;
     }),
     map((response: unknown) => {
-      console.log('Offline response from Cache storage', response);
       return new HttpResponse({ status: 200, body: response })
     })
   );

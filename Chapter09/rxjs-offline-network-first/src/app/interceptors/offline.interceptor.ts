@@ -9,9 +9,9 @@ import { EMPTY, Observable, catchError, from, map, switchMap, withLatestFrom } f
 const cacheFallback = (req: HttpRequest<unknown>, openCache$: Observable<Cache>) => {
   return openCache$.pipe(
     switchMap((cache: Cache) => from(cache.match(req.url))),
-    switchMap((cacheValue: Response | undefined) => {
-      if (cacheValue) {
-        return from(cacheValue.json());
+    switchMap((cacheResponse: Response | undefined) => {
+      if (cacheResponse) {
+        return from(cacheResponse.json());
       }
 
       return EMPTY;

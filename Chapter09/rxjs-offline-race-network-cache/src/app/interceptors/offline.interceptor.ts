@@ -15,9 +15,9 @@ export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>,
   dataFromCache$ = openCache$.pipe(
     delay(4000),
     switchMap((cache: Cache) => from(cache.match(req.url))),
-    switchMap((cacheValue: Response | undefined) => {
-      if (cacheValue) {
-        return from(cacheValue.json());
+    switchMap((cacheResponse: Response | undefined) => {
+      if (cacheResponse) {
+        return from(cacheResponse.json());
       }
 
       return NEVER;
