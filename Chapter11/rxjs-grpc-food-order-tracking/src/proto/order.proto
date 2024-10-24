@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package order;
+
+service FoodOrderService {
+    rpc CreateOrder (stream OrderRequest) returns (stream OrderResponse);
+    rpc GetOrder (stream OrderById) returns (stream OrderResponse);
+}
+
+message OrderRequest {
+    string id = 1;
+    string item = 2;
+    int32 quantity = 3;
+}
+
+message OrderById {
+    string id = 1;
+}
+
+message OrderResponse {
+    string id = 1;
+    string item = 2;
+    int32 quantity = 3;
+    string status = 4;
+}
