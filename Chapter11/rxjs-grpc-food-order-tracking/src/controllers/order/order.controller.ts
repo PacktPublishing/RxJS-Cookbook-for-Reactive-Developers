@@ -1,26 +1,65 @@
-import { Controller } from '@nestjs/common';
+import { Controller, OnModuleDestroy } from '@nestjs/common';
 import { GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable, Subject, switchMap, tap } from 'rxjs';
+import { Observable, ReplaySubject, Subject, delay, finalize, interval, map, startWith, switchMap, takeLast, takeUntil, timer } from 'rxjs';
 import { OrderService } from 'src/services/order/order.service';
-import { OrderById, OrderRequest, OrderResponse } from './../../interfaces/order.interface';
+import { OrderRequest, OrderResponse, OrderStatus, OrderWithLocation } from './../../interfaces/order.interface';
 
 @Controller()
-export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+export class OrderController implements OnModuleDestroy {
+  private orderStatus = new ReplaySubject<any>(1);
+  private orderStreamComplete = new Subject<boolean>();
+  
+  constructor(private readonly orderService: OrderService) { }
 
-  @GrpcStreamMethod('FoodOrderService', 'CreateOrder')
-  createOrder(stream: Observable<OrderRequest>): Observable<OrderResponse> {
-    return stream.pipe(
-      tap((data) => console.log('data', data)),
-      switchMap((data) => this.orderService.createOrder(data))
-    );
+  onModuleDestroy() {
+    this.orderStreamComplete.next(true);
   }
 
-  @GrpcStreamMethod('FoodOrderService', 'GetOrder')
-  getOrder(stream: Observable<OrderById>): Observable<OrderResponse> {
-    return stream.pipe(
-      tap((id: OrderById) => console.log('id', id)),
-      switchMap((id: OrderById) => this.orderService.getOrder(id))
+  @GrpcStreamMethod('FoodOrderService', 'CreateOrder')
+  createOrder(stream: Observable<OrderRequest>): Observable<OrderWithLocation> {
+    stream.pipe(
+      switchMap((data: OrderRequest) => this.orderService.createOrder(data)),
+      delay(1000),
+      map((order: OrderResponse) => {
+        order.status = OrderStatus.ACCEPTED;
+        this.orderStatus.next(order);
+        return order;
+      }),
+      delay(1000),
+      map((order: OrderResponse) => {
+        order.status = OrderStatus.PREPARING;
+        this.orderStatus.next(order);
+        return order;
+      }),
+      delay(5000),
+      switchMap((order: OrderResponse) => {
+        order.status = OrderStatus.COURIER_ON_THE_WAY;
+
+        return interval(2000).pipe(
+          map(i => {
+            const orderWithLocation = {
+              ...order,
+              location: { lat: 40.7128 + i * 0.1, lng: -74.0060 + i * 0.1 }
+            };
+            this.orderStatus.next(orderWithLocation);
+
+            return orderWithLocation;
+          }),
+          startWith({ ...order, location: { lat: 40.7128, lng: -74.0060 } }),
+          takeUntil(timer(10001)),
+          takeLast(1) // Take only the last emission
+        );
+      }),
+      map((order: OrderWithLocation) => {
+        order.status = OrderStatus.DELIVERED;
+        this.orderStatus.next(order);
+        return order;
+      }),
+      takeUntil(this.orderStreamComplete)
+    ).subscribe();
+
+    return this.orderStatus.asObservable().pipe(
+      finalize(() => this.orderStatus.complete())
     );
   }
 }
