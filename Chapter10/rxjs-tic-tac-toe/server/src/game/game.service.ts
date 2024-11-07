@@ -21,4 +21,8 @@ export class GameService {
           }
         }
       }
+
+      checkDraw(board: Array<string>): boolean {
+        return board.every(cell => cell !== null) && !this.checkWinner(board);
+      }
 }

@@ -17,6 +17,7 @@ export class GameService {
   public playerJoined$!: Observable<WsMessage>;
   public boardUpdate$!: Observable<WsMessage>;
   public winner$!: Observable<WsMessage>;
+  public draw$!: Observable<WsMessage>;
 
   constructor() {
     this.socket$ = webSocket<WsMessage>({
@@ -38,6 +39,11 @@ export class GameService {
       () => ({ unsubscribe: 'winner' }), 
       (message) => message.event === 'winner'
     );
+    this.draw$ = this.socket$.multiplex(
+      () => ({ subscribe: 'draw' }), 
+      () => ({ unsubscribe: 'draw' }), 
+      (message) => message.event === 'draw'
+    );
   }
 
   getPlayers$() {
@@ -46,6 +52,10 @@ export class GameService {
 
   getWinner$(): Observable<'X' | 'O'> {
     return this.winner$.pipe(map(({ data }: WsMessage) => data));
+  }
+
+  getDraw$(): Observable<boolean> {
+    return this.draw$.pipe(map(({ data }: WsMessage) => data));
   }
 
   getBoardUpdate$() {
@@ -72,4 +82,7 @@ export class GameService {
     this.send({ event: 'move', data: field }); 
   }
   
+  sendDraw(): void {  
+    this.send({ event: 'draw', data: 'Game is a draw' });
+  }
 }

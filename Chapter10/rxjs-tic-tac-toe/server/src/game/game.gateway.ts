@@ -31,6 +31,10 @@ export class GameGateway implements OnGatewayConnection {
       })
     ).subscribe();
 
+    this.initializePlayerMoves();
+  }
+
+  private initializePlayerMoves() {
     const playerMoves$ = this.moves$.pipe(
       withLatestFrom(this.clients$),
       map(([move, clients]) => {
@@ -44,21 +48,43 @@ export class GameGateway implements OnGatewayConnection {
         this.currentPlayer = nextPlayer;
 
         return clients;
-      }))
+      })
+    );
 
-      playerMoves$.pipe(
-        tap((clients) => {
-          const winner = this.gameService.checkWinner(this.board);
-          if (winner) {
-            this.moves$.complete();
+    playerMoves$.pipe(
+      tap((clients) => {
+        const winner = this.gameService.checkWinner(this.board);
+        if (winner) {
+          this.moves$.complete();
 
-            clients.forEach(client => {
-              client.send(JSON.stringify({ event: 'winner', data: winner }));
-            });
-          }
-        }),
-        shareReplay({ bufferSize: 1, refCount: true }),
-      ).subscribe();
+          clients.forEach(client => {
+            client.send(JSON.stringify({ event: 'winner', data: winner }));
+          });
+
+          this.resetGame();
+        }
+        
+        const draw = this.gameService.checkDraw(this.board);
+
+        if (draw) {
+          this.moves$.complete();
+
+          clients.forEach(client => {
+            client.send(JSON.stringify({ event: 'draw', data: 'Game is a draw' }));
+          });
+
+          this.resetGame();
+        }
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    ).subscribe();
+  }
+
+  private resetGame() {
+    this.board = Array(9).fill(null);
+    this.currentPlayer = 'X';
+    this.moves$ = new Subject<number>();
+    this.initializePlayerMoves();
   }
 
   handleConnection(@ConnectedSocket() client: WebSocket): void {    
@@ -74,5 +100,10 @@ export class GameGateway implements OnGatewayConnection {
   @SubscribeMessage('move')
   handleMove(@MessageBody() data: number): void {
     this.moves$.next(data);
+  }
+
+  @SubscribeMessage('draw')
+  handleDraw(): void {
+    this.resetGame();
   }
 }

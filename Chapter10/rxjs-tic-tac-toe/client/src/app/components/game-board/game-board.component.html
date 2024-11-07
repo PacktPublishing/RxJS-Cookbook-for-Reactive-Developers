@@ -1,26 +1,30 @@
 <p class="player">Player joined: {{ playerJoined }}</p>
 <div class="game">
     <div class="turn">
-        @if (winner$ | async; as winner) {
-            <div class="player-turn">
-                <p [ngClass]="{
-                    'player-x-winner': winner === 'X',
-                    'player-o-winner': winner === 'O',
-                }">Player {{ winner }} wins! 🎉🎉🎉</p>
-            </div>
+        @if (draw$ | async) {
+            <button mat-raised-button color="primary" (click)="resetGame()">Draw! Click to play again</button>
         } @else {
-            <div class="player-turn">
-                @if (currentPlayerTurn === 'X') {
-                    <mat-icon class="icon x" fontIcon="keyboard_arrow_right"></mat-icon>
-                }
-                <p>Player X turn</p>
-            </div>
-            <div class="player-turn">
-                @if (currentPlayerTurn === 'O') {
-                    <mat-icon class="icon o" fontIcon="keyboard_arrow_right"></mat-icon>
-                }
-                <p>Player O turn</p>
-            </div>
+            @if (winner$ | async; as winner) {
+                <div class="player-turn">
+                    <p [ngClass]="{
+                        'player-x-winner': winner === 'X',
+                        'player-o-winner': winner === 'O',
+                    }">Player {{ winner }} wins! 🎉🎉🎉</p>
+                </div>
+            } @else {
+                <div class="player-turn">
+                    @if (currentPlayerTurn === 'X') {
+                        <mat-icon class="icon x" fontIcon="keyboard_arrow_right"></mat-icon>
+                    }
+                    <p>Player X turn</p>
+                </div>
+                <div class="player-turn">
+                    @if (currentPlayerTurn === 'O') {
+                        <mat-icon class="icon o" fontIcon="keyboard_arrow_right"></mat-icon>
+                    }
+                    <p>Player O turn</p>
+                </div>
+            }
         }
     </div>
     <div class="board">
