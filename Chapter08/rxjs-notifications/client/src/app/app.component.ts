@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PushNotificationService } from './services/push-notification.service';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,10 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'rxjs-notifications';
+
+  constructor(private pushNotifications: PushNotificationService) {}
+
+  ngOnInit(): void {
+    this.pushNotifications.subscribeToNotifications();
+  }
 }
