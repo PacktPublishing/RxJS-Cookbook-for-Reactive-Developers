@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import * as webpush from 'web-push';
+import { OrderStatus, orderNotification } from './notification';
+import { delay, of, switchMap } from 'rxjs';
 
 const vapidKeys = {
   publicKey:
@@ -13,9 +15,7 @@ const options = {
       publicKey: vapidKeys.publicKey,
       privateKey: vapidKeys.privateKey,
   },
-  TTL: 60,
 };
-// webpush.setVapidDetails('mailto:example@yourdomain.org', vapidKeys.publicKey, vapidKeys.privateKey);
 
 @Controller()
 export class AppController {
@@ -28,31 +28,12 @@ export class AppController {
 
   @Post('/api/subscriptions')
   async addSubscription(@Body() sub: any) {
-    const payload = {
-      "notification": {
-        "title": "Feedback Request",
-        "body": "How was your experience? Rate your order and help us improve.",
-        "actions": [
-          {"action": "rate", "title": "Rate Now"}
-        ],
-        "data": {
-          "onActionClick": {
-            "default": {"operation": "openWindow", "url": "/feedback"},
-            "rate": {"operation": "openWindow", "url": "/feedback"}
-          }
-        }
-      }
-    };
-  
-    try {
-      const response = await webpush.sendNotification(sub, JSON.stringify(payload), options);
-      return response;
-    } catch (error) {
-      return {
-        success: false,
-        message: 'Failed to send notification',
-        error,
-      };
-    }
+    return of(orderNotification[OrderStatus.ACCEPTED]).pipe(
+      switchMap((notification) =>  webpush.sendNotification(sub, JSON.stringify(notification), options)),
+      delay(4000),
+      switchMap(() =>  webpush.sendNotification(sub, JSON.stringify(orderNotification[OrderStatus.COURIER_ON_THE_WAY]), options)),
+      delay(50000),
+      switchMap(() =>  webpush.sendNotification(sub, JSON.stringify(orderNotification[OrderStatus.DELIVERED]), options)),
+    );
   }
 }
