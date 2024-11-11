@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { AppService, Recipe } from './app.service';
+import { Observable } from 'rxjs';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
+  @Get('/api/recipes')
+  getHello(): Observable<Recipe[]> {
     return this.appService.getHello();
   }
 }
