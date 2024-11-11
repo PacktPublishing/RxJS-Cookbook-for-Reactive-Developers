@@ -2,11 +2,11 @@ import { Controller, OnModuleDestroy } from '@nestjs/common';
 import { GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable, ReplaySubject, Subject, delay, finalize, interval, map, startWith, switchMap, takeLast, takeUntil, timer } from 'rxjs';
 import { OrderService } from 'src/services/order/order.service';
-import { OrderRequest, OrderResponse, OrderStatus, OrderWithLocation } from './../../interfaces/order.interface';
+import { OrderRequest, OrderResponse, OrderStatus } from './../../interfaces/order.interface';
 
 @Controller()
 export class OrderController implements OnModuleDestroy {
-  private orderStatus = new ReplaySubject<any>(1);
+  private orderStatus = new ReplaySubject<OrderResponse>(1);
   private orderStreamComplete = new Subject<boolean>();
   
   constructor(private readonly orderService: OrderService) { }
@@ -16,7 +16,7 @@ export class OrderController implements OnModuleDestroy {
   }
 
   @GrpcStreamMethod('FoodOrderService', 'CreateOrder')
-  createOrder(stream: Observable<OrderRequest>): Observable<OrderWithLocation> {
+  createOrder(stream: Observable<OrderRequest>): Observable<OrderResponse> {
     stream.pipe(
       switchMap((data: OrderRequest) => this.orderService.createOrder(data)),
       delay(1000),
@@ -39,7 +39,10 @@ export class OrderController implements OnModuleDestroy {
           map(i => {
             const orderWithLocation = {
               ...order,
-              location: { lat: 40.7128 + i * 0.1, lng: -74.0060 + i * 0.1 }
+              location: { 
+                lat: parseFloat((40.7128 + i * 0.1 + (Math.random() * 0.01 - 0.005)).toFixed(2)), 
+                lng: parseFloat((-74.0060 + i * 0.1 + (Math.random() * 0.01 - 0.005)).toFixed(2)) 
+              }
             };
             this.orderStatus.next(orderWithLocation);
 
@@ -50,7 +53,7 @@ export class OrderController implements OnModuleDestroy {
           takeLast(1) // Take only the last emission
         );
       }),
-      map((order: OrderWithLocation) => {
+      map((order: OrderResponse) => {
         order.status = OrderStatus.DELIVERED;
         this.orderStatus.next(order);
         return order;
