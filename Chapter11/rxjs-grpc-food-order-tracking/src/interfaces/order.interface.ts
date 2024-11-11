@@ -18,6 +18,10 @@ export interface OrderResponse {
   item: string;
   quantity: number;
   status: OrderStatus;
+  location?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export enum OrderStatus {
@@ -27,11 +31,4 @@ export enum OrderStatus {
   COURIER_ON_THE_WAY = 'Courier on the way',
   DELIVERED = 'Delivered',
   CANCELLED = 'Cancelled',
-}
-
-export interface OrderWithLocation extends OrderResponse {
-  location: {
-    lat: number;
-    lng: number;
-  };
 }
