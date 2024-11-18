@@ -38,14 +38,15 @@ export class ParticlesComponent {
       x: Math.random() * this.canvas.nativeElement.width,
       y: Math.random() * this.canvas.nativeElement.height,
       radius: Math.random() * 0.5 + 3.5,
-      vx: Math.random() < 0.5 ? (Math.random() * 3 + 0.2) : -(Math.random() * 3 + 0.2),
-      vy: Math.random() < 0.5 ? (Math.random() * 3 + 0.2) : -(Math.random() * 3 + 0.2),
+      vx: Math.random() < 0.5 ? (Math.random() * 2 + 0.3) : -(Math.random() * 2 + 0.3),
+      vy: Math.random() < 0.5 ? (Math.random() * 2 + 0.3) : -(Math.random() * 2 + 0.3),
       color: `rgba(255,255,255,0.6)`
     }
   };
 
   ngOnInit() {
     this.ctx = this.canvas.nativeElement.getContext('2d')!;
+    console.log(this.ctx)
     this.mouseX = 0; 
     this.mouseY = 0;
 
@@ -58,16 +59,28 @@ export class ParticlesComponent {
       now() { return now++; }
     };
 
+    const mouseMove$ = fromEvent<MouseEvent>(this.canvas.nativeElement, 'mousemove').pipe(
+      map(event => {
+        const rect = this.canvas.nativeElement.getBoundingClientRect();
+        return {
+          x: (event.clientX - rect.left) * (this.canvas.nativeElement.width / rect.width),
+          y: (event.clientY - rect.top) * (this.canvas.nativeElement.height / rect.height)
+        };
+      })
+    );
+
     const animationFrame$ = animationFrames(customTSProvider);
 
-    this.particles$ = merge(animationFrame$).pipe(
+    this.particles$ = merge(mouseMove$,animationFrame$).pipe(
       // tap(console.log),
       scan((particles: Particle[], event: any) => {
         if (typeof event !== 'number' && 'radius' in event) {
-          return [...particles, event];
+          // return [...particles, event];
+          return [];
         } else if (typeof event !== 'number' && 'x' in event && 'y' in event) {
           this.mouseX = event.x;
           this.mouseY = event.y;
+          
           return particles;
         } else {
           return particles.map(particle => {
@@ -84,17 +97,17 @@ export class ParticlesComponent {
 
             // Mouse hover radius avoidance
             const distanceToMouse = Math.sqrt((this.mouseX - particle.x) ** 2 + (this.mouseY - particle.y) ** 2);
-            if (distanceToMouse <= 400) { 
+            if (distanceToMouse <= 200) { 
               // Calculate angle between particle and mouse
               const angle = Math.atan2(particle.y - this.mouseY, particle.x - this.mouseX);
               const normalX = Math.cos(angle);
               const normalY = Math.sin(angle);
               const dotProduct = particle.vx * normalX + particle.vy * normalY;
-              particle.vx = particle.vx - 5 * dotProduct * normalX;
-              particle.vy = particle.vy - 5 * dotProduct * normalY;
+              particle.vx = particle.vx - 1.2 * dotProduct * normalX;
+              particle.vy = particle.vy - 1.2 * dotProduct * normalY;
               // Move particle away from mouse
-              newX = this.mouseX + 100 * Math.cos(angle) + particle.vx; 
-              newY = this.mouseY + 100 * Math.sin(angle) + particle.vy;
+              newX = this.mouseX + 200 * Math.cos(angle) + particle.vx; 
+              newY = this.mouseY + 200 * Math.sin(angle) + particle.vy;
             }
 
 
@@ -120,8 +133,8 @@ export class ParticlesComponent {
           (particle1.x - particle2.x) ** 2 + (particle1.y - particle2.y) ** 2
         );
 
-        if (distance <= 350) {
-          const opacity = 1 - distance / 350;
+        if (distance <= 250) {
+          const opacity = 1 - distance / 250;
           this.ctx.beginPath();
           this.ctx.moveTo(particle1.x, particle1.y);
           this.ctx.lineTo(particle2.x, particle2.y);
