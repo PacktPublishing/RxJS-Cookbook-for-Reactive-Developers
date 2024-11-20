@@ -25,39 +25,24 @@ export class ParticlesComponent {
   private particles$!: Observable<Particle[]>;
 
   private generateParticle(): Particle {
-    if (!this.canvas) return {
-      x: 0,
-      y: 0,
-      radius: 0,
-      vx: 0,
-      vy: 0,
-      color: ``
-    };
-
     return {
       x: Math.random() * this.canvas.nativeElement.width,
       y: Math.random() * this.canvas.nativeElement.height,
       radius: Math.random() * 0.5 + 3.5,
-      vx: Math.random() < 0.5 ? (Math.random() * 2 + 0.3) : -(Math.random() * 2 + 0.3),
-      vy: Math.random() < 0.5 ? (Math.random() * 2 + 0.3) : -(Math.random() * 2 + 0.3),
-      color: `rgba(255,255,255,0.6)`
+      vx: Math.random() < 0.5 ? (Math.random() + 0.8) : -(Math.random() + 0.8),
+      vy: Math.random() < 0.5 ? (Math.random() + 0.8) : -(Math.random() + 0.8),
+      color: `rgba(255,255,255,0.5)`
     }
   };
 
   ngOnInit() {
     this.ctx = this.canvas.nativeElement.getContext('2d')!;
-    console.log(this.ctx)
     this.mouseX = 0; 
     this.mouseY = 0;
 
     const initialParticles: Particle[] = Array.from({ length: 123 }, this.generateParticle, this);
 
     if (!initialParticles.length) return;
-
-    let now = 0;
-    const customTSProvider: TimestampProvider = {
-      now() { return now++; }
-    };
 
     const mouseMove$ = fromEvent<MouseEvent>(this.canvas.nativeElement, 'mousemove').pipe(
       map(event => {
@@ -69,56 +54,43 @@ export class ParticlesComponent {
       })
     );
 
-    const animationFrame$ = animationFrames(customTSProvider);
+    const animationFrame$ = animationFrames();
 
-    this.particles$ = merge(mouseMove$,animationFrame$).pipe(
+    this.particles$ = merge(mouseMove$, animationFrame$).pipe(
       // tap(console.log),
       scan((particles: Particle[], event: any) => {
-        if (typeof event !== 'number' && 'radius' in event) {
-          // return [...particles, event];
-          return [];
-        } else if (typeof event !== 'number' && 'x' in event && 'y' in event) {
+        if ('x' in event && 'y' in event) {
           this.mouseX = event.x;
           this.mouseY = event.y;
           
           return particles;
         } else {
           return particles.map(particle => {
-            let newX = particle.x + particle.vx;
-            let newY = particle.y + particle.vy;
-
-            // Wall collision detection
-            if (newX + particle.radius > this.canvas.nativeElement.width || newX - particle.radius < 0) {
-              particle.vx = -particle.vx;
-            }
-            if (newY + particle.radius > this.canvas.nativeElement.height || newY - particle.radius < 0) {
-              particle.vy = -particle.vy;
-            }
-
-            // Mouse hover radius avoidance
-            const distanceToMouse = Math.sqrt((this.mouseX - particle.x) ** 2 + (this.mouseY - particle.y) ** 2);
-            if (distanceToMouse <= 200) { 
-              // Calculate angle between particle and mouse
-              const angle = Math.atan2(particle.y - this.mouseY, particle.x - this.mouseX);
-              const normalX = Math.cos(angle);
-              const normalY = Math.sin(angle);
-              const dotProduct = particle.vx * normalX + particle.vy * normalY;
-              particle.vx = particle.vx - 1.2 * dotProduct * normalX;
-              particle.vy = particle.vy - 1.2 * dotProduct * normalY;
-              // Move particle away from mouse
-              newX = this.mouseX + 200 * Math.cos(angle) + particle.vx; 
-              newY = this.mouseY + 200 * Math.sin(angle) + particle.vy;
-            }
-
+            const mouseMoveCoordinates = this.handleMouseInteraction(particle);
+            let newX = mouseMoveCoordinates?.newX || particle.x + particle.vx;
+            let newY = mouseMoveCoordinates?.newY || particle.y + particle.vy;
 
             return { ...particle, x: newX, y: newY, vx: particle.vx, vy: particle.vy }; 
           });
         }
       }, initialParticles),
-      tap(particles => this.drawParticles(particles))
+      map(particles => particles.map(particle => this.detectWallCollision(particle, particle.x + particle.vx, particle.y + particle.vy))),
+      tap(particles => this.drawParticles(particles)),
+      tap(particles => this.drawConnections(particles)),
     );
 
     this.particles$.subscribe();
+  }
+
+  detectWallCollision(particle: Particle, newX: number, newY: number): Particle {
+    if (newX + particle.radius > this.canvas.nativeElement.width || newX - particle.radius < 0) {
+      particle.vx = -particle.vx;
+    }
+    if (newY + particle.radius > this.canvas.nativeElement.height || newY - particle.radius < 0) {
+      particle.vy = -particle.vy;
+    }
+
+    return particle;
   }
 
   drawParticles(particles: Particle[]) {
@@ -139,18 +111,65 @@ export class ParticlesComponent {
           this.ctx.moveTo(particle1.x, particle1.y);
           this.ctx.lineTo(particle2.x, particle2.y);
           this.ctx.strokeStyle = `rgba(255,255,255, ${opacity})`;
-          this.ctx.lineWidth = 0.7;
+          this.ctx.lineWidth = 0.45;
           this.ctx.stroke();
         }
       }
     }
 
     // Draw particles
-    particles.forEach(particle => {
-      this.ctx.beginPath();
-      this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-      this.ctx.fillStyle = particle.color;
-      this.ctx.fill();  
-    });
+    particles.forEach(particle => this.drawParticle(particle));
+  }
+
+  drawConnections(particles: Particle[]) {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const particle1 = particles[i];
+        const particle2 = particles[j];
+        const distance = Math.sqrt(
+          (particle1.x - particle2.x) ** 2 + (particle1.y - particle2.y) ** 2
+        );
+
+        if (distance <= 250) {
+          const opacity = 1 - distance / 250;
+          this.drawLine(particle1, particle2, opacity);
+        }
+      }
+    }
+  }
+
+  drawLine(particle1: Particle, particle2: Particle, opacity: number) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(particle1.x, particle1.y);
+    this.ctx.lineTo(particle2.x, particle2.y);
+    this.ctx.strokeStyle = `rgba(255,255,255, ${opacity})`;
+    this.ctx.lineWidth = 0.45;
+    this.ctx.stroke();
+  }
+
+  drawParticle(particle: Particle) {
+    this.ctx.beginPath();
+    this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+    this.ctx.fillStyle = particle.color;
+    this.ctx.fill();  
+  }
+
+  handleMouseInteraction(particle: Particle): { newX: number, newY: number } | undefined {
+    // Mouse hover radius avoidance
+    const distanceToMouse = Math.sqrt((this.mouseX - particle.x) ** 2 + (this.mouseY - particle.y) ** 2);
+
+    if (distanceToMouse > 200) return;
+    // Calculate angle between particle and mouse
+    const angle = Math.atan2(particle.y - this.mouseY, particle.x - this.mouseX);
+    const normalX = Math.cos(angle);
+    const normalY = Math.sin(angle);
+    const dotProduct = particle.vx * normalX + particle.vy * normalY;
+    particle.vx = particle.vx - 1.2 * dotProduct * normalX;
+    particle.vy = particle.vy - 1.2 * dotProduct * normalY;      
+
+    return { 
+      newX: this.mouseX + 200 * Math.cos(angle),
+      newY: this.mouseY + 200 * Math.sin(angle)
+    }
   }
 }
