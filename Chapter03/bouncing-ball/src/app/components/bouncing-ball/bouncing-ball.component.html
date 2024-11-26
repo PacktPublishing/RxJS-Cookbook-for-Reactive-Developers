@@ -1,1 +1,9 @@
-<div #ball class="ball"></div>
+<div class="container">
+  <input type="number" [(ngModel)]="maxBounces" placeholder="Enter number of bounces" class="custom-input" />
+  <button id="submitButton" (click)="startBouncing()">Start Bouncing</button>
+</div>
+<p class="message">{{ message() }}</p>
+<div #ballContainer class="ball-container">
+  <div id="ball" #ball class="ball"></div>
+  <div id="shadow" #shadow class="shadow"></div>
+</div>

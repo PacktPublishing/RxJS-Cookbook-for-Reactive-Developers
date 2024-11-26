@@ -1,53 +1,78 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { interval, scan, map, takeWhile, timer, defer, delay } from 'rxjs';
+import { Component, ElementRef, ViewChild, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { interval, scan, map, takeWhile, animationFrameScheduler, withLatestFrom, tap, finalize, repeat, Subject, Observable, skip } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-bouncing-ball',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, AsyncPipe],
   templateUrl: './bouncing-ball.component.html',
   styleUrl: './bouncing-ball.component.scss'
 })
 export class BouncingBallComponent {
   @ViewChild('ball', { static: true }) ballRef!: ElementRef;
+  @ViewChild('shadow', { static: true }) shadow!: ElementRef;
+  private bounceRepeat$ = new Subject<void>();
+  message = signal<string>('');
+  buttonWidth = signal<string>('');
+  maxBounces = 7;
+  bounceCount = 0;
+  container!: HTMLElement;
+  ballLoop$!: Observable<{ y: number, dy: number }>;
 
   ngAfterViewInit() {
     const ball = this.ballRef.nativeElement;
-    const container = document.documentElement; // Or any specific container element
+    this.container = document.documentElement; 
+    const initialHeight = 0; 
+    let gravity = 0.981;
+    let energyLoss = 0.9; 
+    const initialVelocity = 0; 
+    const time$ = interval(30);
 
-    // Initial ball properties
-    const initialHeight = 100; // Starting height
-    let y = initialHeight;
-    let dy = 0; 
-    let gravity = 0.5; // Adjust for stronger/weaker gravity
-    let bounceCount = 0;
-    let energyLoss = 0.7; // Energy loss on each bounce
-
-    // Create an observable for the game loop
-    const gameLoop$ = timer(0, 10).pipe(
-      // Update ball position
-      scan(() => {
-        dy += gravity; // Apply gravity
-        y += dy;
-
-        // Bounce off the ground
-        if (y + ball.offsetHeight > container.clientHeight) {
-          y = container.clientHeight - ball.offsetHeight;
-          dy = -dy * energyLoss; // Reverse direction and reduce energy
-          bounceCount++;
-        }
-
-        return { y };
-      }, { y }),
-      // Apply position to the ball
-      map(({ y }) => {
-        ball.style.top = `${y}px`;
-      }),
-      // Stop after 5 bounces
-      takeWhile(() => bounceCount <= 7) 
+    const velocity$ = time$.pipe(
+      map(time => time / 1000),
+      scan((velocity, time) => velocity + gravity * time, initialVelocity),
     );
 
-    // Start the animation
-    gameLoop$.subscribe();
+    this.ballLoop$ = interval(0, animationFrameScheduler).pipe(
+      withLatestFrom(velocity$),
+      map(([_, velocity]) => velocity),
+      scan(({ y, dy }, velocity) => {
+        dy += velocity; // Apply gravity
+        y += dy;
+        // Bounce off the ground
+        if (y + ball.offsetHeight > this.container.clientHeight - 10) {
+          y = this.container.clientHeight - ball.offsetHeight - 10;
+          dy = -dy * energyLoss; // Reverse direction and reduce energy
+          this.bounceCount++;
+        }
+
+        return { y, dy };
+      }, { y: initialHeight, dy: 0 }),
+      tap(({ y }) => {
+        ball.style.top = `${y}px`;
+        this.updateShadow(y);
+      }),
+      takeWhile(() => this.bounceCount < this.maxBounces),
+      finalize(() => {
+        this.message.set(`Bouncing stopped after ${this.bounceCount} bounces`);
+      }),
+      repeat({ delay: () => this.bounceRepeat$ }),
+    );
+
+    this.ballLoop$.subscribe();
   }
+
+  startBouncing() {
+    this.message.set('');
+    this.bounceCount = 0;
+    this.bounceRepeat$.next();
+  }
+
+  updateShadow(y: number) {
+    const shadowScale = Math.max(1, 2 - y / this.container.clientHeight);
+    this.shadow.nativeElement.style.transform = `translateY(-50%) scale(${shadowScale})`;
+  }
+
 }
