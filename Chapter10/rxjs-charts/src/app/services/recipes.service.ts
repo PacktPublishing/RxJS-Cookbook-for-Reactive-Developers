@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { environment } from '../../environments/environment';
+import { retryConnection } from '../operators/retry-connection.operator';
 
 export interface Message {
   type: string;
@@ -27,6 +28,11 @@ export class RecipesService {
         () => ({ subscribe: 'orders' }), // Subscription message
         () => ({ unsubscribe: 'orders' }), // Unsubscription message
         (message) => message.type === 'orders' // Filter function
+      ).pipe(
+        retryConnection<Message>({
+          count: 5,
+          delayTime: 1000,
+        }),
       );
     }
   }

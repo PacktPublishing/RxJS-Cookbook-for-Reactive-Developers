@@ -1,13 +1,12 @@
-import { AfterViewInit, Component, OnInit, ViewChild, input } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import {
   ChartComponent,
   NgApexchartsModule,
 } from 'ng-apexcharts';
-import { ChartOptions } from '../../types/chart.type';
-import { Recipe } from '../../types/recipes.type';
 import { CommonModule } from '@angular/common';
-import { Message, RecipesService } from '../../services/recipes.service';
 import { Subscription } from 'rxjs';
+import { ChartOptions } from '../../types/chart.type';
+import { Message, RecipesService } from '../../services/recipes.service';
 
 @Component({
   selector: 'app-recipes-chart',
@@ -16,7 +15,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './recipes-chart.component.html',
   styleUrl: './recipes-chart.component.scss',
 })
-export class RecipesChartComponent implements AfterViewInit {
+export class RecipesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(ChartComponent, { static: false }) chart!: ChartComponent;
 
   private recipesSubscription: Subscription | undefined;
@@ -68,18 +67,18 @@ export class RecipesChartComponent implements AfterViewInit {
     this.recipesService.connect();    
   }
 
-  ngOnDestroy() {
-    this.recipesSubscription?.unsubscribe();
-    this.recipesService.close();
-  }
-
   ngAfterViewInit(): void {
-    this.recipesService.orders$.subscribe((message: Message) => {
+    this.recipesSubscription = this.recipesService.orders$.subscribe((message: Message) => {
       this.orders = [...this.orders, ...message.payload];
       this.chart.updateSeries([{
         name: 'Orders',
         data: this.orders,
       }]);
     });
+  }
+
+  ngOnDestroy() {
+    this.recipesSubscription?.unsubscribe();
+    this.recipesService.close();
   }
 }
