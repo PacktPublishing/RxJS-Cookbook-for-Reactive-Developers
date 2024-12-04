@@ -18,7 +18,6 @@ import { Message, RecipesService } from '../../services/recipes.service';
 export class RecipesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(ChartComponent, { static: false }) chart!: ChartComponent;
 
-  private recipesSubscription: Subscription | undefined;
   public chartOptions = {} as ChartOptions;
   public orders: number[] = [];
 
@@ -68,7 +67,7 @@ export class RecipesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.recipesSubscription = this.recipesService.orders$.subscribe((message: Message) => {
+    this.recipesService.orders$.subscribe((message: Message) => {
       this.orders = [...this.orders, ...message.payload];
       this.chart.updateSeries([{
         name: 'Orders',
@@ -78,7 +77,6 @@ export class RecipesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.recipesSubscription?.unsubscribe();
     this.recipesService.close();
   }
 }

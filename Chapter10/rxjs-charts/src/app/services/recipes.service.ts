@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, timer } from 'rxjs';
+import { Observable } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { environment } from '../../environments/environment';
 import { retryConnection } from '../operators/retry-connection.operator';
