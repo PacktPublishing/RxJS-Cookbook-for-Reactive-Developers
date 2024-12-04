@@ -2,40 +2,40 @@
 <div class="game">
     <div class="turn">
         @if (draw$ | async) {
-            <button mat-raised-button color="primary" (click)="resetGame()">Draw! Click to play again</button>
+        <button mat-raised-button color="primary" (click)="resetGame()">Draw! Click to play again</button>
+        }
+
+        @if (winner$ | async; as winner) {
+        <div class="player-turn">
+            <p [ngClass]="{
+                    'player-x-winner': winner === 'X',
+                    'player-o-winner': winner === 'O',
+                }">Player {{ winner }} wins! 🎉🎉🎉</p>
+        </div>
         } @else {
-            @if (winner$ | async; as winner) {
-                <div class="player-turn">
-                    <p [ngClass]="{
-                        'player-x-winner': winner === 'X',
-                        'player-o-winner': winner === 'O',
-                    }">Player {{ winner }} wins! 🎉🎉🎉</p>
-                </div>
-            } @else {
-                <div class="player-turn">
-                    @if (currentPlayerTurn === 'X') {
-                        <mat-icon class="icon x" fontIcon="keyboard_arrow_right"></mat-icon>
-                    }
-                    <p>Player X turn</p>
-                </div>
-                <div class="player-turn">
-                    @if (currentPlayerTurn === 'O') {
-                        <mat-icon class="icon o" fontIcon="keyboard_arrow_right"></mat-icon>
-                    }
-                    <p>Player O turn</p>
-                </div>
+        <div class="player-turn">
+            @if (currentPlayerTurn === 'X') {
+            <mat-icon class="icon x" fontIcon="keyboard_arrow_right"></mat-icon>
             }
+            <p>Player X turn</p>
+        </div>
+        <div class="player-turn">
+            @if (currentPlayerTurn === 'O') {
+            <mat-icon class="icon o" fontIcon="keyboard_arrow_right"></mat-icon>
+            }
+            <p>Player O turn</p>
+        </div>
         }
     </div>
     <div class="board">
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(0), 'player-o': !isPlayerX(0)}" (click)="handleMove(0)">{{ board[0] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(1), 'player-o': !isPlayerX(1)}" (click)="handleMove(1)">{{ board[1] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(2), 'player-o': !isPlayerX(2)}" (click)="handleMove(2)">{{ board[2] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(3), 'player-o': !isPlayerX(3)}" (click)="handleMove(3)">{{ board[3] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(4), 'player-o': !isPlayerX(4)}" (click)="handleMove(4)">{{ board[4] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(5), 'player-o': !isPlayerX(5)}" (click)="handleMove(5)">{{ board[5] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(6), 'player-o': !isPlayerX(6)}" (click)="handleMove(6)">{{ board[6] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(7), 'player-o': !isPlayerX(7)}" (click)="handleMove(7)">{{ board[7] }}</div>
-        <div class="cell" [ngClass]="{'player-x': isPlayerX(8), 'player-o': !isPlayerX(8)}" (click)="handleMove(8)">{{ board[8] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[0] === 'X'}" (click)="handleMove(0)">{{ board[0] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[1] === 'X'}" (click)="handleMove(1)">{{ board[1] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[2] === 'X'}" (click)="handleMove(2)">{{ board[2] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[3] === 'X'}" (click)="handleMove(3)">{{ board[3] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[4] === 'X'}" (click)="handleMove(4)">{{ board[4] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[5] === 'X'}" (click)="handleMove(5)">{{ board[5] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[6] === 'X'}" (click)="handleMove(6)">{{ board[6] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[7] === 'X'}" (click)="handleMove(7)">{{ board[7] }}</div>
+        <div class="cell" [ngClass]="{'player-x': board[8] === 'X'}" (click)="handleMove(8)">{{ board[8] }}</div>
     </div>
 </div>

@@ -1,9 +1,9 @@
 import { MatButtonModule } from '@angular/material/button';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { GameService, WsMessage } from '../../services/game.service';
 import { Observable } from 'rxjs';
+import { GameService, WsMessage } from '../../services/game.service';
 
 @Component({
   selector: 'app-game-board',
@@ -23,7 +23,10 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.gameService.getPlayers$().subscribe(({ data }: WsMessage) => {
-      this.playerJoined = data;
+      const { board, player, nextPlayer } = data;
+      this.playerJoined = player;
+      this.board = board;
+      this.currentPlayerTurn = nextPlayer;
     });
     this.gameService.getBoardUpdate$().subscribe(({ data }: WsMessage) => {
       const { move, currentPlayer, nextPlayer } = data;

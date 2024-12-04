@@ -14,7 +14,7 @@ export interface WsMessage {
 export class GameService {
 
   private socket$!: WebSocketSubject<WsMessage>;
-  public playerJoined$!: Observable<WsMessage>;
+  private playerJoined$!: Observable<WsMessage>;
   public boardUpdate$!: Observable<WsMessage>;
   public winner$!: Observable<WsMessage>;
   public draw$!: Observable<WsMessage>;
