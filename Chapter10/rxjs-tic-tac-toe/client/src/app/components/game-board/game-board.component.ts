@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { GameService, WsMessage } from '../../services/game.service';
+import { EPlayer, IBoardUpdate, IPlayerJoined } from '../../types/game.type';
 
 @Component({
   selector: 'app-game-board',
@@ -16,19 +17,19 @@ export class GameBoardComponent implements OnInit, OnDestroy {
   currentPlayerTurn = 'X';
   playerJoined = '';
   board = Array(9).fill(null);
-  winner$!: Observable<'X' | 'O'>;
+  winner$!: Observable<EPlayer>;
   draw$!: Observable<boolean>;
 
   constructor(private gameService: GameService) { }
 
   ngOnInit() {
-    this.gameService.getPlayers$().subscribe(({ data }: WsMessage) => {
+    this.gameService.getPlayers$().subscribe(({ data }: WsMessage<IPlayerJoined>) => {
       const { board, player, nextPlayer } = data;
       this.playerJoined = player;
       this.board = board;
       this.currentPlayerTurn = nextPlayer;
     });
-    this.gameService.getBoardUpdate$().subscribe(({ data }: WsMessage) => {
+    this.gameService.getBoardUpdate$().subscribe(({ data }: WsMessage<IBoardUpdate>) => {
       const { move, currentPlayer, nextPlayer } = data;
       this.board[move] = currentPlayer;
       this.currentPlayerTurn = nextPlayer;

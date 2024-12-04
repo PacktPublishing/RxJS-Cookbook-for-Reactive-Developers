@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
+import { EPlayer, IBoardUpdate, IPlayerJoined } from '../types/game.type';
 
-export interface WsMessage {
+export interface WsMessage<T> {
   event: string;
-  data?: any;
+  data: T;
 }
 
 @Injectable({
@@ -12,16 +13,16 @@ export interface WsMessage {
 })
 export class GameService {
 
-  private socket$!: WebSocketSubject<WsMessage>;
-  private playerJoined$!: Observable<WsMessage>;
-  public boardUpdate$!: Observable<WsMessage>;
-  public winner$!: Observable<WsMessage>;
-  public draw$!: Observable<WsMessage>;
+  private socket$!: WebSocketSubject<WsMessage<any>>;
+  private playerJoined$!: Observable<WsMessage<IPlayerJoined>>;
+  public boardUpdate$!: Observable<WsMessage<IBoardUpdate>>;
+  public winner$!: Observable<WsMessage<EPlayer>>;
+  public draw$!: Observable<WsMessage<boolean>>;
 
   constructor() {
-    this.socket$ = webSocket<WsMessage>({
+    this.socket$ = webSocket<WsMessage<any>>({
       url: 'ws://localhost:8080',
-      deserializer: (e) => JSON.parse(e.data) as WsMessage,
+      deserializer: (e) => JSON.parse(e.data) as WsMessage<any>,
     });
     this.playerJoined$ = this.socket$.multiplex(
       () => ({ subscribe: 'join' }), 
@@ -45,23 +46,23 @@ export class GameService {
     );
   }
 
-  getPlayers$() {
+  getPlayers$(): Observable<WsMessage<IPlayerJoined>> {
     return this.playerJoined$;
   }
 
-  getWinner$(): Observable<'X' | 'O'> {
-    return this.winner$.pipe(map(({ data }: WsMessage) => data));
+  getWinner$(): Observable<EPlayer> {
+    return this.winner$.pipe(map(({ data }: WsMessage<EPlayer>) => data));
   }
 
   getDraw$(): Observable<boolean> {
-    return this.draw$.pipe(map(({ data }: WsMessage) => data));
+    return this.draw$.pipe(map(({ data }: WsMessage<boolean>) => data));
   }
 
   getBoardUpdate$() {
     return this.boardUpdate$;
   }
 
-  public send(message: any): void {
+  public send(message: WsMessage<any>): void {
     this.socket$.next(message);
   }
 
@@ -79,9 +80,5 @@ export class GameService {
     }
 
     this.send({ event: 'move', data: field }); 
-  }
-  
-  sendDraw(): void {  
-    this.send({ event: 'draw', data: 'Game is a draw' });
   }
 }
