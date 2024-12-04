@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { map, Observable } from 'rxjs';
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 
 export interface WsMessage {
