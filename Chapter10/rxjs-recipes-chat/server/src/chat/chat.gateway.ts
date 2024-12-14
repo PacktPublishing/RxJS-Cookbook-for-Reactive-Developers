@@ -27,9 +27,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): void {
     const { topic, isTyping, clientId } = data;
 
-    // this.chatService.sendTopicMessage(topic, {
-    //   typing: isTyping ? clientId : null,
-    // });
+    this.chatService.sendTopicMessage(topic, {
+      clientId,
+      isTyping,
+    });
   }
 
   @SubscribeMessage('message')

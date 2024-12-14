@@ -9,3 +9,8 @@ export interface Message {
   clientId: string;
   timestamp: Date;
 }
+
+export interface ChatEvent {
+  clientId: string;
+  isTyping: boolean;
+}

@@ -9,7 +9,7 @@ import {
   shareReplay,
 } from 'rxjs';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
-import { Message, WsMessage } from './chat.type';
+import { ChatEvent, Message, WsMessage } from './chat.type';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -34,10 +34,10 @@ export class ChatService implements OnModuleInit {
     );
 
     const typing$ = chatTopic$.pipe(
-      filter((data: { typing: string }) => 'typing' in data),
-      map((data: { typing: string }) => ({
+      filter((data: ChatEvent) => 'isTyping' in data),
+      map(({ clientId, isTyping }: ChatEvent) => ({
         event: 'chat',
-        data: { clientId: data.typing },
+        data: { clientId, isTyping },
       })),
     );
 
@@ -49,7 +49,7 @@ export class ChatService implements OnModuleInit {
     );
   }
 
-  sendTopicMessage(topic: string, message: Message): void {
+  sendTopicMessage(topic: string, message: Message | ChatEvent): void {
     if (this.topics[topic]) {
       this.topics[topic].next(message);
     }
