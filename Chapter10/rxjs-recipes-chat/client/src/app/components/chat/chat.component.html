@@ -1,19 +1,25 @@
-<button (click)="sendMessage()">SEND</button>
-<input class="new-message" type="text" (input)="handleTypeMessage($event)" />
-
-@if(isTyping) {
-    <div class="typing">Typing...</div>
-}
-@if (messages.length > 0) {
-    <div class="chat-container">
-        @for (chatMessage of messages; track chatMessage.id) {
-            <div class="message" [ngClass]="{
-                'sent': isSender(chatMessage.clientId),
-                'received': !isSender(chatMessage.clientId),
-            }">
-                <p>{{ chatMessage.message }}</p>
+<header class="chat-header">
+    <h1>Chat</h1>
+</header>
+<div class="chat-container">
+    @for (chatMessage of messages; let idx = $index; track chatMessage.id) {
+        <p class="message" [ngClass]="{
+            'sent': isSender(chatMessage.clientId),
+            'received': !isSender(chatMessage.clientId),
+        }">
+            {{ chatMessage.message }}
+            @if (shouldShowTimestamp(idx)) {
                 <span class="time">{{ chatMessage.timestamp | date:'shortTime' }}</span>
-            </div>
-        }
-    </div>
-}
+            }
+        </p>
+    }
+    @if(isTyping) {
+        <div class="typing">Typing...</div>
+    }
+</div>
+<div class="new-message-container">
+    <input class="new-message-input" placeholder="Message..." type="text" [(ngModel)]="message" />
+    <button mat-fab class="new-message-btn" (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+    </button>
+</div>

@@ -1,53 +1,73 @@
+.chat-header {
+    position: fixed;
+    top: 0;
+    height: 70px;
+    width: 100%;
+    background-color: #684CE3;
+    color: white;
+    padding: 20px;
+    z-index: -1;
+
+    h1 {
+        margin: 0;
+    }
+}
+
 .chat-container {
     display: flex;
     flex-direction: column;
-    max-width: 600px;
-    margin: 0 auto;
     padding: 20px;
     height: 90vh;
     overflow-y: auto;
     border: 1px solid #ddd;
-    border-radius: 10px;
-    background: linear-gradient(to right, #ece9e6, #ffffff); /* Gradient background */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for 3D effect */
+    margin-top: 105px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    background-color: white;
 }
 
-.new-message {
-    width: 100%;
+.new-message-container {
+    position: fixed;
+    bottom: 0;
+}
+
+.new-message-input { 
     padding: 10px 20px;
     margin: 20px 0;
-    font-size: 16px;
+    font-size: 20px;
     border: none;
+    background-color: #fbfbfb;
     border-radius: 20px;
-    box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2); /* Shadow for 3D effect */
     outline: none;
-    transition: box-shadow 0.3s ease; /* Transition effect for box-shadow */
+    transition: box-shadow 0.3s ease; 
+    width: calc(100vw - 60px);
 }
 
-// .new-message:focus {
-//     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5); /* Different shadow when the input is focused */
-// }
+.new-message-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 40px;
+    width: 40px;
+    background-color: #684CE3;
+    color: white;
+  }
 
 .message {
+    position: relative;
     display: flex;
     flex-direction: column;
-    margin-bottom: 40px;
-    padding: 15px;
-    border-radius: 1.2rem;
-    clear: both;
+    margin: 0 0 3px;
+    padding: 5px 15px;
+    border-radius: 1.5rem;
     line-height: 1.5;
-    font-size: 14px;
-    border: 1px solid #ddd; /* Border around the message */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow for 3D effect */
+    font-size: 20px;
+    border: 1px solid #ddd;
 
     p {
         margin: 0;
-    }
-
-    .time {
-        text-align: right;
-        color: #989898;
-        font-style: italic; /* Italic text for time */
     }
 }
 
@@ -55,12 +75,28 @@
     align-self: flex-end;
     background-color: #567AF3;
     color: white;
-    border-top-right-radius: 0; /* Different border radius for sent messages */
+    background: linear-gradient(45deg, #5D3DF5 0%, #9810F4 100%);
+
+    .time {
+        position: absolute;
+        bottom: -23px;
+        right: 0;
+        text-align: right;
+        color: #8a8a8a;
+        font-size: 14px;
+    }
 }
 
 .received {
     align-self: flex-start;
     background-color: #F6F8FD;
     color: black;
-    border-top-left-radius: 0; /* Different border radius for received messages */
+
+    .time {
+        position: absolute;
+        bottom: -23px;
+        left: 0;
+        color: #8a8a8a;
+        font-size: 14px;
+    }
 }

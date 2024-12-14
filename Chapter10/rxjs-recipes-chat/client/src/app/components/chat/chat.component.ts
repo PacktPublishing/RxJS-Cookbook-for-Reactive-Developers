@@ -1,17 +1,21 @@
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { map, shareReplay } from 'rxjs';
 import { ChatService, Message, WsMessage } from '../../services/chat.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, AsyncPipe],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent {
   messages: Array<Message> = [];
+  message: string = '';
   clientId: string = '';
   isTyping = false;
 
@@ -37,15 +41,24 @@ export class ChatComponent {
     });
   }
 
-  sendMessage(msg = 'HolaHolaHolaHolaHola') {
-    this.chatService.sendChatMessage(msg, this.clientId);
+  sendMessage() {
+    if (this.message.trim()) {
+      this.chatService.sendChatMessage(this.message, this.clientId);
+      this.message = ''; 
+    }
   }
 
   isSender(sender: string): boolean {
     return sender === this.clientId;
   }
 
-  handleTypeMessage({ target: { value } }: any) {
-    this.chatService.sendIsTyping(this.clientId, value.length > 0);
+  handleTypeMessage(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const { value } = target;
+    this.chatService.sendIsTyping(this.clientId, value.trim().length > 0);
+  }
+
+  shouldShowTimestamp(index: number): boolean {
+    return index === this.messages.length - 1 || this.messages[index].clientId !== this.messages[index + 1].clientId;
   }
 }
