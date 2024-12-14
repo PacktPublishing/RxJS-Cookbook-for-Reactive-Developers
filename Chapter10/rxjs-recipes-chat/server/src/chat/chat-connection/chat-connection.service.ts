@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { BehaviorSubject, tap } from 'rxjs';
-import { Message } from '../chat.gateway';
 import * as WebSocket from 'ws';
+import { Message } from '../chat.type';
 
 @Injectable()
 export class ChatConnectionService implements OnModuleInit {
@@ -40,15 +40,6 @@ export class ChatConnectionService implements OnModuleInit {
     return this.clients$.getValue();
   }
 
-  broadcastMessage(message: { event: string; data: Message }): void {
-    const clients = this.clients$.getValue();
-    clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(message));
-      }
-    });
-  }
-
   handleClientConnection(client: WebSocket): void {
     const clients = this.clients$.getValue();
 
@@ -67,5 +58,14 @@ export class ChatConnectionService implements OnModuleInit {
   handleDisconnect(client: WebSocket): void {
     const clients = this.clients$.getValue();
     this.clients$.next(clients.filter((c: WebSocket) => c.id !== client.id));
+  }
+
+  broadcastMessage(message: { event: string; data: Message[] }): void {
+    const clients = this.clients$.getValue();
+    clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(message));
+      }
+    });
   }
 }

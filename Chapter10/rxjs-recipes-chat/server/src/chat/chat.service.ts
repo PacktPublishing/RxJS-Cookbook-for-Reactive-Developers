@@ -1,7 +1,15 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { filter, map, merge, ReplaySubject, scan, shareReplay } from 'rxjs';
-import { Message, WsMessage } from './chat.gateway';
+import {
+  filter,
+  map,
+  merge,
+  BehaviorSubject,
+  ReplaySubject,
+  scan,
+  shareReplay,
+} from 'rxjs';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
+import { Message, WsMessage } from './chat.type';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -10,6 +18,7 @@ export class ChatService implements OnModuleInit {
   } = {
     chat: new ReplaySubject(100),
   };
+  public latestMessages$ = new BehaviorSubject<Message[]>([]);
 
   constructor(private chatConnectionService: ChatConnectionService) {}
 
@@ -33,7 +42,8 @@ export class ChatService implements OnModuleInit {
     );
 
     merge(messages$, typing$).subscribe(
-      (response: { event: string; data: Message }) => {
+      (response: { event: string; data: Message[] }) => {
+        this.latestMessages$.next(response.data);
         this.chatConnectionService.broadcastMessage(response);
       },
     );

@@ -11,18 +11,6 @@ import * as WebSocket from 'ws';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
 import { ChatService } from './chat.service';
 
-export interface WsMessage<T> {
-  event: string;
-  data?: T;
-}
-
-export interface Message {
-  id: string;
-  message: string;
-  clientId: string;
-  timestamp: Date;
-}
-
 @WebSocketGateway(8080)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -60,6 +48,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(@ConnectedSocket() client: WebSocket): void {
     this.chatConnectionService.handleClientConnection(client);
+    const messages = this.chatService.latestMessages$.getValue();
+    this.chatConnectionService.broadcastMessage({
+      event: 'chat',
+      data: messages,
+    });
   }
 
   handleDisconnect(@ConnectedSocket() client: WebSocket): void {
