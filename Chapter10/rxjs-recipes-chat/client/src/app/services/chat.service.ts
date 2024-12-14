@@ -34,8 +34,8 @@ export class ChatService {
       (message) => message.event === 'chat'
     );
     this.clientConnection$ = this.socket$.multiplex(
-      () => ({ subscribe: 'connection' }), 
-      () => ({ unsubscribe: 'connection' }), 
+      () => ({ subscribe: 'connect' }), 
+      () => ({ unsubscribe: 'connect' }), 
       (message) => message.event === 'connect'
     );
     this.isTyping$ = this.socket$.multiplex(
@@ -43,26 +43,57 @@ export class ChatService {
       () => ({ unsubscribe: 'typing' }), 
       (message) => message.event === 'typing'
     );
-    this.socket$.next({ event: 'connect', data: 'chat' });
   }
 
   sendChatMessage(message: string, clientId: string) {
     this.socket$.next({ event: 'message', data: { topic: 'chat', message, clientId }});
   }
 
+  
   sendIsTyping(clientId: string, isTyping: boolean = true) {
     this.socket$.next({ event: 'typing', data: { topic: 'chat', clientId, isTyping } });
   }
-
+  
   getClientConnection$(): Observable<WsMessage> {
     return this.clientConnection$;
   }
-
+  
   getChatSocket$(): Observable<WsMessage> {
     return this.chat$;
   }
-
+  
   getIsTyping$() {
     return this.isTyping$;
   }
 }
+// sendVoiceMessage(clientId: string) {
+//   const constraints = { audio: true };
+//   navigator.mediaDevices.getUserMedia(constraints)
+//     .then((stream) => {
+//       const mediaRecorder = new MediaRecorder(stream);
+//       const audioChunks: BlobPart[] = [];
+
+//       mediaRecorder.ondataavailable = (event) => {
+//         audioChunks.push(event.data);
+//       };
+
+//       mediaRecorder.onstop = () => {
+//         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+//         const reader = new FileReader();
+//         reader.readAsDataURL(audioBlob);
+//         reader.onloadend = () => {
+//           const base64AudioMessage = reader.result as string;
+//           this.socket$.next({ event: 'voice', data: { topic: 'chat', clientId, message: base64AudioMessage } });
+//         };
+//       };
+
+//       mediaRecorder.start();
+
+//       setTimeout(() => {
+//         mediaRecorder.stop();
+//       }, 5000); // Record for 5 seconds
+//     })
+//     .catch((error) => {
+//       console.error('Error accessing media devices.', error);
+//     });
+// }

@@ -1,5 +1,11 @@
 <header class="chat-header">
     <h1>Chat</h1>
+    {{clientId}}
+    @if (isOnline) {
+        <span class="online">Online</span>
+    } @else {
+        <span class="offline">Offline</span>
+    }
 </header>
 <div class="chat-container">
     @for (chatMessage of messages; let idx = $index; track chatMessage.id) {

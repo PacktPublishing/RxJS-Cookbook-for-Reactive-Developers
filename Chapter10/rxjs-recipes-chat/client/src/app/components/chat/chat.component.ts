@@ -18,19 +18,22 @@ export class ChatComponent {
   message: string = '';
   clientId: string = '';
   isTyping = false;
+  isOnline = false;
 
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.chatService.getClientConnection$().pipe(
       map((msg: WsMessage) => msg.data)
-    ).subscribe(({ clientId, isOnline }) => {
-      console.log(isOnline)
+    ).subscribe(({ clientId, otherClientId, isOnline }) => {
+      console.log(clientId, otherClientId, isOnline)
       this.clientId = clientId
+      this.isOnline = isOnline;
     });
     this.chatService.getChatSocket$().pipe(
       shareReplay({ bufferSize: 1, refCount: true })
     ).subscribe(({ data }: WsMessage) => {
+      console.log(data)
       if ('clientId' in data) {
         this.isTyping = data.clientId !== this.clientId;
         
