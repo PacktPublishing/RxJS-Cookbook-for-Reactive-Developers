@@ -1,11 +1,19 @@
 <header class="chat-header">
-    <h1>Chat</h1>
-    {{clientId}}
-    @if (isOnline) {
-        <span class="online">Online</span>
-    } @else {
-        <span class="offline">Offline</span>
-    }
+    <img class="avatar" src="/assets/images/red-panda.png" alt="Avatar" />
+    <div class="chat-header-container">
+        <h2>Best friend</h2>
+        @if (isOnline) {
+            <p>
+                Online
+                <span class="online"></span>
+            </p>
+        } @else {
+            <p>
+                Online
+                <span class="offline"></span>
+            </p>
+        }
+    </div>
 </header>
 <div class="chat-container">
     @for (chatMessage of messages; let idx = $index; track chatMessage.id) {
@@ -20,11 +28,15 @@
         </p>
     }
     @if(isTyping) {
-        <div class="typing">Typing...</div>
+        <div class="typing">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
     }
 </div>
 <div class="new-message-container">
-    <input class="new-message-input" placeholder="Message..." type="text" [(ngModel)]="message" />
+    <input class="new-message-input" placeholder="Message..." type="text" [(ngModel)]="message" (ngModelChange)="handleTypeMessage($event)" />
     <button mat-fab class="new-message-btn" (click)="sendMessage()">
         <mat-icon>send</mat-icon>
     </button>

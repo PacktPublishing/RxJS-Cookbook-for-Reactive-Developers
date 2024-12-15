@@ -1,4 +1,5 @@
 .chat-header {
+    display: flex;
     position: fixed;
     top: 0;
     height: 70px;
@@ -8,8 +9,33 @@
     padding: 20px;
     z-index: -1;
 
-    h1 {
+    h2 {
         margin: 0;
+    }
+
+    .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .online {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #2ED47A;
+        border-radius: 50%;
+        margin-left: 3px;
+    }
+
+    .offline {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #F44336;
+        border-radius: 50%;
+        margin-left: 3px;
     }
 }
 
@@ -32,10 +58,10 @@
 }
 
 .new-message-input { 
-    padding: 10px 20px;
-    margin: 20px 0;
+    padding: 15px 20px;
+    margin: 20px 10px;
     font-size: 20px;
-    border: none;
+    border: 1px solid #ddd;
     background-color: #fbfbfb;
     border-radius: 20px;
     outline: none;
@@ -45,12 +71,12 @@
 
 .new-message-btn {
     position: absolute;
-    right: 0;
+    right: 15px;
     top: 0;
     bottom: 0;
     margin: auto;
-    height: 40px;
-    width: 40px;
+    height: 35px;
+    width: 35px;
     background-color: #684CE3;
     color: white;
   }
@@ -100,3 +126,52 @@
         font-size: 14px;
     }
 }
+
+.typing {
+    align-self: flex-start;
+    background-color: #F6F8FD;
+    font-style: italic;
+    font-size: 14px;
+    padding: 15px 20px;
+    margin: 25px 0;
+    font-size: 20px;
+    border: 1px solid #ddd;
+    background-color: #fbfbfb;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .typing .dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: #5D3DF5;
+    animation: blink 1.4s infinite both;
+    border-radius: 20px;
+
+  }
+  
+  .typing .dot:nth-child(1) {
+    animation-delay: 0s;
+  }
+  
+  .typing .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes blink {
+    0% {
+      opacity: 0.2;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.2;
+    }
+  }

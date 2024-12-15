@@ -62,7 +62,7 @@ export class ChatService {
     return this.chat$;
   }
   
-  getIsTyping$() {
+  getIsTyping$(): Observable<WsMessage> {
     return this.isTyping$;
   }
 }

@@ -2,7 +2,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { map, shareReplay } from 'rxjs';
+import { filter, map, shareReplay } from 'rxjs';
 import { ChatService, Message, WsMessage } from '../../services/chat.service';
 import { FormsModule } from '@angular/forms';
 
@@ -25,18 +25,16 @@ export class ChatComponent {
   ngOnInit(): void {
     this.chatService.getClientConnection$().pipe(
       map((msg: WsMessage) => msg.data)
-    ).subscribe(({ clientId, otherClientId, isOnline }) => {
-      console.log(clientId, otherClientId, isOnline)
-      this.clientId = clientId
+    ).subscribe(({ clientId, isOnline }) => {
+      this.clientId = clientId;
       this.isOnline = isOnline;
     });
     this.chatService.getChatSocket$().pipe(
-      shareReplay({ bufferSize: 1, refCount: true })
+      filter(({ data }: WsMessage) => data.clientId !== this.clientId),
     ).subscribe(({ data }: WsMessage) => {
-      console.log(data)
-      if ('clientId' in data) {
-        this.isTyping = data.clientId !== this.clientId;
-        
+      if ('isTyping' in data) {
+        this.isTyping = data.isTyping;
+
         return;
       }
 
@@ -44,9 +42,10 @@ export class ChatComponent {
     });
   }
 
-  sendMessage() {
+  sendMessage(): void {
     if (this.message.trim()) {
       this.chatService.sendChatMessage(this.message, this.clientId);
+      this.chatService.sendIsTyping(this.clientId, false);
       this.message = ''; 
     }
   }
@@ -55,9 +54,7 @@ export class ChatComponent {
     return sender === this.clientId;
   }
 
-  handleTypeMessage(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const { value } = target;
+  handleTypeMessage(value: string) {
     this.chatService.sendIsTyping(this.clientId, value.trim().length > 0);
   }
 
