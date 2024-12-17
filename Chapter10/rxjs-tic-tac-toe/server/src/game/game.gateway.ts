@@ -7,7 +7,7 @@ import {
   SubscribeMessage,
 } from '@nestjs/websockets';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { map, shareReplay, tap, withLatestFrom } from 'rxjs/operators';
+import { filter, map, shareReplay, tap, withLatestFrom } from 'rxjs/operators';
 import * as WebSocket from 'ws';
 import { OnModuleInit } from '@nestjs/common';
 import { GameService } from './game.service';
@@ -79,8 +79,31 @@ export class GameGateway implements OnGatewayConnection, OnModuleInit {
   }
 
   private initializePlayerMoves() {
+    // Step 2: Playing a move
+    // this.moves$.pipe(
+    //   withLatestFrom(this.clients$),
+    //   map(([move, clients]) => {
+    //     const nextPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+    //     this.board[move] = this.currentPlayer;
+
+    //     clients.forEach((client) => {
+    //       client.send(
+    //         JSON.stringify({
+    //           event: 'boardUpdate',
+    //           data: { move, currentPlayer: this.currentPlayer, nextPlayer },
+    //         }),
+    //       );
+    //     });
+
+    //     this.currentPlayer = nextPlayer;
+
+    //     return clients;
+    //   }),
+    //   shareReplay({ bufferSize: 1, refCount: true }),
+    // );
     const playerMoves$ = this.moves$.pipe(
       withLatestFrom(this.clients$),
+      filter(([move]) => this.board[move] === null),
       map(([move, clients]) => {
         const nextPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
         this.board[move] = this.currentPlayer;
@@ -103,7 +126,7 @@ export class GameGateway implements OnGatewayConnection, OnModuleInit {
     playerMoves$
       .pipe(
         tap((clients: WebSocket[]) => this.handleCheckWinner(clients)),
-        tap((clients) => this.handleCheckDraw(clients)),
+        tap((clients: WebSocket[]) => this.handleCheckDraw(clients)),
         shareReplay({ bufferSize: 1, refCount: true }),
       )
       .subscribe();
