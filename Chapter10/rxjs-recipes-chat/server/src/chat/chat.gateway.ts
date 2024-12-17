@@ -11,7 +11,7 @@ import * as WebSocket from 'ws';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
 import { ChatService } from './chat.service';
 
-@WebSocketGateway(8080)
+@WebSocketGateway(8080, { pingTimeout: 2000 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: WebSocket.Server;

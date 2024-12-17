@@ -1,9 +1,9 @@
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { filter, map, shareReplay } from 'rxjs';
-import { ChatService, Message, WsMessage } from '../../services/chat.service';
+import { filter, map } from 'rxjs';
+import { ChatService, IChatConnection, IChatEvent, IMessage, IWsMessage } from '../../services/chat.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -14,31 +14,33 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent {
-  messages: Array<Message> = [];
+  messages: Array<IMessage> = [];
   message: string = '';
   clientId: string = '';
   isTyping = false;
   isOnline = false;
+  name = '';
 
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.chatService.getClientConnection$().pipe(
-      map((msg: WsMessage) => msg.data)
-    ).subscribe(({ clientId, isOnline }) => {
+      map((msg: IWsMessage<IChatConnection>) => msg.data)
+    ).subscribe(({ clientId, name, isOnline }) => {
+      this.name = name;
       this.clientId = clientId;
       this.isOnline = isOnline;
     });
     this.chatService.getChatSocket$().pipe(
-      filter(({ data }: WsMessage) => data.clientId !== this.clientId),
-    ).subscribe(({ data }: WsMessage) => {
+      filter(({ data }: IWsMessage<IChatEvent | IMessage[]>) => (data as IChatEvent).clientId !== this.clientId),
+    ).subscribe(({ data }) => {
       if ('isTyping' in data) {
         this.isTyping = data.isTyping;
 
         return;
       }
 
-      this.messages = data;
+      this.messages = data as IMessage[];
     });
   }
 

@@ -63,15 +63,16 @@
     font-size: 20px;
     border: 1px solid #ddd;
     background-color: #fbfbfb;
-    border-radius: 20px;
+    border-radius: 25px;
     outline: none;
     transition: box-shadow 0.3s ease; 
     width: calc(100vw - 60px);
-}
+    box-shadow: 0 4px 8px rgba(104, 76, 227, 0.3); /* Updated box shadow */
+  }
 
 .new-message-btn {
     position: absolute;
-    right: 15px;
+    right: 25px;
     top: 0;
     bottom: 0;
     margin: auto;

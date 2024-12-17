@@ -6,13 +6,10 @@ import { Message } from '../chat.type';
 @Injectable()
 export class ChatConnectionService implements OnModuleInit {
   private clients$ = new BehaviorSubject<WebSocket[]>([]);
-  private clientOneId = '';
-  private clientTwoId = '';
+  private clientOneId = 'b9ec382c-a624-40ba-9865-a81be0d390a8';
+  private clientTwoId = 'e1426280-0169-4647-b7d1-5e061a23a0d8';
 
   onModuleInit() {
-    this.clientOneId = crypto.randomUUID();
-    this.clientTwoId = crypto.randomUUID();
-
     this.clients$
       .pipe(
         tap((clients: WebSocket[]) => {
@@ -22,6 +19,7 @@ export class ChatConnectionService implements OnModuleInit {
                 event: 'connect',
                 data: {
                   clientId: client.id,
+                  name: client.id === this.clientOneId ? 'Red Panda' : 'Rocket',
                   otherClientId:
                     client.id === this.clientOneId
                       ? this.clientTwoId
