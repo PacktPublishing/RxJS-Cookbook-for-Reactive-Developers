@@ -7,6 +7,7 @@ import {
   ReplaySubject,
   scan,
   shareReplay,
+  distinctUntilKeyChanged,
 } from 'rxjs';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
 import { ChatEvent, Message, WsMessage } from './chat.type';
@@ -35,6 +36,7 @@ export class ChatService implements OnModuleInit {
 
     const typing$ = chatTopic$.pipe(
       filter((data: ChatEvent) => 'isTyping' in data),
+      distinctUntilKeyChanged('isTyping'),
       map(({ clientId, isTyping }: ChatEvent) => ({
         event: 'chat',
         data: { clientId, isTyping },
