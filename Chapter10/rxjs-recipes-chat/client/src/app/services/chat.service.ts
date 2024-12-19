@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, delay, map, Observable, of, ReplaySubject, retry, scan } from 'rxjs';
+import { catchError, delay, EMPTY, from, fromEvent, map, merge, Observable, of, ReplaySubject, retry, switchAll, switchMap, tap } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 export interface IWsMessage<T> {
@@ -13,6 +13,7 @@ export interface IMessage {
   clientId: string;
   timestamp?: Date;
   topic: string;
+  isVoice?: boolean;
 }
 
 export interface IChatEvent {
@@ -118,35 +119,55 @@ export class ChatService {
   getIsTyping$(): Observable<IWsMessage<IChatEvent>> {
     return this.isTyping$;
   }
+
+  sendVoiceMessage(clientId: string) {
+    const constraints = { audio: true };
+    const audioChunks: BlobPart[] = [];
+    const micRecording$ = from(navigator.mediaDevices.getUserMedia(constraints));
+    const audioChunkEvent$ = micRecording$.pipe(
+      switchMap((stream: MediaStream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+  
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 5000); // Record for 5 seconds
+
+        return merge(
+          fromEvent(mediaRecorder, 'dataavailable'),
+          fromEvent(mediaRecorder, 'stop'),
+        );
+      })
+    );
+
+    return audioChunkEvent$.pipe(
+      map((audioEvent: BlobEvent | Event) => {
+        if ('data' in audioEvent) {
+          audioChunks.push(audioEvent.data);
+
+          return EMPTY;
+        }
+
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+          
+        return fromEvent<BlobEvent>(reader, 'loadend');
+      }), 
+      switchAll(),
+      tap((progressEvent: Event) => this.sendVoiceMessageToServer(progressEvent, clientId)),
+      catchError((error: Error) => {
+        console.error('Error accessing media devices.', error);
+
+        return EMPTY;
+      })
+    ).subscribe();
+  }
+
+  sendVoiceMessageToServer(progressEvent: Event, clientId: string) {
+    if (!progressEvent) return;
+    const reader = progressEvent.target as FileReader;
+    const base64AudioMessage = reader.result as string;
+    this.socket$.next({ event: 'message', data: { topic: 'chat', clientId, message: base64AudioMessage } });
+  }
 }
-// sendVoiceMessage(clientId: string) {
-//   const constraints = { audio: true };
-//   navigator.mediaDevices.getUserMedia(constraints)
-//     .then((stream) => {
-//       const mediaRecorder = new MediaRecorder(stream);
-//       const audioChunks: BlobPart[] = [];
-
-//       mediaRecorder.ondataavailable = (event) => {
-//         audioChunks.push(event.data);
-//       };
-
-//       mediaRecorder.onstop = () => {
-//         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-//         const reader = new FileReader();
-//         reader.readAsDataURL(audioBlob);
-//         reader.onloadend = () => {
-//           const base64AudioMessage = reader.result as string;
-//           this.socket$.next({ event: 'voice', data: { topic: 'chat', clientId, message: base64AudioMessage } });
-//         };
-//       };
-
-//       mediaRecorder.start();
-
-//       setTimeout(() => {
-//         mediaRecorder.stop();
-//       }, 5000); // Record for 5 seconds
-//     })
-//     .catch((error) => {
-//       console.error('Error accessing media devices.', error);
-//     });
-// }

@@ -32,7 +32,14 @@
             'received': !isSender(chatMessage.clientId),
         }"
   >
-    {{ chatMessage.message }}
+    @if (chatMessage.isVoice) {
+      <audio controls controlsList="nodownload" [src]="chatMessage.message" class="audio-message" [ngClass]="{
+        'sent': isSender(chatMessage.clientId),
+        'received': !isSender(chatMessage.clientId),
+    }"></audio>
+    } @else {
+      {{ chatMessage.message }}
+    }
     @if (shouldShowTimestamp(idx)) {
     <span class="time">{{ chatMessage.timestamp | date : "shortTime" }}</span>
     }
@@ -55,5 +62,8 @@
   />
   <button mat-fab class="new-message-btn" (click)="sendMessage()">
     <mat-icon>send</mat-icon>
+  </button>
+  <button mat-fab class="new-voice-message-btn" (click)="sendVoiceMessage()">
+    <mat-icon>mic</mat-icon>
   </button>
 </div>

@@ -82,6 +82,18 @@
     color: white;
   }
 
+.new-voice-message-btn {
+    position: absolute;
+    right: 65px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 35px;
+    width: 35px;
+    background-color: #684CE3;
+    color: white;
+  }
+
 .message {
     position: relative;
     display: flex;
@@ -174,5 +186,64 @@
     }
     100% {
       opacity: 0.2;
+    }
+  }
+
+  .audio-message {
+    // width: 300px;
+    // height: 40px;
+    border-radius: 25px;
+    outline: none;
+
+    &::-webkit-media-controls-volume-slider,
+    &::-webkit-media-controls-mute-button {
+      display: none;
+    }
+
+    &::-webkit-media-controls-volume-control-container {
+      display: none !important;
+    }
+
+    &.sent {
+      background-color: #032592;
+      color: white;
+  
+      &::-webkit-media-controls-panel {
+        background: linear-gradient(45deg, #5D3DF5 0%, #9810F4 100%);
+        border-radius: 5px;
+      }
+  
+      &::-webkit-media-controls-play-button,
+      &::-webkit-media-controls-pause-button{
+        filter: invert(100%);
+      }
+  
+      &::-webkit-media-controls-current-time-display,
+      &::-webkit-media-controls-time-remaining-display {
+        color: white;
+      }
+    }
+
+  
+    &.received {
+      background-color: #f1f1f1;
+      color: black;
+  
+      &::-webkit-media-controls-panel {
+        background: linear-gradient(45deg, #f1f1f1 0%, #e0e0e0 100%);
+        border-radius: 5px;
+      }
+  
+      &::-webkit-media-controls-play-button,
+      &::-webkit-media-controls-pause-button,
+      &::-webkit-media-controls-mute-button,
+      &::-webkit-media-controls-volume-slider {
+        filter: invert(0%);
+      }
+  
+      &::-webkit-media-controls-current-time-display,
+      &::-webkit-media-controls-time-remaining-display {
+        color: black;
+      }
     }
   }

@@ -40,7 +40,13 @@ export class ChatComponent {
         return;
       }
 
-      this.messages = data as IMessage[];
+      this.messages = data.map((chatMessage: IMessage) => {
+        if (chatMessage.message.startsWith('data:audio')) {
+          return { ...chatMessage, isVoice: true };
+        }
+
+        return chatMessage;
+      });
     });
   }
 
@@ -50,6 +56,10 @@ export class ChatComponent {
       this.chatService.sendIsTyping(this.clientId, false);
       this.message = ''; 
     }
+  }
+
+  sendVoiceMessage(): void {
+    this.chatService.sendVoiceMessage(this.clientId);
   }
 
   isSender(sender: string): boolean {
