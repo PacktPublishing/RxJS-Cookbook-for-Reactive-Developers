@@ -16,9 +16,9 @@ enum OrderStatus {
 }
 
 message OrderRequest {
-    string id = 1;
-    string item = 2;
-    int32 quantity = 3;
+    string item = 1;
+    int32 quantity = 2;
+    optional Location location = 5;
 }
 
 message Location {

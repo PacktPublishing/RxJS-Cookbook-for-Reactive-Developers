@@ -1,5 +1,4 @@
 export interface OrderRequest {
-  id: string;
   item: string;
   quantity: number;
 }
@@ -8,7 +7,7 @@ export interface OrderStatusRequest {
   id: string;
   status: OrderStatus;
 }
-  
+
 export interface OrderById {
   id: string;
 }
