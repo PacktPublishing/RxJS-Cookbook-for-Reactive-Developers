@@ -9,8 +9,8 @@ interface Message {
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('hello')
-  getHello(@Body() { message }: Message): Promise<string> {
-    return this.appService.getHello(message);
+  @Post('recipe')
+  postRecipe(@Body() { message }: Message): Promise<string> {
+    return this.appService.postRecipe(message);
   }
 }

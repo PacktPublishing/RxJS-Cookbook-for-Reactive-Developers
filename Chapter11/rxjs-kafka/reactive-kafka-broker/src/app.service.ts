@@ -11,14 +11,16 @@ export interface Recipe {
 
 @Injectable()
 export class AppService {
-  constructor(private messageBroker: MessageBrokerService, private rxjsKafkaSocumer: RxjsKafkaConsumerService) {
+  constructor(
+    private messageBroker: MessageBrokerService,
+    private rxjsKafkaSocumer: RxjsKafkaConsumerService,
+  ) {
     this.rxjsKafkaSocumer.consume(['recipes-topic']);
   }
 
-  async getHello(recipe: string): Promise<string> {
+  async postRecipe(recipe: string): Promise<string> {
     await this.messageBroker.produce('recipes-topic', recipe);
 
     return 'Message sent to Kafka recipes-topic';
   }
-
 }

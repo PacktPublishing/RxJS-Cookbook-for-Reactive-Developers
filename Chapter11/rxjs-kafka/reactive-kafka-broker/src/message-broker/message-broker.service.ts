@@ -1,6 +1,24 @@
 import { Injectable, OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
-import { CompressionTypes, Kafka, KafkaJSError, Producer } from 'kafkajs';
-import { Subject, bufferToggle, catchError, filter, from, merge, fromEvent, mergeAll, retry, throwError, timer, windowToggle, fromEventPattern, switchMap, EMPTY, tap, of, NEVER, repeat, ReplaySubject, bufferTime, groupBy, reduce, map, mergeMap, toArray, concatMap, interval } from 'rxjs';
+import { CompressionTypes, Kafka, Producer } from 'kafkajs';
+import {
+  Subject,
+  bufferToggle,
+  catchError,
+  filter,
+  from,
+  merge,
+  mergeAll,
+  retry,
+  timer,
+  windowToggle,
+  fromEventPattern,
+  switchMap,
+  EMPTY,
+  of,
+  ReplaySubject,
+  bufferTime,
+  concatMap,
+} from 'rxjs';
 
 interface KafkaMessage {
   topic: string;
@@ -19,11 +37,11 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     this.kafka = new Kafka({
       brokers: ['localhost:9092'],
       retry: {
-        retries: 0
+        retries: 0,
       },
     });
     this.producer = this.kafka.producer({
-      allowAutoTopicCreation: true
+      allowAutoTopicCreation: true,
     });
   }
 
@@ -37,10 +55,18 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
       this.producer.connect();
     }, 50000);
 
-    const producerActive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => activeState));
-    const producerInactive$ = this.producerActiveState$.asObservable().pipe(filter(activeState => !activeState));
-    const acceptIncomingMessages$ = this.kafkaMessage$.pipe(windowToggle(producerActive$, () => producerInactive$));
-    const bufferIncomingMessages$ = this.kafkaMessage$.pipe(bufferToggle(producerInactive$, () => producerActive$));
+    const producerActive$ = this.producerActiveState$
+      .asObservable()
+      .pipe(filter((activeState) => activeState));
+    const producerInactive$ = this.producerActiveState$
+      .asObservable()
+      .pipe(filter((activeState) => !activeState));
+    const acceptIncomingMessages$ = this.kafkaMessage$.pipe(
+      windowToggle(producerActive$, () => producerInactive$),
+    );
+    const bufferIncomingMessages$ = this.kafkaMessage$.pipe(
+      bufferToggle(producerInactive$, () => producerActive$),
+    );
 
     // Step 3
     // this.kafkaMessage$.pipe(
@@ -58,17 +84,16 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     // ).subscribe();
 
     // Step 6
-    merge(
-      acceptIncomingMessages$,
-      bufferIncomingMessages$
-    ).pipe(
-      mergeAll(),
-      bufferTime(2000),
-      filter(messages => messages.length > 0),
-      concatMap((kafkaMessage) => from(this.producer.sendBatch({ topicMessages: kafkaMessage }))),
-      catchError(() => of('Error sending messages to Kafka!')),
-    ).subscribe();
-    
+    merge(acceptIncomingMessages$, bufferIncomingMessages$)
+      .pipe(
+        mergeAll(),
+        bufferTime(2000),
+        filter((messages) => messages.length > 0),
+        concatMap((kafkaMessage) => from(this.producer.sendBatch({ topicMessages: kafkaMessage }))),
+        catchError(() => of('Error sending messages to Kafka!')),
+      )
+      .subscribe();
+
     this.handleBrokerConnection();
   }
 
@@ -90,12 +115,12 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
         count: 3,
         delay: (error, retryCount) => {
           console.log(
-            `Attempt ${retryCount}: Error occurred during network request, retrying in ${Math.pow(2, retryCount)} seconds...`
+            `Attempt ${retryCount}: Error occurred during network request, retrying in ${Math.pow(2, retryCount)} seconds...`,
           );
           return timer(Math.pow(2, retryCount) * 1000);
         },
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Error connecting to Kafka: ${error}`);
         this.producerActiveState$.next(false);
         return EMPTY;
@@ -103,16 +128,17 @@ export class MessageBrokerService implements OnModuleInit, OnApplicationShutdown
     );
     producerConnect$.subscribe();
 
+    // list of available events https://kafka.js.org/docs/instrumentation-events
     this.producer.on(this.producer.events.CONNECT, () => {
       this.producerActiveState$.next(true);
     });
 
-    const producerDisconnect$ = fromEventPattern(
-      (handler) => this.producer.on(this.producer.events.DISCONNECT, handler),
+    const producerDisconnect$ = fromEventPattern((handler) =>
+      this.producer.on(this.producer.events.DISCONNECT, handler),
     );
 
-    producerDisconnect$.pipe(
-      switchMap(() => producerConnect$)
-    ).subscribe(() => this.producerActiveState$.next(false));
+    producerDisconnect$
+      .pipe(switchMap(() => producerConnect$))
+      .subscribe(() => this.producerActiveState$.next(false));
   }
 }
