@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AppService } from './app.service';
 
 @Controller('recipes')
@@ -8,6 +8,6 @@ export class AppController {
 
   @Get()
   getHello(): Observable<string> {
-    return this.appService.getHello();
+    return this.appService.getOrder();
   }
 }
