@@ -1,14 +1,26 @@
 import { Component, ElementRef, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { interval, scan, map, takeWhile, animationFrameScheduler, withLatestFrom, tap, finalize, repeat, Subject, Observable, skip } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
+import {
+  interval,
+  scan,
+  map,
+  takeWhile,
+  animationFrameScheduler,
+  withLatestFrom,
+  tap,
+  finalize,
+  repeat,
+  Subject,
+  Observable,
+  distinctUntilChanged,
+} from 'rxjs';
 
 @Component({
   selector: 'app-bouncing-ball',
   standalone: true,
-  imports: [FormsModule, AsyncPipe],
+  imports: [FormsModule],
   templateUrl: './bouncing-ball.component.html',
-  styleUrl: './bouncing-ball.component.scss'
+  styleUrl: './bouncing-ball.component.scss',
 })
 export class BouncingBallComponent {
   @ViewChild('ball', { static: true }) ballRef!: ElementRef;
@@ -19,37 +31,47 @@ export class BouncingBallComponent {
   maxBounces = 7;
   bounceCount = 0;
   container!: HTMLElement;
-  ballLoop$!: Observable<{ y: number, dy: number }>;
+  ballLoop$!: Observable<{ y: number; dy: number }>;
 
   ngAfterViewInit() {
     const ball = this.ballRef.nativeElement;
-    this.container = document.documentElement; 
-    const initialHeight = 0; 
+    this.container = document.documentElement;
+    const initialHeight = 0;
     let gravity = 0.981;
-    let energyLoss = 0.9; 
-    const initialVelocity = 0; 
+    let energyLoss = 0.9;
+    const initialVelocity = 0;
     const time$ = interval(30);
 
     const velocity$ = time$.pipe(
-      map(time => time / 1000),
+      map((time) => time / 1000),
       scan((velocity, time) => velocity + gravity * time, initialVelocity),
+      tap(v => console.log(v)),
+      distinctUntilChanged(),
     );
 
     this.ballLoop$ = interval(0, animationFrameScheduler).pipe(
       withLatestFrom(velocity$),
-      map(([_, velocity]) => velocity),
-      scan(({ y, dy }, velocity) => {
-        dy += velocity; // Apply gravity
-        y += dy;
-        // Bounce off the ground
-        if (y + ball.offsetHeight > this.container.clientHeight - 10) {
-          y = this.container.clientHeight - ball.offsetHeight - 10;
-          dy = -dy * energyLoss; // Reverse direction and reduce energy
-          this.bounceCount++;
-        }
+      map(([_, velocity]) => {
+        // console.log(velocity)
 
-        return { y, dy };
-      }, { y: initialHeight, dy: 0 }),
+        return velocity
+      }),
+      scan(
+        ({ y, dy }, velocity) => {
+          // console.log(velocity)
+          dy += velocity; // Apply gravity
+          y += dy;
+          // Bounce off the ground
+          if (y + ball.offsetHeight > this.container.clientHeight - 10) {
+            y = this.container.clientHeight - ball.offsetHeight - 10;
+            dy = -dy * energyLoss; // Reverse direction and reduce energy
+            this.bounceCount++;
+          }
+
+          return { y, dy };
+        },
+        { y: initialHeight, dy: 0 }
+      ),
       tap(({ y }) => {
         ball.style.top = `${y}px`;
         this.updateShadow(y);
@@ -58,7 +80,7 @@ export class BouncingBallComponent {
       finalize(() => {
         this.message.set(`Bouncing stopped after ${this.bounceCount} bounces`);
       }),
-      repeat({ delay: () => this.bounceRepeat$ }),
+      repeat({ delay: () => this.bounceRepeat$ })
     );
 
     this.ballLoop$.subscribe();
@@ -74,5 +96,4 @@ export class BouncingBallComponent {
     const shadowScale = Math.max(1, 2 - y / this.container.clientHeight);
     this.shadow.nativeElement.style.transform = `translateY(-50%) scale(${shadowScale})`;
   }
-
 }
