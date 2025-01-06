@@ -1,5 +1,10 @@
-<button #button id="submitButton" (click)="startBouncing()">
-    Upload
-    <span class="upload" [style.width.px]="buttonWidth()"></span>
+<button #button id="submitButton" (click)="startUpload()">
+  <span class="upload" [style.width.px]="buttonProgressWidth()"></span>
+  @if ((btnState$ | async) === 'loading') {
+    <span class="spinner"></span>
+  } @else if ((btnState$ | async) === 'done') {
+    <span class="checkmark"></span>
+  } @else {
     <span class="upload-text">Upload</span>
+  }
 </button>

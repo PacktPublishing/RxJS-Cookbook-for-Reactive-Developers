@@ -1,72 +1,62 @@
 import {
-  animationFrames, distinctUntilChanged, endWith,
-  interval,
-  range,
-  startWith,
-  switchMap,
+  animationFrames,
+  BehaviorSubject,
+  distinctUntilChanged, finalize, range, Subject, switchMap,
   take,
-  takeUntil,
   tap,
-  zip,
+  timer,
   zipWith
 } from 'rxjs';
 import { Component, ElementRef, ViewChild, signal } from '@angular/core';
-import {
-  scan,
-  map,
-  takeWhile,
-  timer, withLatestFrom, finalize, Subject, fromEvent
-} from 'rxjs';
+import { map, takeWhile, withLatestFrom } from 'rxjs';
+import { AsyncPipe, CommonModule } from '@angular/common';
+
+export enum EBtnStates {
+  IDLE = 'idle',
+  LOADING = 'loading',
+  DONE = 'done'
+}
 
 @Component({
   selector: 'app-progress-btn',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, AsyncPipe],
   templateUrl: './progress-btn.component.html',
   styleUrl: './progress-btn.component.scss',
 })
 export class ProgressBtnComponent {
   @ViewChild('button', { static: false }) buttonRef!: ElementRef;
-  buttonWidth = signal<string>('');
+  buttonProgressWidth = signal<string>('');
+  private upload$ = new Subject<void>();
+  public btnState$ = new BehaviorSubject<string>(EBtnStates.IDLE);
 
   ngAfterViewInit() {
-    const btnState$ = new Subject<string>();
-    let buttonState$ = btnState$.pipe(startWith('idle'));
-
     const uploadProgress$ = range(0, 101).pipe(
-      zipWith(interval(50)),
+      zipWith(timer(0, 50)),
       map(([value, _]) => value),
       take(101) 
     );
-
-    const clickStream$ = fromEvent(this.buttonRef.nativeElement, 'click').pipe(
-      switchMap(() => {
-        btnState$.next('loading');
-
-        return animationFrames().pipe(
-          withLatestFrom(buttonState$),
-          map(([_, state]) => state),
-          takeWhile((state) => state !== 'done')
-        );
-      }),
-      withLatestFrom(uploadProgress$),
-      map(([_, progress]) => progress),
-      distinctUntilChanged(),
-      tap((progress) => {
+    const clickStream$ = this.upload$.pipe(
+      tap(() => this.btnState$.next(EBtnStates.LOADING)),
+      switchMap(() => animationFrames()),
+      withLatestFrom(uploadProgress$, this.btnState$),
+      distinctUntilChanged(([_, progress], [__, prevProgress]) => progress === prevProgress),
+      tap(([_, progress]) => {
         if (progress === 100) {
-          btnState$.next('done');
+          this.btnState$.next(EBtnStates.DONE);
         }
       }),
-      takeWhile((progress) => progress <= 100),
+      takeWhile(([_, __, btnState]) => btnState !== EBtnStates.DONE, true),
     );
 
-    clickStream$.subscribe((progress) => {
+    clickStream$.subscribe(([_, progress]) => {
       const progressWidth =
         (this.buttonRef.nativeElement.clientWidth / 100) * progress;
-      this.buttonWidth.set(`${progressWidth}`);
-      console.log(progress)
+      this.buttonProgressWidth.set(`${progressWidth}`);
     });
   }
 
-  startBouncing() {}
+  startUpload() {
+    this.upload$.next();
+  }
 }
