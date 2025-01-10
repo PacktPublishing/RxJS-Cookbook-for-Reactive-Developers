@@ -20,6 +20,7 @@ export class PushNotificationService {
       }),
       switchMap((sub: PushSubscription) =>  this.http.post('http://localhost:3000/api/subscriptions', sub)),
       catchError(err => {
+        // add notification message to UI
         console.error('Could not subscribe to notifications', err);
         return EMPTY;
       })

@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AppService } from './app.service';
 import * as webpush from 'web-push';
 import { OrderStatus, orderNotification } from './notification';
-import { delay, of, switchMap } from 'rxjs';
+import { delay, delayWhen, of, switchMap } from 'rxjs';
+import { FoodOrderService } from './food-order/food-order.service';
 
 const vapidKeys = {
   publicKey:
@@ -11,15 +11,24 @@ const vapidKeys = {
 };
 const options = {
   vapidDetails: {
-      subject: 'mailto:example_email@example.com',
-      publicKey: vapidKeys.publicKey,
-      privateKey: vapidKeys.privateKey,
+    subject: 'mailto:example_email@example.com',
+    publicKey: vapidKeys.publicKey,
+    privateKey: vapidKeys.privateKey,
   },
 };
 
+interface NotificationSubscription {
+  endpoint: string;
+  expirationTime: null | number;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly foodOrderService: FoodOrderService) {}
 
   @Get('/api/publicKey')
   getPublicKey() {
@@ -27,13 +36,27 @@ export class AppController {
   }
 
   @Post('/api/subscriptions')
-  async addSubscription(@Body() sub: any) {
+  async addSubscription(@Body() sub: NotificationSubscription) {
     return of(orderNotification[OrderStatus.ACCEPTED]).pipe(
-      switchMap((notification) =>  webpush.sendNotification(sub, JSON.stringify(notification), options)),
+      switchMap((notification) =>
+        webpush.sendNotification(sub, JSON.stringify(notification), options),
+      ),
+      delayWhen(() => this.foodOrderService.processOrder()),
+      switchMap(() =>
+        webpush.sendNotification(
+          sub,
+          JSON.stringify(orderNotification[OrderStatus.COURIER_ON_THE_WAY]),
+          options,
+        ),
+      ),
       delay(4000),
-      switchMap(() =>  webpush.sendNotification(sub, JSON.stringify(orderNotification[OrderStatus.COURIER_ON_THE_WAY]), options)),
-      delay(50000),
-      switchMap(() =>  webpush.sendNotification(sub, JSON.stringify(orderNotification[OrderStatus.DELIVERED]), options)),
+      switchMap(() =>
+        webpush.sendNotification(
+          sub,
+          JSON.stringify(orderNotification[OrderStatus.DELIVERED]),
+          options,
+        ),
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ export const routes: Routes = [
     {
         path: '',
         redirectTo: 'order',
+        pathMatch: 'full'
     },
     {
         path: 'geolocation',
