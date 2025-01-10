@@ -8,7 +8,7 @@ import { db } from './db/dexie.db';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, JsonPipe, AsyncPipe],
+  imports: [JsonPipe, AsyncPipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -19,10 +19,6 @@ export class AppComponent {
   constructor(private recipesService: RecipesService) { }
 
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this.recipesService.getRecipes().subscribe((recipes) => {
-      console.log(recipes);
-    });
+    this.recipesService.getRecipes().subscribe();
   }
 }

@@ -7,8 +7,12 @@ import { backgroundSyncInterceptor } from './interceptors/background-sync.interc
 import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideHttpClient(withInterceptors([backgroundSyncInterceptor])), provideServiceWorker('ngsw-worker.js', {
-        enabled: true,
-        registrationStrategy: 'registerWhenStable:30000'
-    })]
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([backgroundSyncInterceptor])),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: true,
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+  ],
 };

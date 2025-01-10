@@ -1,5 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { BehaviorSubject, Observable, interval, map, of, takeWhile } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  interval,
+  map,
+  of,
+  takeWhile,
+} from 'rxjs';
 
 export interface Recipe {
   id: number;
@@ -15,9 +22,26 @@ export class AppService implements OnModuleInit {
 
   private generateRandomRecipe() {
     const recipes = [
-      { id: 1, title: 'Spaghetti Carbonara', ingredients: ['spaghetti', 'eggs', 'cheese', 'bacon'], instructions: 'Boil pasta. Cook bacon. Mix eggs and cheese. Combine all.' },
-      { id: 2, title: 'Chicken Curry', ingredients: ['chicken', 'curry powder', 'coconut milk', 'onions'], instructions: 'Cook chicken. Add onions and curry powder. Add coconut milk. Simmer.' },
-      { id: 3, title: 'Beef Tacos', ingredients: ['beef', 'taco shells', 'lettuce', 'cheese', 'salsa'], instructions: 'Cook beef. Fill taco shells with beef and toppings.' },
+      {
+        id: 1,
+        title: 'Spaghetti Carbonara',
+        ingredients: ['spaghetti', 'eggs', 'cheese', 'bacon'],
+        instructions:
+          'Boil pasta. Cook bacon. Mix eggs and cheese. Combine all.',
+      },
+      {
+        id: 2,
+        title: 'Chicken Curry',
+        ingredients: ['chicken', 'curry powder', 'coconut milk', 'onions'],
+        instructions:
+          'Cook chicken. Add onions and curry powder. Add coconut milk. Simmer.',
+      },
+      {
+        id: 3,
+        title: 'Beef Tacos',
+        ingredients: ['beef', 'taco shells', 'lettuce', 'cheese', 'salsa'],
+        instructions: 'Cook beef. Fill taco shells with beef and toppings.',
+      },
       // Add more recipes as needed
     ];
 
@@ -26,15 +50,19 @@ export class AppService implements OnModuleInit {
   }
 
   onModuleInit() {
-    interval(5000).pipe(
-      map(() => this.generateRandomRecipe()),
-      takeWhile(() => this.index < 3),
-    ).subscribe((recipe) => {
-      this.recipes$.next([...this.recipes$.getValue(), recipe]);
-    });
+    interval(5000)
+      .pipe(
+        map(() => this.generateRandomRecipe()),
+        takeWhile(() => this.index < 3),
+      )
+      .subscribe((recipe: Recipe) => {
+        this.recipes$.next([...this.recipes$.getValue(), recipe]);
+      });
   }
 
-  getHello(): Observable<Recipe[]> {
-    return this.recipes$.getValue().length ? of(this.recipes$.getValue()) : of([]);
+  getRecipe(): Observable<Recipe[]> {
+    return this.recipes$.getValue().length
+      ? of(this.recipes$.getValue())
+      : of([]);
   }
 }

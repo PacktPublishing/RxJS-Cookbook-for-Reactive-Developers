@@ -8,6 +8,6 @@ export class AppController {
 
   @Get('/api/recipes')
   getHello(): Observable<Recipe[]> {
-    return this.appService.getHello();
+    return this.appService.getRecipe();
   }
 }

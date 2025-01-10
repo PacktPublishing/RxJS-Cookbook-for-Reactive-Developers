@@ -2,7 +2,12 @@ import Dexie from 'dexie';
 
 export interface Recipe {
   id?: number;
-  data: any;
+  lastUpdated: Date; 
+  data: {
+    title: string;
+    ingredients: string[];
+    instructions: string;
+  }
 }
 
 export class RecipesDB extends Dexie {
