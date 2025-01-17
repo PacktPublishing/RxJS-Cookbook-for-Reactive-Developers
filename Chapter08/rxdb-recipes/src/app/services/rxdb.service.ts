@@ -1,72 +1,88 @@
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 import { Injectable } from '@angular/core';
-import {
-  createRxDatabase,
-  RxCollection,
-  RxDatabase,
-} from 'rxdb';
-import { NgZone } from '@angular/core';
+import { createRxDatabase, RxChangeEvent, RxDatabase, RxDocument } from 'rxdb';
 import {
   BehaviorSubject,
+  catchError,
   EMPTY,
   from,
+  map,
   Observable,
+  retry,
+  shareReplay,
+  Subject,
+  switchMap,
+  withLatestFrom,
 } from 'rxjs';
-import { map, first, tap, max } from 'rxjs/operators';
+import { recipeSchema } from '../schemas/recipes.schema';
 
-const recipeSchema = {
-  title: 'recipe schema',
-  description: 'describes a simple recipe',
-  primaryKey: 'title',
-  type: 'object',
-  version: 0,
-  properties: {
-    title: {
-      type: 'string',
-      primary: true,
-      maxLength: 100
-    },
-    ingredients: {
-      type: 'array',
-      items: {
-        type: 'string'
-      }
-    },
-    instructions: {
-      type: 'string'
-    }
-  },
-  required: ['title', 'ingredients', 'instructions']
-};
-
+interface Recipe {
+  title: string;
+  ingredients: string[];
+  instructions: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class RxDBService {
-  private recipesDatabase!: any;
-  private database$: BehaviorSubject<any> = new BehaviorSubject(null);
+  db$: Observable<RxDatabase> = from(this.initDatabase()).pipe(
+    catchError((error) => {
+      console.error('Error initializing database:', error);
+      return EMPTY;
+    }),
+    retry(3),
+    shareReplay({ bufferSize: 1, refCount: true  })
+  );
+  recipes$ = new BehaviorSubject<Recipe[]>([]);
+  addRecipe$ = new Subject<Recipe>();
+  findRecipe$ = new Subject<string>();
 
-  constructor(private ngZone: NgZone) {
-    this.initDatabase();
+  constructor() {
+    this.addRecipe$
+      .pipe(
+        withLatestFrom(this.db$),
+        switchMap(([recipe, db]) => db.collections['recipes'].insert(recipe)),
+        catchError((error) => {
+          console.error('Error inserting recipe:', error);
+          return EMPTY;
+        })
+      )
+      .subscribe();
+
+    this.findRecipe$
+      .pipe(
+        withLatestFrom(this.db$),
+        switchMap(
+          ([recipeTitle, db]) =>
+            db.collections['recipes'].find().where('title').eq(recipeTitle).$
+        ),
+        map((recipes: RxDocument[]) => recipes.map((r) => r.toJSON()))
+      )
+      .subscribe((recipes) => this.recipes$.next(recipes as Recipe[]));
   }
 
-  async initDatabase() {
-    this.recipesDatabase = await createRxDatabase({
+  async initDatabase(): Promise<RxDatabase> {
+    const db = await createRxDatabase({
       name: 'recipesdatabase',
-      storage: getRxStorageDexie()
+      storage: getRxStorageDexie(),
     });
-    await this.recipesDatabase.addCollections({
+    await db.addCollections({
       recipes: {
-        schema: recipeSchema
-      }
+        schema: recipeSchema,
+      },
     });
-    this.recipesDatabase.recipes.insert({
-      title: 'Spaghetti Carbonara',
-      ingredients: ['spaghetti', 'eggs', 'bacon', 'parmesan cheese'],
-      instructions: 'Cook spaghetti. Fry bacon. Mix eggs and cheese. Combine all ingredients.'
-    });
-    this.recipesDatabase.$.subscribe((changeEvent: any) => {
-      debugger
-      console.dir(changeEvent)
-    });
+    // Track changes to the database
+    // db.$.subscribe((changeEvent: RxChangeEvent<RxDocument>) => {
+    //   console.dir(changeEvent);
+    // });
+
+    return db;
+  }
+
+  addRecipe(data: Recipe): void {
+    this.addRecipe$.next(data);
+  }
+
+  findRecipe(recipeTitle: string): void {
+    this.findRecipe$.next(recipeTitle);
   }
 }
