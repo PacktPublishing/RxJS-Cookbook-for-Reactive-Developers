@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/api/recipes')
-  getHello(): Observable<Recipe[]> {
-    return this.appService.getRecipe();
+  getRecipes(): Observable<Recipe[]> {
+    return this.appService.getRecipes();
   }
 }

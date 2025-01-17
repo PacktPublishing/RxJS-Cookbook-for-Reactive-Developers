@@ -9,6 +9,6 @@ export class RecipesService {
   constructor(private http: HttpClient) { }
 
   getRecipes() {
-    return this.http.get('http://localhost:3000/api/recipes');
+    this.http.get('http://localhost:3000/api/recipes').subscribe();
   }
 }

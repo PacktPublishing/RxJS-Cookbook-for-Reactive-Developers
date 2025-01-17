@@ -19,6 +19,6 @@ export class AppComponent {
   constructor(private recipesService: RecipesService) { }
 
   ngOnInit(): void {
-    this.recipesService.getRecipes().subscribe();
+    this.recipesService.getRecipes();
   }
 }
