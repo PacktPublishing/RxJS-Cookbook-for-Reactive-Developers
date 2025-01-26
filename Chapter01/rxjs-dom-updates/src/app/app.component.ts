@@ -18,18 +18,18 @@ import { RecipesService } from './services/recipes.service';
 import { Recipe } from './types/recipes.type';
 
 @Component({
-    selector: 'app-root',
-    imports: [
-        RecipesListComponent,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        MatButtonModule,
-        MatIconModule,
-        ReactiveFormsModule,
-    ],
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.scss'
+  selector: 'app-root',
+  imports: [
+    RecipesListComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    ReactiveFormsModule,
+  ],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements AfterViewInit {
   title = 'rxjs-dom-updates';
