@@ -74,7 +74,7 @@ export class AppComponent implements AfterViewInit {
         }),
         switchMap(({ searchName, searchIngredient }) =>
           this.recipesService.searchRecipes$(searchName, searchIngredient)
-        )
+        ),
       )
       .subscribe((recipes) => {
         console.log('recipes', recipes);

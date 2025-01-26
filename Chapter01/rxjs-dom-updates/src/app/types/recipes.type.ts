@@ -7,7 +7,7 @@ export enum ResponseStatus {
 export interface ResponseData<T> {
     status: ResponseStatus;
     data?: T;
-    error?: any;
+    error?: Error;
   }
 
 export interface Recipe {

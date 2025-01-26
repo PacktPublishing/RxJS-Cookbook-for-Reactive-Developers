@@ -15,6 +15,4 @@ export class RecipesListComponent {
  
   recipes = input<Recipe[]>();
   
-  constructor() { }
-
 }
