@@ -16,7 +16,7 @@ export const handlers = [
 
     if (recipeIngredient) {
       filteredRecipes = filteredRecipes.filter((recipe) =>
-        recipe.ingredients.includes(recipeIngredient)
+        recipe.ingredients.filter(ingredient => ingredient.toLowerCase().includes(recipeIngredient.toLowerCase())).length > 0
       );
     }
 

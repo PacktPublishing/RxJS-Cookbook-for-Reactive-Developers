@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,11 +13,13 @@ import {
   startWith,
   switchMap,
 } from 'rxjs';
+import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 import { RecipesService } from './services/recipes.service';
 import { Recipe } from './types/recipes.type';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [
     RecipesListComponent,
     MatFormFieldModule,

@@ -6,6 +6,7 @@ import { Recipe } from '../../types/recipes.type';
 
 @Component({
     selector: 'app-recipes-list',
+    standalone: true,
     imports: [CommonModule, RecipeItemComponent],
     templateUrl: './recipes-list.component.html',
     styleUrl: './recipes-list.component.scss'

@@ -5,6 +5,7 @@ import { Recipe } from '../../types/recipes.type';
 
 @Component({
     selector: 'app-recipe-item',
+    standalone: true,
     imports: [MatCardModule, MatChipsModule],
     templateUrl: './recipe-item.component.html',
     styleUrl: './recipe-item.component.scss'
