@@ -5,13 +5,12 @@ import {
   forkJoin,
   from,
   map,
-  mergeMap,
-  of,
+  mergeMap, shareReplay,
   switchMap,
-  tap,
+  tap
 } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { Recipe, RecipeDetails } from '../types/recipes.type';
+import { ImageUrl, Recipe, RecipeDetails } from '../types/recipes.type';
 
 @Injectable({
   providedIn: 'root',
@@ -27,12 +26,12 @@ export class RecipesService {
     );
   }
 
-  getRecipesWithImageInParallel$(): Observable<Object[]> {
+  getRecipesWithImageInParallel$(): Observable<ImageUrl[]> {
     return this.getRecipes$().pipe(
       tap((recipes: Recipe[]) => this.recipes.next(recipes)),
       switchMap((recipes: Recipe[]) => {
         const imageRequests = recipes.map((recipe) =>
-          this.httpClient.get(
+          this.httpClient.get<ImageUrl>(
             `https://super-recipes.com/api/recipes/images?id=${recipe.id}`
           )
         );
@@ -42,7 +41,7 @@ export class RecipesService {
     );
   }
 
-  getRecipesWithConcurrentImage$(): Observable<any> {
+  getRecipesWithConcurrentImage$(): Observable<ImageUrl[]> {
     return this.getRecipes$().pipe(
       tap((recipes: Recipe[]) => this.recipes.next(recipes)),
       switchMap((recipes: Recipe[]) => {
@@ -51,7 +50,7 @@ export class RecipesService {
         return from(imageIds).pipe(
           mergeMap(
             (id) =>
-              this.httpClient.get<{ id: string; image: string }[]>(
+              this.httpClient.get<ImageUrl[]>(
                 `https://super-recipes.com/api/recipes/images?id=${id}`
               ),
             3

@@ -7,7 +7,7 @@ export enum ResponseStatus {
 export interface ResponseData<T> {
     status: ResponseStatus;
     data?: T;
-    error?: any;
+    error?: Error;
   }
 
 export interface Recipe {
@@ -30,4 +30,9 @@ export interface RecipeDetails {
         carbs: number;
         protein: number;
     };
+}
+
+export interface ImageUrl {
+    id: number
+    url: string
 }

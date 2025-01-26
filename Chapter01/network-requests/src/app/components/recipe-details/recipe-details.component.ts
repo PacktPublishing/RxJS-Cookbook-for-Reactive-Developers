@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, JsonPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +9,7 @@ import { Recipe, RecipeDetails } from '../../types/recipes.type';
 @Component({
   selector: 'app-recipe-details',
   standalone: true,
-  imports: [MatCardModule, MatChipsModule, JsonPipe, CommonModule],
+  imports: [MatCardModule, MatChipsModule, CommonModule],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss'
 })

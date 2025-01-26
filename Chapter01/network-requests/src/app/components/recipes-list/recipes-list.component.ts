@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { RecipeItemComponent } from '../recipe-item/recipe-item.component';
-import { Recipe } from '../../types/recipes.type';
+import { ImageUrl, Recipe } from '../../types/recipes.type';
 import { RecipesService } from '../../services/recipes.service';
 
 
@@ -14,10 +14,10 @@ import { RecipesService } from '../../services/recipes.service';
   templateUrl: './recipes-list.component.html',
   styleUrl: './recipes-list.component.scss'
 })
-export class RecipesListComponent {
+export class RecipesListComponent implements OnInit, OnDestroy {
   private recipesSubscription: Subscription | undefined;
   recipes: Recipe[] = [];
-  images: any[] = [];
+  images: ImageUrl[] = [];
   error: Error | undefined;
 
   constructor(private recipesService: RecipesService, private router: Router) { }
@@ -33,7 +33,6 @@ export class RecipesListComponent {
     });
 
     // Parallel requests recipe
-
     this.recipesSubscription = this.recipesService.getRecipesWithImageInParallel$().subscribe({
       next: (images) => {
         if (Array.isArray(images)) {
@@ -48,7 +47,6 @@ export class RecipesListComponent {
     });
     
     // Concurrent requests recipe
-
     // this.recipesSubscription = this.recipesService.getRecipesWithConcurrentImage$().subscribe({
     //   next: (images) => {
     //     if (Array.isArray(images)) {
