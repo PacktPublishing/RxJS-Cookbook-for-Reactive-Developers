@@ -42,6 +42,7 @@ export class AppComponent implements AfterViewInit {
   constructor(private recipesService: RecipesService) {}
 
   ngAfterViewInit(): void {
+    // Step 2: Handling two search inputs
     combineLatest({
       searchName: fromEvent<InputEvent>(
         this.searchNameInputElement.nativeElement,
@@ -74,13 +75,13 @@ export class AppComponent implements AfterViewInit {
         }),
         switchMap(({ searchName, searchIngredient }) =>
           this.recipesService.searchRecipes$(searchName, searchIngredient)
-        ),
+        )
       )
       .subscribe((recipes) => {
         console.log('recipes', recipes);
         this.recipes = recipes;
       });
-    // ])
+    // Step 1: Handling one search input
     // this.searchNameFormControl.valueChanges.pipe(
     //   startWith(''),
     //   debounceTime(500),
