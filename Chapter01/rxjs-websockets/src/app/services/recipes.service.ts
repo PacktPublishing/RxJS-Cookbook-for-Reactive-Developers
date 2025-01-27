@@ -1,41 +1,43 @@
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Injectable } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import { environment } from '../../environments/environment';
 import {
   catchError,
   delay,
+  EMPTY,
   filter,
   Observable,
   of,
   retry,
   switchMap,
-  takeWhile,
   tap,
   timeout,
   timer,
 } from 'rxjs';
+import { Recipe } from '../types/recipes.type';
+import { environment } from '../../environments/environment';
 
-export interface Message {
+export interface Message<T> {
   type: string;
-  payload?: any;
+  payload?: T;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecipesService {
-  private socket$!: WebSocketSubject<Message>;
-  public recipes$!: Observable<Message>;
+  private socket$!: WebSocketSubject<Message<any>>;
+  public recipes$!: Observable<Message<Recipe[]>>;
   // public chatMessages$ = this.socket$.pipe(filter(msg => msg.type === 'chat'));
   // public notificationMessages$ = this.socket$.pipe(filter(msg => msg.type === 'notification'));
 
-  constructor() {}
+  constructor(private _snackBar: MatSnackBar) {}
 
   connect() {
     if (!this.socket$ || this.socket$.closed) {
-      this.socket$ = webSocket<Message>({
+      this.socket$ = webSocket<Message<any>>({
         url: environment.wsEndpoint,
-        deserializer: (e) => JSON.parse(e.data) as Message,
+        deserializer: (e) => JSON.parse(e.data) as Message<any>,
       });
       this.recipes$ = this.socket$.multiplex(
         () => ({ subscribe: 'recipes' }), // Subscription message
@@ -65,7 +67,7 @@ export class RecipesService {
   }
 
   sendHeartbeat() {
-    timer(2000)
+    timer(0, 5000)
       .pipe(
         tap(() => this.sendMessage({ type: 'heartbeat' })),
         switchMap(() =>
@@ -76,16 +78,21 @@ export class RecipesService {
             catchError(() => {
               console.error('Heartbeat timeout, closing connection');
               this.close();
-              return of(null); // Return null to stop retry attempts after closing
+              this._snackBar.open('Lost connection to the WebSocket.', 'Close', {
+                verticalPosition: 'top',
+                horizontalPosition: 'right',
+                panelClass: ['mat-error'],
+              });
+              return EMPTY; // Return EMPTY to stop retry attempts after closing
             })
           )
         ),
-        takeWhile(() => this.socket$.observed)
+        tap(() => this._snackBar.dismiss())
       )
       .subscribe();
   }
 
-  sendMessage(message: Message) {
+  sendMessage(message: Message<Recipe[]>) {
     this.socket$.next(message);
   }
 

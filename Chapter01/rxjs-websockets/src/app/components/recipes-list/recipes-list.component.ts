@@ -22,27 +22,25 @@ export class RecipesListComponent {
   ngOnInit() {
     this.recipesService.connect();
     this.recipesService.sendMessage({ type: 'recipes' });
-    this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message) => {
-      this.recipes = message.payload;
+    this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message<Recipe[]>) => {
+      this.recipes = message.payload || [];
     });
 
     // Test WS heartbeat behavior
-
     // this.recipesService.sendHeartbeat();
     // console.log('Heartbeat says I\'m alive!')
 
     // setTimeout(() => {
     //   this.recipesService.close();
-    //   this.recipesService.sendHeartbeat();
+    //   this.recipes = [];
     //   console.log('Heartbeat will throw error, since we closed WS connection')
-    // }, 2000);
+    // }, 8000);
     
     // setTimeout(() => {
     //   this.recipesService.connect();
-    //   this.recipesService.sendHeartbeat();
     //   console.log('Heartbeat says I\'m alive!')
     //   this.connectToRecipesTopic();
-    // }, 15000);
+    // }, 25000);
   }
 
   ngOnDestroy() {
@@ -52,8 +50,8 @@ export class RecipesListComponent {
 
   private connectToRecipesTopic(): void {
     this.recipesService.sendMessage({ type: 'recipes' });
-      this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message) => {
-        this.recipes = message.payload;
+      this.recipesSubscription = this.recipesService.recipes$.subscribe((message: Message<Recipe[]>) => {
+        this.recipes = message.payload || [];
     });
   }
 
