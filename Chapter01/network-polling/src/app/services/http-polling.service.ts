@@ -41,7 +41,7 @@ export class HttpPollingService {
   startLongPolling<T>(
     url: string,
     interval: number = 5000
-  ): Observable<any> {
+  ): Observable<T> {
     return timer(0, interval).pipe(
       switchMap(() => this.httpClient.get<T>(url).pipe(
         timeout(interval),
@@ -71,7 +71,7 @@ export class HttpPollingService {
         return throwError(() => new Error('Request Timeout'));
       }),
       takeUntil(this.stopPolling$),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: true })
     );
   }
 
