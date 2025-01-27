@@ -7,3 +7,6 @@
         }
     </div>
 }
+@if(showRetryButton$ | async) {
+    <button mat-raised-button color="primary" (click)="getRecipes()">Retry request</button>
+}

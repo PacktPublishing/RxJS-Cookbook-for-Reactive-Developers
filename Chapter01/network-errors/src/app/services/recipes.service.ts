@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, catchError, defer, of, retry, shareReplay, tap, throwError, timer } from 'rxjs';
+import { NEVER, Observable, Subject, catchError, defer, of, repeat, retry, share, shareReplay, tap, throwError, timer } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Recipe } from '../types/recipes.type';
 
@@ -10,11 +10,11 @@ import { Recipe } from '../types/recipes.type';
 export class RecipesService {
 
   private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
-  private failureCount = 0;
+  public showRetryButton$ = new Subject<boolean>();
 
   constructor(private httpClient: HttpClient, private _snackBar: MatSnackBar) { }
 
-  getRecipes$(): Observable<any> {
+  getRecipes$(): Observable<Recipe[]> {
     return this.httpClient.get<Recipe[]>('https://super-recipes.com/api/recipes').pipe(
       catchError((error) => {
         this._snackBar.open('Recipes could not be fetched.', 'Close', {
@@ -59,13 +59,12 @@ export class RecipesService {
 
   private halfOpenCircuit() {
     this.state = 'HALF_OPEN';
-    console.log(this.state)
-    this.failureCount = 0;
+    console.log(this.state);
+    this.showRetryButton$.next(true);
   }
 
   private closeCircuit() {
     this.state = 'CLOSED';
-    this.failureCount = 0;
   }
 
   sendRequestIfCircuitNotOpen() {
@@ -106,9 +105,8 @@ export class RecipesService {
         // Successful retry, close the circuit
         this.closeCircuit(); 
         this._snackBar.dismiss();
-      }),
-      shareReplay(1)
-   );
+      })
+    );
   }
 
 }
