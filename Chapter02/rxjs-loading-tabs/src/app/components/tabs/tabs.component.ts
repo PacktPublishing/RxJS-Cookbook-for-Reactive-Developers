@@ -41,7 +41,7 @@ export class TabsComponent {
   ];
 
   activeTab$ = new BehaviorSubject<TabConfig | null>(null);
-  activeTabContent$!: Observable<any>;
+  activeTabContent$!: Observable<typeof TabContentComponent | typeof TabContent2Component | null>;
   loadingTab$ = new BehaviorSubject<boolean>(false);
   errors$ = new Subject<Error>();
   private cache = new Map<string, any>();
@@ -76,7 +76,7 @@ export class TabsComponent {
           finalize(() => this.loadingTab$.next(false))
         )
       ),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: true })
     );
   }
 
@@ -85,7 +85,7 @@ export class TabsComponent {
     this.destroy$.complete();
   }
 
-  private loadTabContent(tab: TabConfig): Observable<any> {
+  private loadTabContent(tab: TabConfig): Observable<typeof TabContentComponent | typeof TabContent2Component> {
     if (this.cache.has(tab.route)) {
       return this.cache.get(tab.route)!;
     }

@@ -30,7 +30,7 @@ export class FileUploadService {
     );
   }
 
-  getFileUploadProgress(event: HttpEvent<any>): number {
+  getFileUploadProgress(event: HttpEvent<Blob>): number {
     const { type } = event;
 
     if (type === HttpEventType.Sent) {
@@ -66,8 +66,8 @@ export class FileUploadService {
       responseType: 'blob'
     });
     
-    return this.httpClient.request(req).pipe(
-      map((event: HttpEvent<any>) => this.getFileUploadProgress(event)),
+    return this.httpClient.request<Blob>(req).pipe(
+      map((event: HttpEvent<Blob>) => this.getFileUploadProgress(event)),
       filter(progress => progress < 100),
     );
   }
