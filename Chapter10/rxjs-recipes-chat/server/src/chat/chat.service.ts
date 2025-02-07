@@ -10,12 +10,12 @@ import {
   distinctUntilKeyChanged,
 } from 'rxjs';
 import { ChatConnectionService } from './chat-connection/chat-connection.service';
-import { ChatEvent, Message, WsMessage } from './chat.type';
+import { ChatEvent, Message } from './chat.type';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
   private topics: {
-    [topicKey: string]: ReplaySubject<Message | { typing: string } | any>;
+    [topicKey: string]: ReplaySubject<Message | ChatEvent>;
   } = {
     chat: new ReplaySubject(100),
   };
@@ -29,7 +29,7 @@ export class ChatService implements OnModuleInit {
     );
 
     const messages$ = chatTopic$.pipe(
-      filter((data: WsMessage<string>) => 'message' in data),
+      filter((data: Message) => 'message' in data),
       scan((acc, message) => [...acc, message], []),
       map((messages) => ({ event: 'chat', data: messages })),
     );
