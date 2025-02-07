@@ -1,9 +1,9 @@
 import { Reducer } from "./recipes.reducer";
-import { AppState } from "./recipes.types";
+import { AppState, Recipe } from "./recipes.types";
 
-export interface Action {
+export interface Action<T = any> {
     type: string;
-    payload?: any;
+    payload?: T;
     error?: Error | string;
 }
 
@@ -14,7 +14,7 @@ export const SELECT_RECIPE = 'SELECT_RECIPE';
 export const ORDER_RECIPE = 'ORDER_RECIPE';
 
 export const loadRecipesAction = (): Action => ({ type: LOAD_RECIPES });
-export const loadRecipesActionSuccess = (payload: any): Action => ({ type: LOAD_RECIPES_SUCCESS, payload });
+export const loadRecipesActionSuccess = (payload: Recipe[]): Action => ({ type: LOAD_RECIPES_SUCCESS, payload });
 export const loadRecipesActionError = (error: Error | string): Action => ({ type: LOAD_RECIPES_ERROR, error });
 export const selectRecipeAction = () => ({ type: SELECT_RECIPE });
 export const orderRecipeAction = () => ({ type: ORDER_RECIPE });

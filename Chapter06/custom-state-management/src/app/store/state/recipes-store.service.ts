@@ -49,7 +49,7 @@ export class RecipesStoreService {
     });
   }
 
-  createEffect(handler: () => Observable<any>) {
+  createEffect(handler: () => Observable<Action>) {
     return handler().pipe(
       map(({ type, payload, error }) =>
         this.dispatch({ type, payload: payload ?? error })
