@@ -4,7 +4,7 @@ import { recipes } from './mock.json'
 const socket = ws.link('wss://recipes.example.com')
 
 export const handlers = [
-  socket.on('connection', ({ client }: any) => {
+  socket.addEventListener('connection', ({ client }: any) => {
     client.addEventListener('message', async (event: any) => {
       if (JSON.parse(event.data).type === 'heartbeat') {
         socket.broadcast(JSON.stringify({
