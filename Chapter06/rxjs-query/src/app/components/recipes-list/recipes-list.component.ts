@@ -10,11 +10,10 @@ import { RecipesService } from '../../services/recipes.service';
 import { tapError } from '../../operators/tapError';
 
 @Component({
-  selector: 'app-recipes-list',
-  standalone: true,
-  imports: [CommonModule, RecipeItemComponent, MatProgressSpinnerModule],
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
+    selector: 'app-recipes-list',
+    imports: [CommonModule, RecipeItemComponent, MatProgressSpinnerModule],
+    templateUrl: './recipes-list.component.html',
+    styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent {
   private recipesSubscription: Subscription | undefined;

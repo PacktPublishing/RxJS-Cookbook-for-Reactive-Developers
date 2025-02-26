@@ -11,11 +11,10 @@ import { tapError } from './operators/tapError';
 import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, RecipesListComponent, MatButtonModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [RouterOutlet, CommonModule, RecipesListComponent, MatButtonModule],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
   title = 'rxjs-query';
