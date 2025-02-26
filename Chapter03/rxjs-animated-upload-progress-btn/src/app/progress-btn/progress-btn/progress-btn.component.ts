@@ -18,11 +18,10 @@ export enum EBtnStates {
 }
 
 @Component({
-  selector: 'app-progress-btn',
-  standalone: true,
-  imports: [CommonModule, AsyncPipe],
-  templateUrl: './progress-btn.component.html',
-  styleUrl: './progress-btn.component.scss',
+    selector: 'app-progress-btn',
+    imports: [CommonModule, AsyncPipe],
+    templateUrl: './progress-btn.component.html',
+    styleUrl: './progress-btn.component.scss'
 })
 export class ProgressBtnComponent {
   @ViewChild('button', { static: false }) buttonRef!: ElementRef;
