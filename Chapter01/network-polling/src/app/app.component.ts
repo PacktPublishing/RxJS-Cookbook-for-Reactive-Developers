@@ -5,11 +5,10 @@ import { RouterOutlet } from '@angular/router';
 import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, MatButtonModule, RecipesListComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [RouterOutlet, MatButtonModule, RecipesListComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'network-polling';
