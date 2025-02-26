@@ -6,11 +6,10 @@ import { RecipesService } from './services/recipes.service';
 import { db } from './db/dexie.db';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [JsonPipe, AsyncPipe],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [JsonPipe, AsyncPipe],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'client';
