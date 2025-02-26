@@ -23,11 +23,10 @@ import { FileWithProgress } from '../../types/file-upload.type';
 import { FileUploadService } from '../../services/file-upload.service';
 
 @Component({
-  selector: 'app-dnd-file-upload',
-  standalone: true,
-  imports: [CommonModule, MatIconModule, MatProgressBarModule, MatButtonModule],
-  templateUrl: './dnd-file-upload.component.html',
-  styleUrl: './dnd-file-upload.component.scss'
+    selector: 'app-dnd-file-upload',
+    imports: [CommonModule, MatIconModule, MatProgressBarModule, MatButtonModule],
+    templateUrl: './dnd-file-upload.component.html',
+    styleUrl: './dnd-file-upload.component.scss'
 })
 export class DndFileUploadComponent {
   validFiles = new Map<string, FileWithProgress>();

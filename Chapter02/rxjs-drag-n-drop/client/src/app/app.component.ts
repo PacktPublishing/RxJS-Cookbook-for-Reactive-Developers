@@ -7,11 +7,10 @@ import { DndFileUploadComponent } from './components/dnd-file-upload/dnd-file-up
 
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, DndFileUploadComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+    selector: 'app-root',
+    imports: [RouterOutlet, CommonModule, DndFileUploadComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'rxjs-drag-n-drop';
