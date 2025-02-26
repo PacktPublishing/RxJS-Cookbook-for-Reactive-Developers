@@ -6,11 +6,10 @@ import { routes } from '../../app.routes';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-router-outlet',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './router-outlet.component.html',
-  styleUrl: './router-outlet.component.scss'
+    selector: 'app-router-outlet',
+    imports: [CommonModule],
+    templateUrl: './router-outlet.component.html',
+    styleUrl: './router-outlet.component.scss'
 })
 export class RouterOutletComponent {
   component: any;
