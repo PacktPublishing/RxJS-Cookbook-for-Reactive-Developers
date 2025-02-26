@@ -5,11 +5,10 @@ import { RecipeService } from './services/recipe.service';
 import { NotificationComponent } from './components/notification/notification.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, NotificationComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [RouterOutlet, CommonModule, NotificationComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'rxjs-notification';

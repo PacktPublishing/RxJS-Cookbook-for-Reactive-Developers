@@ -4,11 +4,10 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { NotificationService } from '../../services/notification.service';
 
 @Component({
-  selector: 'app-notification',
-  standalone: true,
-  imports: [CommonModule, AsyncPipe, MatIconModule],
-  templateUrl: './notification.component.html',
-  styleUrl: './notification.component.scss'
+    selector: 'app-notification',
+    imports: [CommonModule, AsyncPipe, MatIconModule],
+    templateUrl: './notification.component.html',
+    styleUrl: './notification.component.scss'
 })
 export class NotificationComponent {
   notifications = this.notificationService.notifications;
