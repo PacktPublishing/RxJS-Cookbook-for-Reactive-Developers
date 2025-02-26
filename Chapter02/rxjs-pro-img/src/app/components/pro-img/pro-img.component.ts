@@ -19,11 +19,10 @@ import {
 } from 'rxjs';
 
 @Component({
-  selector: 'app-pro-img',
-  standalone: true,
-  imports: [CommonModule, AsyncPipe],
-  templateUrl: './pro-img.component.html',
-  styleUrl: './pro-img.component.scss',
+    selector: 'app-pro-img',
+    imports: [CommonModule, AsyncPipe],
+    templateUrl: './pro-img.component.html',
+    styleUrl: './pro-img.component.scss'
 })
 export class ProImgComponent implements OnInit {
   placeholderSrc = 'blurry-image.jpeg';
