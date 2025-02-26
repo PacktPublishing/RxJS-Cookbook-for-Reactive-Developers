@@ -26,11 +26,10 @@ interface IAnimationFrame {
 }
 
 @Component({
-  selector: 'app-particles',
-  standalone: true,
-  imports: [],
-  templateUrl: './particles.component.html',
-  styleUrl: './particles.component.scss',
+    selector: 'app-particles',
+    imports: [],
+    templateUrl: './particles.component.html',
+    styleUrl: './particles.component.scss'
 })
 export class ParticlesComponent {
   @ViewChild('canvas', { static: true }) canvas!: ElementRef<HTMLCanvasElement>;
