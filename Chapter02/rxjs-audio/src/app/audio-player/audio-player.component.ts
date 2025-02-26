@@ -9,18 +9,17 @@ import { AudioService, Track } from '../audio-service/audio-service.service';
 import { TimePipe } from '../pipes/time.pipe';
 
 @Component({
-  selector: 'app-audio-player',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatIconModule,
-    MatSliderModule,
-    MatCardModule,
-    TimePipe,
-  ],
-  templateUrl: './audio-player.component.html',
-  styleUrl: './audio-player.component.scss',
+    selector: 'app-audio-player',
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatIconModule,
+        MatSliderModule,
+        MatCardModule,
+        TimePipe,
+    ],
+    templateUrl: './audio-player.component.html',
+    styleUrl: './audio-player.component.scss'
 })
 export class AudioPlayerComponent {
   @ViewChild('audio') audioElement!: ElementRef<HTMLAudioElement>;
