@@ -30,7 +30,7 @@ export class BouncingBallComponent {
     this.container = document.documentElement;
     const initialHeight = 0;
     let gravity = 0.981;
-    let energyLoss = 0.99;
+    let energyLoss = 0.85;
 
     this.ballLoop$ = interval(0, animationFrameScheduler).pipe(
       scan(
