@@ -27,11 +27,10 @@ interface TabConfig {
 }
 
 @Component({
-  selector: 'app-tabs',
-  standalone: true,
-  imports: [CommonModule, TabContentComponent, RouterModule, MatTabsModule, MatProgressSpinnerModule],
-  templateUrl: './tabs.component.html',
-  styleUrl: './tabs.component.scss',
+    selector: 'app-tabs',
+    imports: [CommonModule, TabContentComponent, RouterModule, MatTabsModule, MatProgressSpinnerModule],
+    templateUrl: './tabs.component.html',
+    styleUrl: './tabs.component.scss'
 })
 export class TabsComponent {
   private destroy$ = new Subject<void>();
