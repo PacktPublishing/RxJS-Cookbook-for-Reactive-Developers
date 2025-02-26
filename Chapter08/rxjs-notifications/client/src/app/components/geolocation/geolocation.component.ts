@@ -3,11 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-geolocation',
-  standalone: true,
-  imports: [JsonPipe],
-  templateUrl: './geolocation.component.html',
-  styleUrl: './geolocation.component.scss'
+    selector: 'app-geolocation',
+    imports: [JsonPipe],
+    templateUrl: './geolocation.component.html',
+    styleUrl: './geolocation.component.scss'
 })
 export class GeolocationComponent implements OnInit {
   geolocation: { lat: number; long: number } = { lat: 0, long: 0 };
