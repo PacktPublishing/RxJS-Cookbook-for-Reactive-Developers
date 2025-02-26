@@ -3,11 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { RxDBService } from '../../services/rxdb.service';
 
 @Component({
-  selector: 'app-recipes-list',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
+    selector: 'app-recipes-list',
+    imports: [FormsModule],
+    templateUrl: './recipes-list.component.html',
+    styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent implements OnInit {
   newRecipeName = '';
