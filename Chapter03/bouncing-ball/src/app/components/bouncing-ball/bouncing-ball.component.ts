@@ -12,11 +12,10 @@ import {
 } from 'rxjs';
 
 @Component({
-  selector: 'app-bouncing-ball',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: './bouncing-ball.component.html',
-  styleUrl: './bouncing-ball.component.scss',
+    selector: 'app-bouncing-ball',
+    imports: [FormsModule],
+    templateUrl: './bouncing-ball.component.html',
+    styleUrl: './bouncing-ball.component.scss'
 })
 export class BouncingBallComponent {
   @ViewChild('ball', { static: true }) ballRef!: ElementRef;
