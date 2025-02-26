@@ -26,11 +26,10 @@ import { Recipe } from './types/recipes.type';
 import { NewRecipesComponent } from './components/new-recipes/new-recipes.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, RecipesListComponent, MatProgressSpinnerModule, AsyncPipe, NewRecipesComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+    selector: 'app-root',
+    imports: [RouterOutlet, RecipesListComponent, MatProgressSpinnerModule, AsyncPipe, NewRecipesComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   private page = 0;
