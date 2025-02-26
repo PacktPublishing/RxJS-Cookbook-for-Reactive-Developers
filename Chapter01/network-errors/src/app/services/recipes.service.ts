@@ -60,7 +60,7 @@ export class RecipesService {
   private halfOpenCircuit() {
     this.state = 'HALF_OPEN';
     console.log(this.state);
-    this.showRetryButton$.next(true);
+    this.showRetryButton$.next(true); // This is just for testing purposes, otherwise not needed for the pattern itself :)
   }
 
   private closeCircuit() {
