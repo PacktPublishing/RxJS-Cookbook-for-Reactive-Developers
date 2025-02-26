@@ -22,11 +22,10 @@ import { PixelCoordinates } from '../../types/pixel-coordinates.type';
 import { arraysHaveSameElements } from '../../utils/array.util';
 
 @Component({
-  selector: 'app-swipe-unlock',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './swipe-unlock.component.html',
-  styleUrl: './swipe-unlock.component.scss',
+    selector: 'app-swipe-unlock',
+    imports: [CommonModule],
+    templateUrl: './swipe-unlock.component.html',
+    styleUrl: './swipe-unlock.component.scss'
 })
 export class SwipeUnlockComponent {
   @ViewChild('swipeArea') swipeArea!: ElementRef;
