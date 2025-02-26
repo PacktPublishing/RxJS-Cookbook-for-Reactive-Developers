@@ -6,11 +6,10 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, RecipesListComponent, MatSidenavModule, SidebarComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [RouterOutlet, CommonModule, RecipesListComponent, MatSidenavModule, SidebarComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'ngrx-state-management';

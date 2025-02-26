@@ -10,11 +10,10 @@ import * as fromRecipes from '../../reducers/recipes.selector';
 import { selectCurrentRoute } from '../../reducers/recipes.selector';
 
 @Component({
-  selector: 'app-recipes-list',
-  standalone: true,
-  imports: [CommonModule, RecipeItemComponent],
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
+    selector: 'app-recipes-list',
+    imports: [CommonModule, RecipeItemComponent],
+    templateUrl: './recipes-list.component.html',
+    styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent {
   private recipesSubscription: Subscription | undefined;
