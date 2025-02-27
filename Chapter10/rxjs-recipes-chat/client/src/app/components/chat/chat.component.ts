@@ -7,11 +7,10 @@ import { ChatService, IChatConnection, IChatEvent, IMessage, IWsMessage } from '
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-chat',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
-  templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.scss']
+    selector: 'app-chat',
+    imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
+    templateUrl: './chat.component.html',
+    styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent {
   messages: Array<IMessage> = [];
