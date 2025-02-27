@@ -1,9 +1,4 @@
-import {
-  HttpHandlerFn,
-  HttpInterceptorFn,
-  HttpRequest,
-  HttpResponse
-} from '@angular/common/http';
+import { HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import { EMPTY, concat, from, map, switchMap, withLatestFrom } from 'rxjs';
 
 export const offlineInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
