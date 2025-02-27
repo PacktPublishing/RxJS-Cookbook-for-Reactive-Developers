@@ -6,11 +6,10 @@ import { RecipeItemComponent } from '../recipe-item/recipe-item.component';
 import { Recipe } from '../../types/recipes.type';
 
 @Component({
-  selector: 'app-recipes-list',
-  standalone: true,
-  imports: [CommonModule, RecipeItemComponent],
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
+    selector: 'app-recipes-list',
+    imports: [CommonModule, RecipeItemComponent],
+    templateUrl: './recipes-list.component.html',
+    styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent {
   private recipesSubscription: Subscription | undefined;
