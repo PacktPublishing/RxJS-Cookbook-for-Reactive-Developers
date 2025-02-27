@@ -7,11 +7,10 @@ import { RecipesService } from '../../services/recipes.service';
 
 
 @Component({
-  selector: 'app-recipes-list',
-  standalone: true,
-  imports: [CommonModule, RecipeItemComponent, AsyncPipe, MatButtonModule],
-  templateUrl: './recipes-list.component.html',
-  styleUrl: './recipes-list.component.scss'
+    selector: 'app-recipes-list',
+    imports: [CommonModule, RecipeItemComponent, AsyncPipe, MatButtonModule],
+    templateUrl: './recipes-list.component.html',
+    styleUrl: './recipes-list.component.scss'
 })
 export class RecipesListComponent {
   recipe$: Subject<any> = new Subject();
