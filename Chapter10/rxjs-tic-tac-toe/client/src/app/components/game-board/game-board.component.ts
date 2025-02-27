@@ -7,11 +7,10 @@ import { GameService, WsMessage } from '../../services/game.service';
 import { EPlayer, IBoardUpdate, IPlayerJoined } from '../../types/game.type';
 
 @Component({
-  selector: 'app-game-board',
-  standalone: true,
-  imports: [MatIconModule, MatButtonModule, CommonModule],
-  templateUrl: './game-board.component.html',
-  styleUrl: './game-board.component.scss'
+    selector: 'app-game-board',
+    imports: [MatIconModule, MatButtonModule, CommonModule],
+    templateUrl: './game-board.component.html',
+    styleUrl: './game-board.component.scss'
 })
 export class GameBoardComponent implements OnInit, OnDestroy {
   currentPlayerTurn = 'X';
