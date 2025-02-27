@@ -9,11 +9,10 @@ import { ChartOptions } from '../../types/chart.type';
 import { Message, RecipesService } from '../../services/recipes.service';
 
 @Component({
-  selector: 'app-recipes-chart',
-  standalone: true,
-  imports: [NgApexchartsModule, CommonModule],
-  templateUrl: './recipes-chart.component.html',
-  styleUrl: './recipes-chart.component.scss',
+    selector: 'app-recipes-chart',
+    imports: [NgApexchartsModule, CommonModule],
+    templateUrl: './recipes-chart.component.html',
+    styleUrl: './recipes-chart.component.scss'
 })
 export class RecipesChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(ChartComponent, { static: false }) chart!: ChartComponent;
