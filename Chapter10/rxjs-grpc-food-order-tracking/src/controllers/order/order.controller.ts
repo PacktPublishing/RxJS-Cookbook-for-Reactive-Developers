@@ -1,7 +1,7 @@
 import { Controller, OnModuleDestroy } from '@nestjs/common';
 import { GrpcStreamMethod } from '@nestjs/microservices';
 import { Observable, Subject, mergeMap } from 'rxjs';
-import { OrderService } from 'src/services/order/order.service';
+import { OrderService } from '../../services/order/order.service';
 import { OrderRequest, OrderResponse } from './../../interfaces/order.interface';
 
 @Controller()
